@@ -477,6 +477,55 @@ def download_providers_template():
         download_name='providers_template.xlsx'
     )
 
+# ==================== DOWNLOAD ALL CONTACTS ====================
+@app.route('/contacts/download-all')
+@login_required
+def download_all_contacts():
+    """Download all contacts as Excel file"""
+    try:
+        # Get all contacts
+        contacts = Contact.query.all()
+        
+        # Create a list of dictionaries for pandas
+        data = []
+        for contact in contacts:
+            # Parse notes to extract speciality, address, comments if needed
+            notes = contact.notes or ""
+            
+            data.append({
+                'Name': contact.name,
+                'Email': contact.email or '',
+                'Phone': contact.phone or '',
+                'Company': contact.company or '',
+                'Type': contact.type or '',
+                'Notes': notes
+            })
+        
+        # Create DataFrame
+        df = pd.DataFrame(data)
+        
+        # Create Excel file in memory
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, sheet_name='All Contacts')
+        
+        output.seek(0)
+        
+        # Generate filename with current date
+        from datetime import datetime
+        filename = f"all_contacts_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+        
+        return send_file(
+            output,
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            as_attachment=True,
+            download_name=filename
+        )
+    
+    except Exception as e:
+        flash(f'Error downloading contacts: {str(e)}')
+        return redirect(url_for('contacts'))
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()

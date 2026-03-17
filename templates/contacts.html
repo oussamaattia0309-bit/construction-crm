@@ -7,23 +7,46 @@
     </div>
 </div>
 
+<!-- Action Buttons -->
 <div class="row mb-4">
     <div class="col-12">
         <div class="btn-group" role="group">
+            <!-- Add New Contact Button -->
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addContactModal">
                 <i class="fas fa-plus-circle me-2"></i>Add New Contact
             </button>
             
-            <!-- Upload Button -->
+            <!-- Upload Contacts Button -->
             <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#uploadContactsModal">
-                <i class="fas fa-upload me-2"></i>Upload Excel/CSV
+                <i class="fas fa-upload me-2"></i>Upload Contacts
             </button>
             
+            <!-- Download All Contacts Button -->
+            <a href="{{ url_for('download_all_contacts') }}" class="btn btn-info">
+                <i class="fas fa-download me-2"></i>Download All Contacts
+            </a>
+            
             <!-- Download Template Button -->
-            <a href="{{ url_for('download_contacts_template') }}" class="btn btn-info">
-                <i class="fas fa-download me-2"></i>Download Template
+            <a href="{{ url_for('download_contacts_template') }}" class="btn btn-warning">
+                <i class="fas fa-file-excel me-2"></i>Download Template
             </a>
         </div>
+    </div>
+</div>
+
+<!-- Search Bar -->
+<div class="row mb-3">
+    <div class="col-md-6">
+        <div class="input-group">
+            <span class="input-group-text bg-primary text-white">
+                <i class="fas fa-search"></i>
+            </span>
+            <input type="text" id="searchInput" class="form-control form-control-lg" 
+                   placeholder="Search by name, email, phone, company, or type...">
+        </div>
+    </div>
+    <div class="col-md-6 text-end">
+        <span id="resultCount" class="text-muted align-middle">Showing all contacts</span>
     </div>
 </div>
 
@@ -31,32 +54,48 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Company</th>
-                            <th>Type</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for contact in contacts %}
-                        <tr>
-                            <td>{{ contact.name }}</td>
-                            <td>{{ contact.email }}</td>
-                            <td>{{ contact.phone }}</td>
-                            <td>{{ contact.company }}</td>
-                            <td><span class="badge bg-{{ 'primary' if contact.type == 'client' else 'success' }}">{{ contact.type }}</span></td>
-                            <td>
-                                <a href="{{ url_for('delete_contact', id=contact.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-hover" id="contactsTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Company</th>
+                                <th>Type</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="contactsTableBody">
+                            {% for contact in contacts %}
+                            <tr>
+                                <td>{{ contact.name }}</td>
+                                <td>{{ contact.email }}</td>
+                                <td>{{ contact.phone }}</td>
+                                <td>{{ contact.company }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'primary' if contact.type == 'client' else 'success' }}">
+                                        {{ contact.type }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('delete_contact', id=contact.id) }}" 
+                                       class="btn btn-sm btn-danger" 
+                                       onclick="return confirm('Are you sure?')">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- No results message -->
+                <div id="noResults" class="text-center py-4" style="display: none;">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No contacts found matching your search</h5>
+                </div>
             </div>
         </div>
     </div>
@@ -130,15 +169,15 @@
                     </div>
                     
                     <div class="alert alert-warning">
-                        <strong>Required columns:</strong>
+                        <strong>Expected columns:</strong>
                         <ul class="mb-0 mt-2">
                             <li><strong>Name</strong> (required)</li>
                             <li>Phone</li>
                             <li>Email</li>
                             <li>Company</li>
-                            <li>Speciality</li>
-                            <li>Comments</li>
-                            <li>Address</li>
+                            <li>Speciality (will be saved in notes)</li>
+                            <li>Comments (will be saved in notes)</li>
+                            <li>Address (will be saved in notes)</li>
                         </ul>
                     </div>
                     
@@ -157,4 +196,151 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const tableBody = document.getElementById('contactsTableBody');
+    const rows = tableBody.getElementsByTagName('tr');
+    const noResults = document.getElementById('noResults');
+    const resultCount = document.getElementById('resultCount');
+    
+    function filterTable() {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        let visibleCount = 0;
+        
+        // If search is empty, show all rows
+        if (searchTerm === '') {
+            for (let i = 0; i < rows.length; i++) {
+                rows[i].style.display = '';
+                visibleCount++;
+            }
+            noResults.style.display = 'none';
+            resultCount.textContent = `Showing all ${visibleCount} contacts`;
+            return;
+        }
+        
+        // Split search into words (respects multiple spaces)
+        const searchWords = searchTerm.split(/\s+/).filter(word => word.length > 0);
+        
+        // Loop through all rows
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const cells = row.getElementsByTagName('td');
+            
+            // Get text from each cell separately (excluding Actions column)
+            const nameText = cells[0]?.textContent.toLowerCase() || '';
+            const emailText = cells[1]?.textContent.toLowerCase() || '';
+            const phoneText = cells[2]?.textContent.toLowerCase() || '';
+            const companyText = cells[3]?.textContent.toLowerCase() || '';
+            const typeText = cells[4]?.textContent.toLowerCase() || '';
+            
+            // Check if ALL search words are found somewhere
+            let allWordsFound = true;
+            
+            for (let word of searchWords) {
+                const wordFound = 
+                    nameText.includes(word) ||
+                    emailText.includes(word) ||
+                    phoneText.includes(word) ||
+                    companyText.includes(word) ||
+                    typeText.includes(word);
+                
+                if (!wordFound) {
+                    allWordsFound = false;
+                    break;
+                }
+            }
+            
+            // Show/hide row based on match
+            if (allWordsFound) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        }
+        
+        // Update results count and show/hide no results message
+        if (visibleCount === 0) {
+            noResults.style.display = 'block';
+            resultCount.textContent = 'No contacts found';
+        } else {
+            noResults.style.display = 'none';
+            resultCount.textContent = `Found ${visibleCount} contact${visibleCount > 1 ? 's' : ''}`;
+        }
+    }
+    
+    // Add event listener for search input
+    searchInput.addEventListener('keyup', filterTable);
+    
+    // Optional: Add search by pressing Enter
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // Prevent form submission if inside a form
+            filterTable();
+        }
+    });
+});
+</script>
+
+<style>
+/* Button group styling */
+.btn-group {
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.btn-group .btn {
+    border-radius: 5px !important;
+    margin-bottom: 5px;
+}
+
+/* Search bar styling */
+.input-group-text {
+    border-radius: 10px 0 0 10px;
+}
+
+#searchInput {
+    border-radius: 0 10px 10px 0;
+    border-left: none;
+}
+
+#searchInput:focus {
+    box-shadow: none;
+    border-color: #ced4da;
+}
+
+/* Table styling */
+.table td {
+    vertical-align: middle;
+}
+
+.badge {
+    padding: 0.5em 1em;
+    font-size: 0.85em;
+}
+
+/* Animation for no results */
+#noResults {
+    animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .btn-group .btn {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+    
+    #searchInput {
+        margin-bottom: 10px;
+    }
+}
+</style>
 {% endblock %}

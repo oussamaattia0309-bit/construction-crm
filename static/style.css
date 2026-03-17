@@ -387,3 +387,18 @@ footer a:hover {
     font-size: 2rem;
   }
 }
+/* Type badge colors */
+.badge.bg-primary { background-color: #007bff !important; }  /* Client - Blue */
+.badge.bg-success { background-color: #28a745 !important; }  /* Fournisseur - Green */
+.badge.bg-info { background-color: #17a2b8 !important; }     /* Ingénieur - Light Blue */
+.badge.bg-warning { background-color: #ffc107 !important; }  /* Architecte - Yellow/Orange */
+.badge.bg-secondary { background-color: #6c757d !important; } /* Sous-traitant - Gray */
+.badge.bg-dark { background-color: #343a40 !important; }      /* Autre - Dark Gray */
+
+/* Ensure text is readable on colored backgrounds */
+.badge {
+    color: white !important;
+    padding: 0.5em 1em;
+    font-size: 0.85em;
+    font-weight: 500;
+}
