@@ -9,9 +9,21 @@
 
 <div class="row mb-4">
     <div class="col-12">
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addContactModal">
-            Add New Contact
-        </button>
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addContactModal">
+                <i class="fas fa-plus-circle me-2"></i>Add New Contact
+            </button>
+            
+            <!-- Upload Button -->
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#uploadContactsModal">
+                <i class="fas fa-upload me-2"></i>Upload Excel/CSV
+            </button>
+            
+            <!-- Download Template Button -->
+            <a href="{{ url_for('download_contacts_template') }}" class="btn btn-info">
+                <i class="fas fa-download me-2"></i>Download Template
+            </a>
+        </div>
     </div>
 </div>
 
@@ -91,6 +103,55 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary">Add Contact</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Contacts Modal -->
+<div class="modal fade" id="uploadContactsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Upload Contacts from Excel/CSV</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('upload_contacts') }}" method="POST" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>File Format:</strong> CSV or Excel (.xlsx, .xls)
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Choose File</label>
+                        <input type="file" class="form-control" id="file" name="file" accept=".csv,.xlsx,.xls" required>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <strong>Required columns:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li><strong>Name</strong> (required)</li>
+                            <li>Phone</li>
+                            <li>Email</li>
+                            <li>Company</li>
+                            <li>Speciality</li>
+                            <li>Comments</li>
+                            <li>Address</li>
+                        </ul>
+                    </div>
+                    
+                    <p class="text-muted small">
+                        <i class="fas fa-download me-1"></i>
+                        <a href="{{ url_for('download_contacts_template') }}">Download template</a> for correct format
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-upload me-2"></i>Upload Contacts
+                    </button>
                 </div>
             </form>
         </div>

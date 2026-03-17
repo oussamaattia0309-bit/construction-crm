@@ -1,129 +1,389 @@
+/* ===== CivilArchEngineering CRM Styles ===== */
+
+/* ----------------------------------------------
+   1. VARIABLES & RESET
+   ---------------------------------------------- */
+:root {
+  --primary:        #1E3A5F;
+  --primary-mid:    #2C5282;
+  --accent-glow:    #4DA8DA;
+  --accent:         #FF6600;
+  --dark-text:      #0A1F35;
+  --light-bg:       #E8EEF4;
+  --white:          #FFFFFF;
+  --sidebar-width: 250px;
+}
+
 body {
-    background-color: #f8f9fa;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--dark-text);
+  background-color: #fff;
+  padding-top: 100px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+/* ----------------------------------------------
+   2. HEADER & NAVIGATION
+   ---------------------------------------------- */
+header {
+  background: var(--primary);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.navbar {
+  padding: 0;
+  min-height: 100px;
 }
 
 .navbar-brand {
-    font-weight: bold;
-    font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  padding: 0;
 }
 
-.card {
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
-    border: none;
-    border-radius: 10px;
+.navbar-brand img {
+  height: 80px;
+  width: auto;
+  max-height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 14px #ffffff)
+          drop-shadow(0 0 9px #ffffff)
+          drop-shadow(0 0 5px #ffffff)
+          drop-shadow(0 0 2px #ffffff);
 }
 
-.card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+.nav-link {
+  color: var(--white) !important;
+  font-weight: 500;
+  transition: color 0.3s;
+  padding: 0.5rem 1rem !important;
 }
 
-.card-header {
-    background-color: rgba(0,0,0,0.03);
-    border-bottom: none;
-    font-weight: 600;
-    border-radius: 10px 10px 0 0 !important;
+.nav-link:hover,
+.nav-link.active {
+  color: var(--accent) !important;
 }
 
-.table th {
-    background-color: #343a40;
-    color: white;
-    font-weight: 500;
-    border-bottom: none;
+.nav-link i {
+  margin-right: 0.3rem;
+}
+
+.dropdown-menu {
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  border: none;
+  margin-top: 0.5rem;
+}
+
+.dropdown-item {
+  padding: 0.7rem 1.5rem;
+}
+
+.dropdown-item:hover {
+  background-color: var(--light-bg);
+  color: var(--accent);
+}
+
+.dropdown-item i {
+  width: 20px;
+  color: var(--primary);
+}
+
+/* ----------------------------------------------
+   3. DASHBOARD CARDS
+   ---------------------------------------------- */
+.dashboard-card {
+  border: none;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+  transition: all 0.4s ease;
+  background: white;
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+}
+
+.dashboard-card .card-header {
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+  padding: 1rem 1.5rem;
+  border-bottom: none;
+}
+
+.dashboard-card .card-body {
+  padding: 2rem 1.5rem;
+}
+
+.dashboard-card .card-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-card .card-text {
+  color: var(--dark-text);
+  font-size: 1rem;
+}
+
+/* ----------------------------------------------
+   4. SECTION TITLES
+   ---------------------------------------------- */
+.section-title {
+  font-size: 2.2rem;
+  color: var(--primary);
+  margin-bottom: 2rem;
+  position: relative;
+  padding-bottom: 1rem;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 80px;
+  height: 4px;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+.section-title.text-center::after {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* ----------------------------------------------
+   5. TABLES
+   ---------------------------------------------- */
+.table-container {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  overflow: hidden;
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+.table thead th {
+  background: var(--primary);
+  color: white;
+  font-weight: 500;
+  border-bottom: none;
+  padding: 1rem;
 }
 
 .table td {
-    vertical-align: middle;
+  padding: 1rem;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--light-bg);
 }
 
-.btn-group-sm > .btn, .btn-sm {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.875rem;
-    border-radius: 6px;
+.table tbody tr:hover {
+  background-color: var(--light-bg);
+}
+
+/* ----------------------------------------------
+   6. CARDS (Projects & Services)
+   ---------------------------------------------- */
+.project-card {
+  border: none;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+  transition: all 0.4s ease;
+  background: white;
+  height: 100%;
+}
+
+.project-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+}
+
+.project-card .card-img-top {
+  height: 200px;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.project-card:hover .card-img-top {
+  transform: scale(1.08);
+}
+
+.project-card .card-body {
+  padding: 1.5rem;
+}
+
+.project-card .badge {
+  font-size: 0.9rem;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+}
+
+.badge.bg-planned { background-color: #ffc107; color: #000; }
+.badge.bg-in_progress { background-color: var(--primary); color: white; }
+.badge.bg-completed { background-color: #28a745; color: white; }
+
+/* ----------------------------------------------
+   7. BUTTONS
+   ---------------------------------------------- */
+.btn {
+  border-radius: 8px;
+  font-weight: 500;
+  padding: 0.6rem 1.5rem;
+  transition: all 0.3s;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn-warning,
+.btn-warning:hover,
+.btn-warning:focus,
+.btn-warning:active {
+  background-color: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: var(--white) !important;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-mid);
+  border-color: var(--primary-mid);
+}
+
+.btn-outline-primary {
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+/* ----------------------------------------------
+   8. FORMS
+   ---------------------------------------------- */
+.form-control, .form-select {
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  padding: 0.75rem 1rem;
+  transition: all 0.3s;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 0.2rem rgba(255, 102, 0, 0.25);
 }
 
 .form-label {
-    font-weight: 500;
-    color: #495057;
-    margin-bottom: 0.3rem;
+  font-weight: 500;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
 }
 
-.form-control {
-    border-radius: 8px;
-    border: 1px solid #ced4da;
-    padding: 0.5rem 0.75rem;
-}
-
-.form-control:focus {
-    border-color: #80bdff;
-    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
-}
-
-.dashboard-card {
-    min-height: 120px;
-}
-
-.badge {
-    padding: 0.5em 0.8em;
-    font-weight: 500;
-    border-radius: 6px;
-}
-
+/* ----------------------------------------------
+   9. MODALS
+   ---------------------------------------------- */
 .modal-content {
-    border-radius: 12px;
-    border: none;
+  border-radius: 16px;
+  border: none;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.3);
 }
 
 .modal-header {
-    background-color: #f8f9fa;
-    border-radius: 12px 12px 0 0;
-    border-bottom: 1px solid #dee2e6;
+  background: var(--primary);
+  color: white;
+  border-radius: 16px 16px 0 0;
+  padding: 1.5rem;
 }
 
-.btn {
-    border-radius: 8px;
-    font-weight: 500;
+.modal-header .btn-close {
+  filter: brightness(0) invert(1);
 }
 
-.alert {
-    border-radius: 10px;
-    border: none;
+.modal-body {
+  padding: 2rem;
 }
 
-.list-group-item {
-    border: none;
-    margin-bottom: 5px;
-    border-radius: 8px !important;
+.modal-footer {
+  border-top: 1px solid var(--light-bg);
+  padding: 1.5rem;
 }
 
-.list-group-item:hover {
-    background-color: #f8f9fa;
+/* ----------------------------------------------
+   10. FOOTER
+   ---------------------------------------------- */
+footer {
+  background: var(--primary);
+  color: var(--white);
+  text-align: center;
+  margin-top: 3rem;
 }
 
-/* Custom colors for status badges */
-.bg-planned {
-    background-color: #ffc107;
-    color: #000;
+footer a {
+  color: var(--accent-glow);
+  text-decoration: none;
+  margin: 0 0.5rem;
 }
 
-.bg-in_progress {
-    background-color: #007bff;
-    color: #fff;
+footer a:hover {
+  color: var(--accent);
 }
 
-.bg-completed {
-    background-color: #28a745;
-    color: #fff;
+/* ----------------------------------------------
+   11. STATS COUNTERS (from your website)
+   ---------------------------------------------- */
+.counter {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--primary);
 }
 
-/* Hover effects for cards */
-.card.text-white .card-header {
-    background-color: rgba(255,255,255,0.1);
+/* ----------------------------------------------
+   12. RESPONSIVE
+   ---------------------------------------------- */
+@media (max-width: 992px) {
+  body {
+    padding-top: 80px;
+  }
+  
+  .navbar {
+    min-height: 80px;
+  }
+  
+  .navbar-brand img {
+    height: 60px;
+  }
+  
+  .section-title {
+    font-size: 1.8rem;
+  }
 }
 
-/* Table row hover */
-.table-hover tbody tr:hover {
-    background-color: rgba(0,123,255,0.05);
+@media (max-width: 576px) {
+  .dashboard-card .card-title {
+    font-size: 2rem;
+  }
 }

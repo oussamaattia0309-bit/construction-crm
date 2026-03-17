@@ -1,9 +1,13 @@
-from flask import Flask, render_template, redirect, url_for, request, flash, jsonify
+from flask import Flask, render_template, redirect, url_for, request, flash, jsonify, send_file
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import os
+import pandas as pd
+import io
+import csv
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'fallback-dev-key')
@@ -274,6 +278,204 @@ def recent_projects():
         'name': p.name,
         'status': p.status
     } for p in projects])
+
+# ==================== CONTACT UPLOAD ====================
+@app.route('/contacts/upload', methods=['POST'])
+@login_required
+def upload_contacts():
+    if 'file' not in request.files:
+        flash('No file selected')
+        return redirect(url_for('contacts'))
+    
+    file = request.files['file']
+    if file.filename == '':
+        flash('No file selected')
+        return redirect(url_for('contacts'))
+    
+    # Read the file
+    try:
+        if file.filename.endswith('.csv'):
+            df = pd.read_csv(file)
+        elif file.filename.endswith(('.xlsx', '.xls')):
+            df = pd.read_excel(file)
+        else:
+            flash('Please upload CSV or Excel file')
+            return redirect(url_for('contacts'))
+        
+        # Track success/failure
+        success_count = 0
+        error_count = 0
+        errors = []
+        
+        # Process each row
+        for index, row in df.iterrows():
+            try:
+                # Map Excel columns to database fields
+                contact = Contact(
+                    name=str(row.get('Name', '')),
+                    phone=str(row.get('Phone', '')),
+                    email=str(row.get('Email', '')),
+                    company=str(row.get('Company', '')),
+                    type='client',  # Default type
+                    notes=f"Speciality: {row.get('Speciality', '')} | Address: {row.get('Address', '')} | Comments: {row.get('Comments', '')}"
+                )
+
+                # Basic validation
+                if not contact.name:
+                    errors.append(f"Row {index + 2}: Name is required")
+                    error_count += 1
+                    continue
+
+                db.session.add(contact)
+                success_count += 1
+                
+            except Exception as e:
+                errors.append(f"Row {index + 2}: {str(e)}")
+                error_count += 1
+        
+        # Commit all successful entries
+        db.session.commit()
+        
+        # Flash summary
+        if success_count > 0:
+            flash(f'✅ Successfully imported {success_count} contacts')
+        if error_count > 0:
+            flash(f'⚠️ Failed to import {error_count} contacts. Check your file format.')
+            for error in errors[:5]:  # Show first 5 errors
+                flash(f'Error: {error}')
+        
+    except Exception as e:
+        flash(f'Error reading file: {str(e)}')
+    
+    return redirect(url_for('contacts'))
+
+# ==================== PROVIDER UPLOAD ====================
+@app.route('/providers/upload', methods=['POST'])
+@login_required
+def upload_providers():
+    if 'file' not in request.files:
+        flash('No file selected')
+        return redirect(url_for('providers'))
+    
+    file = request.files['file']
+    if file.filename == '':
+        flash('No file selected')
+        return redirect(url_for('providers'))
+    
+    # Read the file
+    try:
+        if file.filename.endswith('.csv'):
+            df = pd.read_csv(file)
+        elif file.filename.endswith(('.xlsx', '.xls')):
+            df = pd.read_excel(file)
+        else:
+            flash('Please upload CSV or Excel file')
+            return redirect(url_for('providers'))
+        
+        # Track success/failure
+        success_count = 0
+        error_count = 0
+        errors = []
+        
+        # Process each row
+        for index, row in df.iterrows():
+            try:
+                # Map Excel columns to database fields
+                provider = Provider(
+                    name=str(row.get('Company Name', '')),
+                    contact_person=str(row.get('Contact Person', '')),
+                    phone=str(row.get('Phone', '')),
+                    email=str(row.get('Email', '')),
+                    address=str(row.get('Address', '')),
+                    service_type=str(row.get('Speciality', '')),  # Map Speciality to service_type
+                    notes=str(row.get('Comments', ''))
+                )
+                
+                # Basic validation
+                if not provider.name:
+                    errors.append(f"Row {index + 2}: Company Name is required")
+                    error_count += 1
+                    continue
+                
+                db.session.add(provider)
+                success_count += 1
+                
+            except Exception as e:
+                errors.append(f"Row {index + 2}: {str(e)}")
+                error_count += 1
+        
+        # Commit all successful entries
+        db.session.commit()
+        
+        # Flash summary
+        if success_count > 0:
+            flash(f'✅ Successfully imported {success_count} providers')
+        if error_count > 0:
+            flash(f'⚠️ Failed to import {error_count} providers. Check your file format.')
+            for error in errors[:5]:  # Show first 5 errors
+                flash(f'Error: {error}')
+        
+    except Exception as e:
+        flash(f'Error reading file: {str(e)}')
+    
+    return redirect(url_for('providers'))
+
+# ==================== DOWNLOAD TEMPLATE ====================
+@app.route('/contacts/template')
+@login_required
+def download_contacts_template():
+    # Create a template DataFrame with your preferred columns
+    template = pd.DataFrame({
+        'Name': ['Ahmed Ben Ali', 'Sarra Mansour'],
+        'Phone': ['+216 22 123 456', '+216 55 789 012'],
+        'Email': ['ahmed@email.com', 'sarra@email.com'],
+        'Company': ['ABC Construction', 'XYZ Materials'],
+        'Speciality': ['Project Management', 'Electrical Engineering'],
+        'Comments': ['Good client, multiple projects', 'Reliable supplier'],
+        'Address': ['Tunis, Centre Ville', 'Sousse, Rue de la Liberté']
+    })
+    
+    # Create Excel file in memory
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        template.to_excel(writer, index=False, sheet_name='Contacts')
+    
+    output.seek(0)
+    
+    return send_file(
+        output,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        as_attachment=True,
+        download_name='contacts_template.xlsx'
+    )
+
+@app.route('/providers/template')
+@login_required
+def download_providers_template():
+    # Create a template DataFrame with your preferred columns
+    template = pd.DataFrame({
+        'Company Name': ['Matériaux Tunisie', 'Électro Plus'],
+        'Contact Person': ['Karim Ben Salem', 'Leila Mansour'],
+        'Phone': ['+216 71 123 456', '+216 72 789 012'],
+        'Email': ['karim@materiaux.tn', 'leila@electroplus.tn'],
+        'Speciality': ['Construction Materials', 'Electrical Supplies'],
+        'Comments': ['Good prices, fast delivery', 'Certified products'],
+        'Address': ['Tunis, Zone Industrielle', 'Sousse, Route de la Plage']
+    })
+    
+    # Create Excel file in memory
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        template.to_excel(writer, index=False, sheet_name='Providers')
+    
+    output.seek(0)
+    
+    return send_file(
+        output,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        as_attachment=True,
+        download_name='providers_template.xlsx'
+    )
 
 if __name__ == '__main__':
     with app.app_context():

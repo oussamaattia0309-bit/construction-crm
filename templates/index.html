@@ -1,78 +1,192 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <h1 class="mb-4">Dashboard</h1>
+<div class="container">
+    <!-- Hero Section (simplified) -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="img-fluid mb-4" style="max-height: 150px;">
+            <h1 class="display-4" style="color: var(--primary);">Welcome to Your CRM</h1>
+            <p class="lead">Manage your construction projects, contacts, and budgets efficiently</p>
+        </div>
     </div>
-</div>
 
-<div class="row">
-    <div class="col-md-3">
-        <div class="card text-white bg-primary mb-3">
-            <div class="card-header">Contacts</div>
-            <div class="card-body">
-                <h5 class="card-title" id="contacts-count">Loading...</h5>
-                <a href="{{ url_for('contacts') }}" class="text-white">View all →</a>
+    <!-- Stats Counters (like your website) -->
+    <div class="row text-center g-4 mb-5" id="stats-section">
+        <div class="col-md-3">
+            <div class="dashboard-card">
+                <div class="card-body">
+                    <h3 class="counter display-4 fw-bold" id="contacts-count">0</h3>
+                    <p class="text-muted">Total Contacts</p>
+                    <a href="{{ url_for('contacts') }}" class="btn btn-outline-primary btn-sm">View All</a>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-white bg-success mb-3">
-            <div class="card-header">Providers</div>
-            <div class="card-body">
-                <h5 class="card-title" id="providers-count">Loading...</h5>
-                <a href="{{ url_for('providers') }}" class="text-white">View all →</a>
+        <div class="col-md-3">
+            <div class="dashboard-card">
+                <div class="card-body">
+                    <h3 class="counter display-4 fw-bold" id="providers-count">0</h3>
+                    <p class="text-muted">Providers</p>
+                    <a href="{{ url_for('providers') }}" class="btn btn-outline-primary btn-sm">View All</a>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-white bg-warning mb-3">
-            <div class="card-header">Active Projects</div>
-            <div class="card-body">
-                <h5 class="card-title" id="projects-count">Loading...</h5>
-                <a href="{{ url_for('projects') }}" class="text-white">View all →</a>
+        <div class="col-md-3">
+            <div class="dashboard-card">
+                <div class="card-body">
+                    <h3 class="counter display-4 fw-bold" id="projects-count">0</h3>
+                    <p class="text-muted">Active Projects</p>
+                    <a href="{{ url_for('projects') }}" class="btn btn-outline-primary btn-sm">View All</a>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-white bg-info mb-3">
-            <div class="card-header">Total Budget</div>
-            <div class="card-body">
-                <h5 class="card-title" id="budget-total">Loading...</h5>
-                <a href="{{ url_for('budgets') }}" class="text-white">View all →</a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row mt-4">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h4>Recent Projects</h4>
-            </div>
-            <div class="card-body">
-                <div class="list-group" id="recent-projects">
-                    <!-- Will be populated by JavaScript -->
+        <div class="col-md-3">
+            <div class="dashboard-card">
+                <div class="card-body">
+                    <h3 class="counter display-4 fw-bold" id="budget-total">$0</h3>
+                    <p class="text-muted">Total Budget</p>
+                    <a href="{{ url_for('budgets') }}" class="btn btn-outline-primary btn-sm">Manage</a>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h4>Quick Actions</h4>
-            </div>
-            <div class="card-body">
-                <div class="d-grid gap-2">
-                    <a href="{{ url_for('contacts') }}" class="btn btn-outline-primary">Add New Contact</a>
-                    <a href="{{ url_for('providers') }}" class="btn btn-outline-success">Add New Provider</a>
-                    <a href="{{ url_for('projects') }}" class="btn btn-outline-warning">Add New Project</a>
-                    <a href="{{ url_for('budgets') }}" class="btn btn-outline-info">Manage Budget</a>
-                </div>
+
+    <!-- Recent Projects Section (like your website) -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="section-title">Recent Projects</h2>
+        </div>
+    </div>
+
+    <div class="row g-4" id="recent-projects-container">
+        <!-- Will be populated by JavaScript -->
+        <div class="col-12 text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
             </div>
         </div>
     </div>
+
+    <!-- Quick Actions -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h2 class="section-title">Quick Actions</h2>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-3 col-6">
+            <a href="{{ url_for('contacts') }}" class="text-decoration-none">
+                <div class="dashboard-card text-center p-4">
+                    <i class="fas fa-user-plus fa-3x mb-3" style="color: var(--primary);"></i>
+                    <h5>Add Contact</h5>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3 col-6">
+            <a href="{{ url_for('providers') }}" class="text-decoration-none">
+                <div class="dashboard-card text-center p-4">
+                    <i class="fas fa-truck fa-3x mb-3" style="color: var(--primary);"></i>
+                    <h5>Add Provider</h5>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3 col-6">
+            <a href="{{ url_for('projects') }}" class="text-decoration-none">
+                <div class="dashboard-card text-center p-4">
+                    <i class="fas fa-hard-hat fa-3x mb-3" style="color: var(--primary);"></i>
+                    <h5>New Project</h5>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3 col-6">
+            <a href="{{ url_for('budgets') }}" class="text-decoration-none">
+                <div class="dashboard-card text-center p-4">
+                    <i class="fas fa-calculator fa-3x mb-3" style="color: var(--primary);"></i>
+                    <h5>Manage Budget</h5>
+                </div>
+            </a>
+        </div>
+    </div>
 </div>
+
+<script>
+// Counter animation from your website
+function animateCounter(element, target) {
+    let count = 0;
+    const increment = target / 50;
+    const updateCount = () => {
+        if (count < target) {
+            count += increment;
+            element.innerText = Math.ceil(count) + (element.id === 'budget-total' ? '' : '+');
+            requestAnimationFrame(updateCount);
+        } else {
+            element.innerText = target + (element.id === 'budget-total' ? '' : '+');
+        }
+    };
+    updateCount();
+}
+
+// Observer for stats section
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            loadDashboardData();
+        }
+    });
+}, { threshold: 0.5 });
+
+function loadDashboardData() {
+    fetch('/api/dashboard')
+        .then(response => response.json())
+        .then(data => {
+            animateCounter(document.getElementById('contacts-count'), data.contacts);
+            animateCounter(document.getElementById('providers-count'), data.providers);
+            animateCounter(document.getElementById('projects-count'), data.active_projects);
+            document.getElementById('budget-total').innerText = '$' + data.total_budget.toLocaleString();
+        });
+    
+    fetch('/api/projects/recent')
+        .then(response => response.json())
+        .then(projects => {
+            const container = document.getElementById('recent-projects-container');
+            container.innerHTML = '';
+            
+            if (projects.length === 0) {
+                container.innerHTML = '<div class="col-12 text-center"><p class="text-muted">No projects yet</p></div>';
+                return;
+            }
+            
+            projects.forEach(project => {
+                const statusClass = {
+                    'planned': 'bg-warning',
+                    'in_progress': 'bg-primary',
+                    'completed': 'bg-success'
+                }[project.status] || 'bg-secondary';
+                
+                const statusText = project.status.replace('_', ' ');
+                
+                container.innerHTML += `
+                    <div class="col-md-4">
+                        <div class="project-card">
+                            <div class="card-body">
+                                <h5 class="card-title">${project.name}</h5>
+                                <span class="badge ${statusClass} text-white mb-3">${statusText}</span>
+                                <a href="/projects/${project.id}" class="btn btn-outline-primary w-100">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        });
+}
+
+// Start observing when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    const statsSection = document.getElementById('stats-section');
+    if (statsSection) {
+        observer.observe(statsSection);
+    }
+});
+</script>
 {% endblock %}
