@@ -1,0 +1,10 @@
+# on local
+cd C:\Users\USER\Desktop\stuff\web\CRM CAE
+git add .
+git commit -m "Describe your changes"
+git push
+
+#On PythonAnywhere
+cd ~/mysite
+git pull
+touch /var/www/oussamaattia1994_pythonanywhere_com_wsgi.py
