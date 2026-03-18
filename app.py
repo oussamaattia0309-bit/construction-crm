@@ -7,7 +7,7 @@ import os
 import pandas as pd
 import io
 import csv
-import json  # Make sure this is imported
+import json
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
@@ -38,7 +38,7 @@ class Contact(db.Model):
     email = db.Column(db.String(100))
     phone = db.Column(db.String(20))
     company = db.Column(db.String(100))
-    type = db.Column(db.String(50))  # 'client' or 'provider'
+    type = db.Column(db.String(50))
     notes = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -59,7 +59,7 @@ class Project(db.Model):
     address = db.Column(db.String(200))
     start_date = db.Column(db.Date)
     end_date = db.Column(db.Date)
-    status = db.Column(db.String(50))  # 'planned', 'in_progress', 'completed'
+    status = db.Column(db.String(50))
     description = db.Column(db.Text)
     budget_total = db.Column(db.Float, default=0.0)
 
@@ -69,16 +69,45 @@ class Budget(db.Model):
     item_name = db.Column(db.String(100), nullable=False)
     estimated_cost = db.Column(db.Float)
     actual_cost = db.Column(db.Float)
-    category = db.Column(db.String(50))  # 'materials', 'labor', 'equipment', 'other'
+    category = db.Column(db.String(50))
     notes = db.Column(db.Text)
     
     project = db.relationship('Project', backref=db.backref('budget_items', lazy=True))
+
+class ProjectExpense(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    date = db.Column(db.Date)
+    nature = db.Column(db.String(200))
+    amount = db.Column(db.Float)
+    comment = db.Column(db.Text)
+    category = db.Column(db.String(50))
+    
+    project = db.relationship('Project', backref=db.backref('expenses', lazy=True))
+
+class ProjectReceipt(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    date = db.Column(db.Date)
+    amount = db.Column(db.Float)
+    comment = db.Column(db.Text)
+    
+    project = db.relationship('Project', backref=db.backref('receipts', lazy=True))
+
+class ProjectFinancialParams(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'), unique=True)
+    sale_price = db.Column(db.Float, default=0)
+    estimated_budget = db.Column(db.Float, default=0)
+    devis_ref = db.Column(db.Float, default=0)
+    
+    project = db.relationship('Project', backref=db.backref('financial_params', uselist=False))
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# Routes
+# ==================== AUTH ROUTES ====================
 @app.route('/')
 def index():
     if current_user.is_authenticated:
@@ -126,7 +155,7 @@ def change_password():
     
     return render_template('change_password.html')
 
-# Contact routes
+# ==================== CONTACT ROUTES ====================
 @app.route('/contacts')
 @login_required
 def contacts():
@@ -157,431 +186,6 @@ def delete_contact(id):
     db.session.commit()
     flash('Contact deleted')
     return redirect(url_for('contacts'))
-
-# Provider routes
-@app.route('/providers')
-@login_required
-def providers():
-    providers_list = Provider.query.all()
-    return render_template('providers.html', providers=providers_list)
-
-@app.route('/providers/add', methods=['POST'])
-@login_required
-def add_provider():
-    provider = Provider(
-        name=request.form.get('name'),
-        contact_person=request.form.get('contact_person'),
-        email=request.form.get('email'),
-        phone=request.form.get('phone'),
-        address=request.form.get('address'),
-        service_type=request.form.get('service_type'),
-        notes=request.form.get('notes')
-    )
-    db.session.add(provider)
-    db.session.commit()
-    flash('Provider added successfully')
-    return redirect(url_for('providers'))
-
-@app.route('/providers/delete/<int:id>')
-@login_required
-def delete_provider(id):
-    provider = Provider.query.get_or_404(id)
-    db.session.delete(provider)
-    db.session.commit()
-    flash('Provider deleted')
-    return redirect(url_for('providers'))
-
-# Project routes
-@app.route('/projects')
-@login_required
-def projects():
-    projects_list = Project.query.all()
-    return render_template('projects.html', projects=projects_list)
-
-@app.route('/projects/add', methods=['POST'])
-@login_required
-def add_project():
-    project = Project(
-        name=request.form.get('name'),
-        client_name=request.form.get('client_name'),
-        address=request.form.get('address'),
-        start_date=datetime.strptime(request.form.get('start_date'), '%Y-%m-%d') if request.form.get('start_date') else None,
-        end_date=datetime.strptime(request.form.get('end_date'), '%Y-%m-%d') if request.form.get('end_date') else None,
-        status=request.form.get('status'),
-        description=request.form.get('description')
-    )
-    db.session.add(project)
-    db.session.commit()
-    flash('Project added successfully')
-    return redirect(url_for('projects'))
-
-@app.route('/projects/<int:id>')
-@login_required
-def project_detail(id):
-    project = Project.query.get_or_404(id)
-    return render_template('project_detail.html', project=project)
-
-# Budget routes
-@app.route('/budgets')
-@login_required
-def budgets():
-    budgets_list = Budget.query.all()
-    projects_list = Project.query.all()
-    return render_template('budgets.html', budgets=budgets_list, projects=projects_list)
-
-@app.route('/budgets/add', methods=['POST'])
-@login_required
-def add_budget():
-    budget = Budget(
-        project_id=request.form.get('project_id'),
-        item_name=request.form.get('item_name'),
-        estimated_cost=float(request.form.get('estimated_cost')) if request.form.get('estimated_cost') else None,
-        actual_cost=float(request.form.get('actual_cost')) if request.form.get('actual_cost') else None,
-        category=request.form.get('category'),
-        notes=request.form.get('notes')
-    )
-    db.session.add(budget)
-    db.session.commit()
-    flash('Budget item added successfully')
-    return redirect(url_for('budgets'))
-
-@app.route('/budgets/delete/<int:id>')
-@login_required
-def delete_budget(id):
-    budget = Budget.query.get_or_404(id)
-    db.session.delete(budget)
-    db.session.commit()
-    flash('Budget item deleted')
-    return redirect(url_for('budgets'))
-
-# API routes
-@app.route('/api/dashboard')
-@login_required
-def dashboard_data():
-    total_contacts = Contact.query.count()
-    total_providers = Provider.query.count()
-    active_projects = Project.query.filter_by(status='in_progress').count()
-    total_budget = db.session.query(db.func.sum(Budget.estimated_cost)).scalar() or 0
-    
-    return jsonify({
-        'contacts': total_contacts,
-        'providers': total_providers,
-        'active_projects': active_projects,
-        'total_budget': total_budget
-    })
-
-@app.route('/api/projects/recent')
-@login_required
-def recent_projects():
-    projects = Project.query.order_by(Project.id.desc()).limit(5).all()
-    return jsonify([{
-        'id': p.id,
-        'name': p.name,
-        'status': p.status
-    } for p in projects])
-
-# ==================== CONTACT UPLOAD ====================
-@app.route('/contacts/upload', methods=['POST'])
-@login_required
-def upload_contacts():
-    if 'file' not in request.files:
-        flash('No file selected')
-        return redirect(url_for('contacts'))
-    
-    file = request.files['file']
-    if file.filename == '':
-        flash('No file selected')
-        return redirect(url_for('contacts'))
-    
-    # Read the file
-    try:
-        if file.filename.endswith('.csv'):
-            df = pd.read_csv(file)
-        elif file.filename.endswith(('.xlsx', '.xls')):
-            df = pd.read_excel(file)
-        else:
-            flash('Please upload CSV or Excel file')
-            return redirect(url_for('contacts'))
-        
-        # Track success/failure
-        success_count = 0
-        error_count = 0
-        errors = []
-        
-        # Define clean function once
-        def clean(val):
-            s = str(val).strip()
-            return '' if s.lower() == 'nan' else s
-        
-        # Process each row
-        for index, row in df.iterrows():
-            try:
-                # Map Excel columns to database fields
-                contact = Contact(
-                    name=clean(row.get('Name', '')),
-                    phone=clean(row.get('Phone', '')),
-                    email=clean(row.get('Email', '')),
-                    company=clean(row.get('Company', '')),
-                    type='client',
-                    notes=f"Speciality: {clean(row.get('Speciality', ''))} | Address: {clean(row.get('Address', ''))} | Comments: {clean(row.get('Comments', ''))}"
-                )
-
-                # Basic validation
-                if not contact.name:
-                    errors.append(f"Row {index + 2}: Name is required")
-                    error_count += 1
-                    continue
-
-                db.session.add(contact)
-                success_count += 1
-                
-            except Exception as e:
-                errors.append(f"Row {index + 2}: {str(e)}")
-                error_count += 1
-        
-        # Commit all successful entries
-        db.session.commit()
-        
-        # Flash summary
-        if success_count > 0:
-            flash(f'✅ Successfully imported {success_count} contacts')
-        if error_count > 0:
-            flash(f'⚠️ Failed to import {error_count} contacts. Check your file format.')
-            for error in errors[:5]:  # Show first 5 errors
-                flash(f'Error: {error}')
-        
-    except Exception as e:
-        flash(f'Error reading file: {str(e)}')
-    
-    return redirect(url_for('contacts'))
-
-# ==================== PROVIDER UPLOAD ====================
-@app.route('/providers/upload', methods=['POST'])
-@login_required
-def upload_providers():
-    if 'file' not in request.files:
-        flash('No file selected')
-        return redirect(url_for('providers'))
-    
-    file = request.files['file']
-    if file.filename == '':
-        flash('No file selected')
-        return redirect(url_for('providers'))
-    
-    # Read the file
-    try:
-        if file.filename.endswith('.csv'):
-            df = pd.read_csv(file)
-        elif file.filename.endswith(('.xlsx', '.xls')):
-            df = pd.read_excel(file)
-        else:
-            flash('Please upload CSV or Excel file')
-            return redirect(url_for('providers'))
-        
-        # Track success/failure
-        success_count = 0
-        error_count = 0
-        errors = []
-        
-        # Define clean function
-        def clean(val):
-            s = str(val).strip()
-            return '' if s.lower() == 'nan' else s
-        
-        # Process each row
-        for index, row in df.iterrows():
-            try:
-                # Map Excel columns to database fields
-                provider = Provider(
-                    name=clean(row.get('Company Name', '')),
-                    contact_person=clean(row.get('Contact Person', '')),
-                    phone=clean(row.get('Phone', '')),
-                    email=clean(row.get('Email', '')),
-                    address=clean(row.get('Address', '')),
-                    service_type=clean(row.get('Speciality', '')),  # Map Speciality to service_type
-                    notes=clean(row.get('Comments', ''))
-                )
-                
-                # Basic validation
-                if not provider.name:
-                    errors.append(f"Row {index + 2}: Company Name is required")
-                    error_count += 1
-                    continue
-                
-                db.session.add(provider)
-                success_count += 1
-                
-            except Exception as e:
-                errors.append(f"Row {index + 2}: {str(e)}")
-                error_count += 1
-        
-        # Commit all successful entries
-        db.session.commit()
-        
-        # Flash summary
-        if success_count > 0:
-            flash(f'✅ Successfully imported {success_count} providers')
-        if error_count > 0:
-            flash(f'⚠️ Failed to import {error_count} providers. Check your file format.')
-            for error in errors[:5]:  # Show first 5 errors
-                flash(f'Error: {error}')
-        
-    except Exception as e:
-        flash(f'Error reading file: {str(e)}')
-    
-    return redirect(url_for('providers'))
-
-# ==================== DOWNLOAD TEMPLATE ====================
-@app.route('/contacts/template')
-@login_required
-def download_contacts_template():
-    # Create a template DataFrame with your preferred columns
-    template = pd.DataFrame({
-        'Name': ['Ahmed Ben Ali', 'Sarra Mansour'],
-        'Phone': ['+216 22 123 456', '+216 55 789 012'],
-        'Email': ['ahmed@email.com', 'sarra@email.com'],
-        'Company': ['ABC Construction', 'XYZ Materials'],
-        'Speciality': ['Project Management', 'Electrical Engineering'],
-        'Comments': ['Good client, multiple projects', 'Reliable supplier'],
-        'Address': ['Tunis, Centre Ville', 'Sousse, Rue de la Liberté']
-    })
-    
-    # Create Excel file in memory
-    output = io.BytesIO()
-    with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        template.to_excel(writer, index=False, sheet_name='Contacts')
-    
-    output.seek(0)
-    
-    return send_file(
-        output,
-        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        as_attachment=True,
-        download_name='contacts_template.xlsx'
-    )
-
-@app.route('/providers/template')
-@login_required
-def download_providers_template():
-    # Create a template DataFrame with your preferred columns
-    template = pd.DataFrame({
-        'Company Name': ['Matériaux Tunisie', 'Électro Plus'],
-        'Contact Person': ['Karim Ben Salem', 'Leila Mansour'],
-        'Phone': ['+216 71 123 456', '+216 72 789 012'],
-        'Email': ['karim@materiaux.tn', 'leila@electroplus.tn'],
-        'Speciality': ['Construction Materials', 'Electrical Supplies'],
-        'Comments': ['Good prices, fast delivery', 'Certified products'],
-        'Address': ['Tunis, Zone Industrielle', 'Sousse, Route de la Plage']
-    })
-    
-    # Create Excel file in memory
-    output = io.BytesIO()
-    with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        template.to_excel(writer, index=False, sheet_name='Providers')
-    
-    output.seek(0)
-    
-    return send_file(
-        output,
-        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        as_attachment=True,
-        download_name='providers_template.xlsx'
-    )
-
-# ==================== DOWNLOAD ALL CONTACTS ====================
-@app.route('/contacts/download-all')
-@login_required
-def download_all_contacts():
-    """Download all contacts as Excel file"""
-    try:
-        # Get all contacts
-        contacts = Contact.query.all()
-        
-        # Create a list of dictionaries for pandas
-        data = []
-        for contact in contacts:
-            # Parse notes to extract speciality, address, comments if needed
-            notes = contact.notes or ""
-            
-            data.append({
-                'Name': contact.name,
-                'Email': contact.email or '',
-                'Phone': contact.phone or '',
-                'Company': contact.company or '',
-                'Type': contact.type or '',
-                'Notes': notes
-            })
-        
-        # Create DataFrame
-        df = pd.DataFrame(data)
-        
-        # Create Excel file in memory
-        output = io.BytesIO()
-        with pd.ExcelWriter(output, engine='openpyxl') as writer:
-            df.to_excel(writer, index=False, sheet_name='All Contacts')
-        
-        output.seek(0)
-        
-        # Generate filename with current date
-        from datetime import datetime
-        filename = f"all_contacts_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
-        
-        return send_file(
-            output,
-            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            as_attachment=True,
-            download_name=filename
-        )
-    
-    except Exception as e:
-        flash(f'Error downloading contacts: {str(e)}')
-        return redirect(url_for('contacts'))
-    
-@app.route('/contacts/download-selected', methods=['POST'])
-@login_required
-def download_selected_contacts():
-    """Download selected contacts as Excel file"""
-    try:
-        selected_ids = json.loads(request.form.get('selected_ids', '[]'))
-        
-        if not selected_ids:
-            flash('No contacts selected')
-            return redirect(url_for('contacts'))
-        
-        contacts = Contact.query.filter(Contact.id.in_(selected_ids)).all()
-        
-        data = []
-        for contact in contacts:
-            data.append({
-                'Name': contact.name,
-                'Email': contact.email or '',
-                'Phone': contact.phone or '',
-                'Company': contact.company or '',
-                'Type': contact.type or '',
-                'Notes': contact.notes or ''
-            })
-        
-        df = pd.DataFrame(data)
-        
-        output = io.BytesIO()
-        with pd.ExcelWriter(output, engine='openpyxl') as writer:
-            df.to_excel(writer, index=False, sheet_name='Selected Contacts')
-        
-        output.seek(0)
-        
-        from datetime import datetime
-        filename = f"selected_contacts_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
-        
-        return send_file(
-            output,
-            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            as_attachment=True,
-            download_name=filename
-        )
-    
-    except Exception as e:
-        flash(f'Error downloading contacts: {str(e)}')
-        return redirect(url_for('contacts'))
 
 @app.route('/contacts/<int:contact_id>/details')
 @login_required
@@ -624,6 +228,7 @@ def bulk_delete_contacts():
         return jsonify({'success': True, 'count': len(ids)})
     
     return jsonify({'success': False}), 400
+
 @app.route('/contacts/<int:contact_id>/update-type', methods=['POST'])
 @login_required
 def update_contact_type(contact_id):
@@ -643,13 +248,10 @@ def update_contact_relation(contact_id):
     data = request.get_json()
     relation = data.get('relation', '')
     
-    # Store relation in notes (you could also create a separate field)
-    # Remove any existing relation marker
     notes = contact.notes or ''
     import re
     notes = re.sub(r'relation:(good|average|bad)\s*', '', notes)
     
-    # Add new relation if not empty
     if relation:
         notes = notes.strip() + f' relation:{relation}'
     
@@ -657,10 +259,711 @@ def update_contact_relation(contact_id):
     db.session.commit()
     return jsonify({'success': True})
 
+# ==================== PROVIDER ROUTES ====================
+@app.route('/providers')
+@login_required
+def providers():
+    providers_list = Provider.query.all()
+    return render_template('providers.html', providers=providers_list)
+
+@app.route('/providers/add', methods=['POST'])
+@login_required
+def add_provider():
+    provider = Provider(
+        name=request.form.get('name'),
+        contact_person=request.form.get('contact_person'),
+        email=request.form.get('email'),
+        phone=request.form.get('phone'),
+        address=request.form.get('address'),
+        service_type=request.form.get('service_type'),
+        notes=request.form.get('notes')
+    )
+    db.session.add(provider)
+    db.session.commit()
+    flash('Provider added successfully')
+    return redirect(url_for('providers'))
+
+@app.route('/providers/delete/<int:id>')
+@login_required
+def delete_provider(id):
+    provider = Provider.query.get_or_404(id)
+    db.session.delete(provider)
+    db.session.commit()
+    flash('Provider deleted')
+    return redirect(url_for('providers'))
+
+# ==================== PROJECT ROUTES ====================
+@app.route('/projects')
+@login_required
+def projects():
+    projects_list = Project.query.all()
+    return render_template('projects.html', projects=projects_list)
+
+@app.route('/projects/add', methods=['POST'])
+@login_required
+def add_project():
+    project = Project(
+        name=request.form.get('name'),
+        client_name=request.form.get('client_name'),
+        address=request.form.get('address'),
+        start_date=datetime.strptime(request.form.get('start_date'), '%Y-%m-%d') if request.form.get('start_date') else None,
+        end_date=datetime.strptime(request.form.get('end_date'), '%Y-%m-%d') if request.form.get('end_date') else None,
+        status=request.form.get('status'),
+        description=request.form.get('description')
+    )
+    db.session.add(project)
+    db.session.commit()
+    flash('Project added successfully')
+    return redirect(url_for('projects'))
+
+@app.route('/projects/<int:id>')
+@login_required
+def project_detail(id):
+    project = Project.query.get_or_404(id)
+    return render_template('project_detail.html', project=project)
+
+@app.route('/projects/delete/<int:id>')
+@login_required
+def delete_project(id):
+    project = Project.query.get_or_404(id)
+    try:
+        Budget.query.filter_by(project_id=id).delete()
+        db.session.delete(project)
+        db.session.commit()
+        flash(f'✅ Project "{project.name}" deleted successfully')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'❌ Error deleting project: {str(e)}')
+    return redirect(url_for('index'))
+
+# ==================== BUDGET ROUTES ====================
+@app.route('/budgets')
+@login_required
+def budgets():
+    budgets_list = Budget.query.all()
+    projects_list = Project.query.all()
+    return render_template('budgets.html', budgets=budgets_list, projects=projects_list)
+
+@app.route('/budgets/add', methods=['POST'])
+@login_required
+def add_budget():
+    budget = Budget(
+        project_id=request.form.get('project_id'),
+        item_name=request.form.get('item_name'),
+        estimated_cost=float(request.form.get('estimated_cost')) if request.form.get('estimated_cost') else None,
+        actual_cost=float(request.form.get('actual_cost')) if request.form.get('actual_cost') else None,
+        category=request.form.get('category'),
+        notes=request.form.get('notes')
+    )
+    db.session.add(budget)
+    db.session.commit()
+    flash('Budget item added successfully')
+    return redirect(url_for('budgets'))
+
+@app.route('/budgets/delete/<int:id>')
+@login_required
+def delete_budget(id):
+    budget = Budget.query.get_or_404(id)
+    db.session.delete(budget)
+    db.session.commit()
+    flash('Budget item deleted')
+    return redirect(url_for('budgets'))
+
+# ==================== API ROUTES ====================
+@app.route('/api/dashboard')
+@login_required
+def dashboard_data():
+    total_contacts = Contact.query.count()
+    total_providers = Provider.query.count()
+    active_projects = Project.query.filter_by(status='in_progress').count()
+    total_budget = db.session.query(db.func.sum(Budget.estimated_cost)).scalar() or 0
+    
+    return jsonify({
+        'contacts': total_contacts,
+        'providers': total_providers,
+        'active_projects': active_projects,
+        'total_budget': total_budget
+    })
+
+@app.route('/api/projects/recent')
+@login_required
+def recent_projects():
+    projects = Project.query.order_by(Project.id.desc()).limit(5).all()
+    return jsonify([{
+        'id': p.id,
+        'name': p.name,
+        'status': p.status
+    } for p in projects])
+
+@app.route('/api/projects/list')
+@login_required
+def projects_list():
+    try:
+        projects = Project.query.order_by(Project.created_at.desc()).limit(10).all()
+        return jsonify([{
+            'id': p.id,
+            'name': p.name,
+            'status': p.status,
+            'start_date': p.start_date.strftime('%Y-%m-%d') if p.start_date else None,
+            'end_date': p.end_date.strftime('%Y-%m-%d') if p.end_date else None,
+            'budget_total': p.budget_total,
+            'address': p.address,
+            'contact_name': p.client_name,
+            'contact_phone': 'À venir'
+        } for p in projects])
+    except Exception as e:
+        print(f"Error in projects_list: {e}")
+        return jsonify([]), 500
+
+# ==================== CONTACT UPLOAD ====================
+@app.route('/contacts/upload', methods=['POST'])
+@login_required
+def upload_contacts():
+    if 'file' not in request.files:
+        flash('No file selected')
+        return redirect(url_for('contacts'))
+    
+    file = request.files['file']
+    if file.filename == '':
+        flash('No file selected')
+        return redirect(url_for('contacts'))
+    
+    try:
+        if file.filename.endswith('.csv'):
+            df = pd.read_csv(file)
+        elif file.filename.endswith(('.xlsx', '.xls')):
+            df = pd.read_excel(file)
+        else:
+            flash('Please upload CSV or Excel file')
+            return redirect(url_for('contacts'))
+        
+        success_count = 0
+        error_count = 0
+        errors = []
+        
+        def clean(val):
+            s = str(val).strip()
+            return '' if s.lower() == 'nan' else s
+        
+        for index, row in df.iterrows():
+            try:
+                contact = Contact(
+                    name=clean(row.get('Name', '')),
+                    phone=clean(row.get('Phone', '')),
+                    email=clean(row.get('Email', '')),
+                    company=clean(row.get('Company', '')),
+                    type='client',
+                    notes=f"Speciality: {clean(row.get('Speciality', ''))} | Address: {clean(row.get('Address', ''))} | Comments: {clean(row.get('Comments', ''))}"
+                )
+
+                if not contact.name:
+                    errors.append(f"Row {index + 2}: Name is required")
+                    error_count += 1
+                    continue
+
+                db.session.add(contact)
+                success_count += 1
+                
+            except Exception as e:
+                errors.append(f"Row {index + 2}: {str(e)}")
+                error_count += 1
+        
+        db.session.commit()
+        
+        if success_count > 0:
+            flash(f'✅ Successfully imported {success_count} contacts')
+        if error_count > 0:
+            flash(f'⚠️ Failed to import {error_count} contacts.')
+            for error in errors[:5]:
+                flash(f'Error: {error}')
+        
+    except Exception as e:
+        flash(f'Error reading file: {str(e)}')
+    
+    return redirect(url_for('contacts'))
+
+# ==================== PROVIDER UPLOAD ====================
+@app.route('/providers/upload', methods=['POST'])
+@login_required
+def upload_providers():
+    if 'file' not in request.files:
+        flash('No file selected')
+        return redirect(url_for('providers'))
+    
+    file = request.files['file']
+    if file.filename == '':
+        flash('No file selected')
+        return redirect(url_for('providers'))
+    
+    try:
+        if file.filename.endswith('.csv'):
+            df = pd.read_csv(file)
+        elif file.filename.endswith(('.xlsx', '.xls')):
+            df = pd.read_excel(file)
+        else:
+            flash('Please upload CSV or Excel file')
+            return redirect(url_for('providers'))
+        
+        success_count = 0
+        error_count = 0
+        errors = []
+        
+        def clean(val):
+            s = str(val).strip()
+            return '' if s.lower() == 'nan' else s
+        
+        for index, row in df.iterrows():
+            try:
+                provider = Provider(
+                    name=clean(row.get('Company Name', '')),
+                    contact_person=clean(row.get('Contact Person', '')),
+                    phone=clean(row.get('Phone', '')),
+                    email=clean(row.get('Email', '')),
+                    address=clean(row.get('Address', '')),
+                    service_type=clean(row.get('Speciality', '')),
+                    notes=clean(row.get('Comments', ''))
+                )
+                
+                if not provider.name:
+                    errors.append(f"Row {index + 2}: Company Name is required")
+                    error_count += 1
+                    continue
+                
+                db.session.add(provider)
+                success_count += 1
+                
+            except Exception as e:
+                errors.append(f"Row {index + 2}: {str(e)}")
+                error_count += 1
+        
+        db.session.commit()
+        
+        if success_count > 0:
+            flash(f'✅ Successfully imported {success_count} providers')
+        if error_count > 0:
+            flash(f'⚠️ Failed to import {error_count} providers.')
+            for error in errors[:5]:
+                flash(f'Error: {error}')
+        
+    except Exception as e:
+        flash(f'Error reading file: {str(e)}')
+    
+    return redirect(url_for('providers'))
+
+# ==================== DOWNLOAD TEMPLATES ====================
+@app.route('/contacts/template')
+@login_required
+def download_contacts_template():
+    template = pd.DataFrame({
+        'Name': ['Ahmed Ben Ali', 'Sarra Mansour'],
+        'Phone': ['+216 22 123 456', '+216 55 789 012'],
+        'Email': ['ahmed@email.com', 'sarra@email.com'],
+        'Company': ['ABC Construction', 'XYZ Materials'],
+        'Speciality': ['Project Management', 'Electrical Engineering'],
+        'Comments': ['Good client, multiple projects', 'Reliable supplier'],
+        'Address': ['Tunis, Centre Ville', 'Sousse, Rue de la Liberté']
+    })
+    
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        template.to_excel(writer, index=False, sheet_name='Contacts')
+    
+    output.seek(0)
+    
+    return send_file(
+        output,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        as_attachment=True,
+        download_name='contacts_template.xlsx'
+    )
+
+@app.route('/providers/template')
+@login_required
+def download_providers_template():
+    template = pd.DataFrame({
+        'Company Name': ['Matériaux Tunisie', 'Électro Plus'],
+        'Contact Person': ['Karim Ben Salem', 'Leila Mansour'],
+        'Phone': ['+216 71 123 456', '+216 72 789 012'],
+        'Email': ['karim@materiaux.tn', 'leila@electroplus.tn'],
+        'Speciality': ['Construction Materials', 'Electrical Supplies'],
+        'Comments': ['Good prices, fast delivery', 'Certified products'],
+        'Address': ['Tunis, Zone Industrielle', 'Sousse, Route de la Plage']
+    })
+    
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        template.to_excel(writer, index=False, sheet_name='Providers')
+    
+    output.seek(0)
+    
+    return send_file(
+        output,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        as_attachment=True,
+        download_name='providers_template.xlsx'
+    )
+
+@app.route('/financial/template')
+@login_required
+def download_financial_template():
+    """Download the financial Excel template"""
+    try:
+        # Path to your actual template file
+        template_path = os.path.join(app.root_path, 'templates', 'financial_template.xlsx')
+        
+        # Check if file exists
+        if not os.path.exists(template_path):
+            flash('Template file not found. Please contact administrator.')
+            return redirect(request.referrer or url_for('index'))
+        
+        return send_file(
+            template_path,
+            as_attachment=True,
+            download_name='financial_template.xlsx',
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+    except Exception as e:
+        flash(f'Error downloading template: {str(e)}')
+        return redirect(request.referrer or url_for('index'))
+
+# ==================== DOWNLOAD CONTACTS ====================
+@app.route('/contacts/download-all')
+@login_required
+def download_all_contacts():
+    try:
+        contacts = Contact.query.all()
+        
+        data = []
+        for contact in contacts:
+            notes = contact.notes or ""
+            data.append({
+                'Name': contact.name,
+                'Email': contact.email or '',
+                'Phone': contact.phone or '',
+                'Company': contact.company or '',
+                'Type': contact.type or '',
+                'Notes': notes
+            })
+        
+        df = pd.DataFrame(data)
+        
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, sheet_name='All Contacts')
+        
+        output.seek(0)
+        
+        from datetime import datetime
+        filename = f"all_contacts_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+        
+        return send_file(
+            output,
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            as_attachment=True,
+            download_name=filename
+        )
+    
+    except Exception as e:
+        flash(f'Error downloading contacts: {str(e)}')
+        return redirect(url_for('contacts'))
+    
+@app.route('/contacts/download-selected', methods=['POST'])
+@login_required
+def download_selected_contacts():
+    try:
+        selected_ids = json.loads(request.form.get('selected_ids', '[]'))
+        
+        if not selected_ids:
+            flash('No contacts selected')
+            return redirect(url_for('contacts'))
+        
+        contacts = Contact.query.filter(Contact.id.in_(selected_ids)).all()
+        
+        data = []
+        for contact in contacts:
+            data.append({
+                'Name': contact.name,
+                'Email': contact.email or '',
+                'Phone': contact.phone or '',
+                'Company': contact.company or '',
+                'Type': contact.type or '',
+                'Notes': contact.notes or ''
+            })
+        
+        df = pd.DataFrame(data)
+        
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, sheet_name='Selected Contacts')
+        
+        output.seek(0)
+        
+        from datetime import datetime
+        filename = f"selected_contacts_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+        
+        return send_file(
+            output,
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            as_attachment=True,
+            download_name=filename
+        )
+    
+    except Exception as e:
+        flash(f'Error downloading contacts: {str(e)}')
+        return redirect(url_for('contacts'))
+
+# ==================== PROJECT FINANCIAL ROUTES ====================
+@app.route('/project/<int:project_id>/financial')
+@login_required
+def project_financial(project_id):
+    project = Project.query.get_or_404(project_id)
+    
+    financial = ProjectFinancialParams.query.filter_by(project_id=project_id).first()
+    if not financial:
+        financial = ProjectFinancialParams(project_id=project_id)
+        db.session.add(financial)
+        db.session.commit()
+    
+    expenses = ProjectExpense.query.filter_by(project_id=project_id).order_by(ProjectExpense.date.desc()).all()
+    total_expenses = sum(e.amount for e in expenses)
+    
+    receipts = ProjectReceipt.query.filter_by(project_id=project_id).all()
+    total_receipts = sum(r.amount for r in receipts)
+    
+    client_received = total_receipts
+    current_cash = client_received - total_expenses
+    estimated_margin = financial.sale_price - financial.estimated_budget
+    current_result = financial.sale_price - total_expenses
+    
+    categories = {}
+    for expense in expenses:
+        categories[expense.category] = categories.get(expense.category, 0) + expense.amount
+    
+    category_totals = []
+    colors = {'Ouvrier': '#17a2b8', 'Matériau': '#28a745', 'Divers': '#ffc107'}
+    for cat, amount in categories.items():
+        category_totals.append({
+            'category': cat,
+            'total': amount,
+            'percentage': (amount / total_expenses * 100) if total_expenses > 0 else 0,
+            'color': colors.get(cat, '#6c757d')
+        })
+    
+    return render_template('project_financial.html', 
+                         project=project,
+                         financial={
+                             'client_received': client_received,
+                             'current_cash': current_cash,
+                             'sale_price': financial.sale_price,
+                             'estimated_budget': financial.estimated_budget,
+                             'estimated_margin': estimated_margin,
+                             'total_expenses': total_expenses,
+                             'current_result': current_result,
+                             'devis_ref': financial.devis_ref
+                         },
+                         expenses=expenses,
+                         total_expenses=total_expenses,
+                         category_totals=category_totals)
+
+@app.route('/project/<int:project_id>/expense/add', methods=['POST'])
+@login_required
+def add_project_expense(project_id):
+    expense = ProjectExpense(
+        project_id=project_id,
+        date=datetime.strptime(request.form.get('date'), '%Y-%m-%d'),
+        nature=request.form.get('nature'),
+        amount=float(request.form.get('amount')),
+        comment=request.form.get('comment'),
+        category=request.form.get('category')
+    )
+    db.session.add(expense)
+    db.session.commit()
+    flash('Expense added successfully')
+    return redirect(url_for('project_financial', project_id=project_id))
+
+@app.route('/project/<int:project_id>/receipt/add', methods=['POST'])
+@login_required
+def add_client_receipt(project_id):
+    receipt = ProjectReceipt(
+        project_id=project_id,
+        date=datetime.strptime(request.form.get('date'), '%Y-%m-%d'),
+        amount=float(request.form.get('amount')),
+        comment=request.form.get('comment')
+    )
+    db.session.add(receipt)
+    db.session.commit()
+    flash('Client receipt added successfully')
+    return redirect(url_for('project_financial', project_id=project_id))
+
+@app.route('/project/<int:project_id>/financial/update', methods=['POST'])
+@login_required
+def update_project_financial_params(project_id):
+    financial = ProjectFinancialParams.query.filter_by(project_id=project_id).first()
+    if not financial:
+        financial = ProjectFinancialParams(project_id=project_id)
+        db.session.add(financial)
+    
+    financial.sale_price = float(request.form.get('sale_price', 0))
+    financial.estimated_budget = float(request.form.get('estimated_budget', 0))
+    financial.devis_ref = float(request.form.get('devis_ref', 0))
+    
+    db.session.commit()
+    flash('Project parameters updated')
+    return redirect(url_for('project_financial', project_id=project_id))
+
+@app.route('/project/<int:project_id>/expense/<int:expense_id>/delete', methods=['POST'])
+@login_required
+def delete_expense(project_id, expense_id):
+    expense = ProjectExpense.query.get_or_404(expense_id)
+    db.session.delete(expense)
+    db.session.commit()
+    return jsonify({'success': True})
+
+# ==================== PROJECT FINANCIAL EXPORT/IMPORT ====================
+@app.route('/project/<int:project_id>/financial/export')
+@login_required
+def export_project_financial(project_id):
+    """Export project financial data to Excel"""
+    try:
+        project = Project.query.get_or_404(project_id)
+        expenses = ProjectExpense.query.filter_by(project_id=project_id).all()
+        
+        # Create DataFrame from expenses
+        data = []
+        for expense in expenses:
+            data.append({
+                'Date': expense.date.strftime('%d/%m/%Y'),
+                'Nature': expense.nature,
+                'Montant': expense.amount,
+                'Commentaire': expense.comment or '',
+                'Catégorie': expense.category
+            })
+        
+        df = pd.DataFrame(data)
+        
+        # Create Excel file
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, sheet_name='Dépenses')
+        
+        output.seek(0)
+        
+        filename = f"expenses_{project.name.replace(' ', '_')}_{datetime.now().strftime('%Y%m%d')}.xlsx"
+        
+        return send_file(
+            output,
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            as_attachment=True,
+            download_name=filename
+        )
+    except Exception as e:
+        flash(f'Error exporting: {str(e)}')
+        return redirect(url_for('project_financial', project_id=project_id))
+
+@app.route('/project/<int:project_id>/financial/import', methods=['POST'])
+@login_required
+def import_project_financial(project_id):
+    """Import expenses from Excel"""
+    if 'file' not in request.files:
+        flash('No file selected')
+        return redirect(url_for('project_financial', project_id=project_id))
+    
+    file = request.files['file']
+    if file.filename == '':
+        flash('No file selected')
+        return redirect(url_for('project_financial', project_id=project_id))
+    
+    try:
+        # Read the Excel file
+        if file.filename.endswith('.csv'):
+            df = pd.read_csv(file)
+        else:
+            df = pd.read_excel(file)
+        
+        # Track success/failure
+        success_count = 0
+        error_count = 0
+        errors = []
+        
+        # Define clean function
+        def clean(val):
+            if pd.isna(val):
+                return ''
+            return str(val).strip()
+        
+        # Process each row
+        for index, row in df.iterrows():
+            try:
+                # Parse date (handle different formats)
+                date_str = clean(row.get('Date', ''))
+                if date_str:
+                    try:
+                        # Try DD/MM/YYYY format
+                        date = datetime.strptime(date_str, '%d/%m/%Y').date()
+                    except:
+                        try:
+                            # Try YYYY-MM-DD format
+                            date = datetime.strptime(date_str, '%Y-%m-%d').date()
+                        except:
+                            date = datetime.now().date()
+                else:
+                    date = datetime.now().date()
+                
+                # Get amount
+                amount_str = clean(row.get('Montant', '0'))
+                try:
+                    amount = float(amount_str.replace(',', '.'))
+                except:
+                    amount = 0.0
+                
+                # Create expense
+                expense = ProjectExpense(
+                    project_id=project_id,
+                    date=date,
+                    nature=clean(row.get('Nature', '')),
+                    amount=amount,
+                    comment=clean(row.get('Commentaire', '')),
+                    category=clean(row.get('Catégorie', 'Divers'))
+                )
+                
+                # Basic validation
+                if not expense.nature:
+                    errors.append(f"Row {index + 2}: Nature is required")
+                    error_count += 1
+                    continue
+                
+                if expense.amount <= 0:
+                    errors.append(f"Row {index + 2}: Amount must be positive")
+                    error_count += 1
+                    continue
+                
+                db.session.add(expense)
+                success_count += 1
+                
+            except Exception as e:
+                errors.append(f"Row {index + 2}: {str(e)}")
+                error_count += 1
+        
+        # Commit all successful entries
+        db.session.commit()
+        
+        # Flash summary
+        if success_count > 0:
+            flash(f'✅ Successfully imported {success_count} expenses')
+        if error_count > 0:
+            flash(f'⚠️ Failed to import {error_count} expenses. Check your file format.')
+            for error in errors[:5]:
+                flash(f'Error: {error}')
+        
+    except Exception as e:
+        flash(f'Error reading file: {str(e)}')
+    
+    return redirect(url_for('project_financial', project_id=project_id))
+
+# ==================== MAIN ====================
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-        # Create default admin user if not exists
         if not User.query.filter_by(username='admin').first():
             admin = User(username='admin')
             admin.set_password('changeme')

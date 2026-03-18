@@ -51,10 +51,10 @@
         </div>
     </div>
 
-    <!-- Recent Projects Section (like your website) -->
+    <!-- Projects Section -->
     <div class="row mb-5">
         <div class="col-12">
-            <h2 class="section-title">Recent Projects</h2>
+            <h2 class="section-title">Projects</h2>
         </div>
     </div>
 
@@ -106,6 +106,26 @@
                     <h5>Manage Budget</h5>
                 </div>
             </a>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteProjectModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong id="deleteProjectName"></strong>?</p>
+                <p class="text-danger"><small>This action cannot be undone. All associated budgets and financial data will also be deleted.</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a href="#" id="confirmDeleteBtn" class="btn btn-danger">Delete Project</a>
+            </div>
         </div>
     </div>
 </div>
@@ -170,15 +190,48 @@ function loadDashboardData() {
                     <div class="col-md-4">
                         <div class="project-card">
                             <div class="card-body">
-                                <h5 class="card-title">${project.name}</h5>
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <h5 class="card-title mb-0">${project.name}</h5>
+                                    <button class="btn btn-sm btn-outline-danger delete-project-btn" 
+                                            data-project-id="${project.id}"
+                                            data-project-name="${project.name}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                                 <span class="badge ${statusClass} text-white mb-3">${statusText}</span>
-                                <a href="/projects/${project.id}" class="btn btn-outline-primary w-100">View Details</a>
+                                <div class="d-grid gap-2">
+                                    <a href="/projects/${project.id}" class="btn btn-outline-primary">View Details</a>
+                                    <a href="/project/${project.id}/financial" class="btn btn-outline-info">
+                                        <i class="fas fa-coins me-1"></i>Financial
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 `;
             });
+            
+            // Add delete event listeners after projects are loaded
+            attachDeleteListeners();
         });
+}
+
+// Delete confirmation handling
+function attachDeleteListeners() {
+    const deleteModal = new bootstrap.Modal(document.getElementById('deleteProjectModal'));
+    
+    document.querySelectorAll('.delete-project-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const projectId = this.dataset.projectId;
+            const projectName = this.dataset.projectName;
+            
+            document.getElementById('deleteProjectName').textContent = projectName;
+            document.getElementById('confirmDeleteBtn').href = `/projects/delete/${projectId}`;
+            
+            deleteModal.show();
+        });
+    });
 }
 
 // Start observing when page loads
@@ -189,4 +242,93 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
+<style>
+/* Additional styles for project cards */
+.project-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    height: 100%;
+    background: white;
+}
+
+.project-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+.project-card .card-body {
+    padding: 1.5rem;
+}
+
+.project-card .card-title {
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+.project-card .btn-outline-danger {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.project-card .btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: white;
+}
+
+.project-card .badge {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+.dashboard-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+    background: white;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+.counter {
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+/* Modal styles */
+.modal-content {
+    border: none;
+    border-radius: 16px;
+}
+
+.modal-header {
+    border-radius: 16px 16px 0 0;
+}
+
+.modal-header .btn-close-white {
+    filter: brightness(0) invert(1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .project-card .card-body {
+        padding: 1rem;
+    }
+    
+    .project-card .card-title {
+        font-size: 1.1rem;
+    }
+    
+    .btn-group {
+        flex-wrap: wrap;
+    }
+}
+</style>
 {% endblock %}

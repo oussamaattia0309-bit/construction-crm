@@ -1,0 +1,363 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2" style="color: var(--primary);">
+            <i class="fas fa-hard-hat me-2"></i>{{ project.name }}
+        </h1>
+        <div>
+            <span class="badge bg-warning fs-6 p-2">En cours</span>
+        </div>
+    </div>
+
+    <!-- Financial Summary Cards -->
+    <div class="card mb-4">
+        <div class="card-header" style="background-color: var(--primary); color: white;">
+            <i class="fas fa-chart-pie me-2"></i>Financial Summary
+        </div>
+        <div class="card-body">
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="summary-card">
+                        <div class="summary-label">
+                            <i class="fas fa-hand-holding-usd me-1" style="color: var(--accent);"></i>
+                            Reçu de client
+                        </div>
+                        <div class="summary-value">{{ "%.2f"|format(financial.client_received or 0) }} TND</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="summary-card">
+                        <div class="summary-label">
+                            <i class="fas fa-cash-register me-1" style="color: var(--accent);"></i>
+                            Caisse actuellement
+                        </div>
+                        <div class="summary-value {% if financial.current_cash < 0 %}text-danger{% endif %}">
+                            {{ "%.2f"|format(financial.current_cash or 0) }} TND
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="summary-card">
+                        <div class="summary-label">
+                            <i class="fas fa-tag me-1" style="color: var(--accent);"></i>
+                            Prix de vente
+                        </div>
+                        <div class="summary-value">{{ "%.2f"|format(financial.sale_price or 0) }} TND</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="summary-card">
+                        <div class="summary-label">
+                            <i class="fas fa-chart-line me-1" style="color: var(--accent);"></i>
+                            Budget prévisionnel
+                        </div>
+                        <div class="summary-value">{{ "%.2f"|format(financial.estimated_budget or 0) }} TND</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="summary-card">
+                        <div class="summary-label">
+                            <i class="fas fa-percent me-1" style="color: var(--accent);"></i>
+                            Marge prévisionnelle
+                        </div>
+                        <div class="summary-value text-success">{{ "%.2f"|format(financial.estimated_margin or 0) }} TND</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="summary-card">
+                        <div class="summary-label">
+                            <i class="fas fa-receipt me-1" style="color: var(--accent);"></i>
+                            Total dépenses réelles
+                        </div>
+                        <div class="summary-value">{{ "%.2f"|format(financial.total_expenses or 0) }} TND</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="summary-card">
+                        <div class="summary-label">
+                            <i class="fas fa-chart-bar me-1" style="color: var(--accent);"></i>
+                            Résultat actuel
+                        </div>
+                        <div class="summary-value {% if financial.current_result < 0 %}text-danger{% else %}text-success{% endif %}">
+                            {{ "%.2f"|format(financial.current_result or 0) }} TND
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="summary-card">
+                        <div class="summary-label">
+                            <i class="fas fa-calculator me-1" style="color: var(--accent);"></i>
+                            Référence devis
+                        </div>
+                        <div class="summary-value">{{ "%.2f"|format(financial.devis_ref or 0) }} TND</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Action Buttons -->
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="btn-group" role="group">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addExpenseModal">
+                <i class="fas fa-plus-circle me-2"></i>Add Expense
+            </button>
+            
+            <!-- Download Template Button -->
+            <a href="{{ url_for('download_financial_template') }}" class="btn btn-info">
+                <i class="fas fa-download me-2"></i>Download Template
+            </a>
+            
+            <!-- Import from Excel Button (opens modal) -->
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importExcelModal">
+                <i class="fas fa-upload me-2"></i>Import from Excel
+            </button>
+            
+            <!-- Export to Excel Button -->
+            <a href="{{ url_for('export_project_financial', project_id=project.id) }}" class="btn btn-warning">
+                <i class="fas fa-file-excel me-2"></i>Export to Excel
+            </a>
+        </div>
+    </div>
+</div>
+
+    <!-- Expenses Table -->
+    <div class="card mb-4">
+        <div class="card-header" style="background-color: var(--primary); color: white;">
+            <i class="fas fa-list me-2"></i>Détail des dépenses
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Nature</th>
+                            <th>Montant (TND)</th>
+                            <th>Commentaire</th>
+                            <th>Catégorie</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for expense in expenses %}
+                        <tr>
+                            <td>{{ expense.date.strftime('%d/%m/%Y') }}</td>
+                            <td>{{ expense.nature }}</td>
+                            <td>{{ "%.2f"|format(expense.amount) }}</td>
+                            <td>{{ expense.comment or '' }}</td>
+                            <td><span class="badge-category">{{ expense.category }}</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot style="background-color: #e9ecef; font-weight: 600;">
+                        <tr>
+                            <td colspan="2"><strong>Total</strong></td>
+                            <td><strong>{{ "%.2f"|format(total_expenses) }} TND</strong></td>
+                            <td colspan="3"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cash Summary & Category Breakdown -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header" style="background-color: var(--primary); color: white;">
+                    <i class="fas fa-cash-register me-2"></i>Synthèse financière
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>Total reçu client:</span>
+                        <span class="fw-bold text-success">{{ "%.2f"|format(financial.client_received or 0) }} TND</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>Total dépenses:</span>
+                        <span class="fw-bold text-danger">{{ "%.2f"|format(financial.total_expenses or 0) }} TND</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold">Solde:</span>
+                        <span class="fw-bold {% if (financial.client_received|float - financial.total_expenses|float) < 0 %}text-danger{% else %}text-success{% endif %}">
+                            {{ "%.2f"|format(financial.client_received|float - financial.total_expenses|float) }} TND
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header" style="background-color: var(--primary); color: white;">
+                    <i class="fas fa-chart-simple me-2"></i>Répartition par catégorie
+                </div>
+                <div class="card-body">
+                    {% for cat in category_totals %}
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between">
+                            <span>{{ cat.category }}</span>
+                            <span>{{ "%.2f"|format(cat.total) }} TND ({{ "%.1f"|format(cat.percentage) }}%)</span>
+                        </div>
+                        <div class="progress mb-3" style="height: 8px;">
+                            <div class="progress-bar" style="width: {{ cat.percentage }}%; background-color: {{ cat.color }};"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Expense Modal -->
+<div class="modal fade" id="addExpenseModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: var(--primary); color: white;">
+                <h5 class="modal-title">Add New Expense</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('add_project_expense', project_id=project.id) }}" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Date</label>
+                        <input type="date" class="form-control" name="date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nature</label>
+                        <input type="text" class="form-control" name="nature" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Montant (TND)</label>
+                        <input type="number" step="0.01" class="form-control" name="amount" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Commentaire</label>
+                        <textarea class="form-control" name="comment" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Catégorie</label>
+                        <select class="form-select" name="category" required>
+                            <option value="Ouvrier">Ouvrier</option>
+                            <option value="Matériau">Matériau</option>
+                            <option value="Divers">Divers</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Expense</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Import Excel Modal -->
+<div class="modal fade" id="importExcelModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">Import from Excel</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('import_project_financial', project_id=project.id) }}" method="POST" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Choose Excel File</label>
+                        <input type="file" class="form-control" name="file" accept=".xlsx,.xls,.csv" required>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Format required:</strong> Columns should be:
+                        <ul class="mb-0 mt-2">
+                            <li><strong>Date</strong> (DD/MM/YYYY)</li>
+                            <li><strong>Nature</strong> (description)</li>
+                            <li><strong>Montant</strong> (number)</li>
+                            <li><strong>Commentaire</strong> (optional)</li>
+                            <li><strong>Catégorie</strong> (Ouvrier, Matériau, Divers)</li>
+                        </ul>
+                    </div>
+                    <p class="text-muted small mb-0">
+                        <i class="fas fa-download me-1"></i>
+                        <a href="{{ url_for('download_financial_template') }}">Download template</a> for correct format
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Import</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.summary-card {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    height: 100%;
+}
+
+.summary-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 5px;
+}
+
+.summary-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.table th {
+    background-color: var(--primary);
+    color: white;
+}
+
+.badge-category {
+    background-color: #e9ecef;
+    color: #495057;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    display: inline-block;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-radius: 12px;
+}
+
+.btn-group {
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.btn-group .btn {
+    border-radius: 5px !important;
+    margin-bottom: 5px;
+}
+</style>
+{% endblock %}
