@@ -525,6 +525,94 @@ def download_all_contacts():
     except Exception as e:
         flash(f'Error downloading contacts: {str(e)}')
         return redirect(url_for('contacts'))
+    
+@app.route('/contacts/download-selected', methods=['POST'])
+@login_required
+def download_selected_contacts():
+    """Download selected contacts as Excel file"""
+    try:
+        selected_ids = json.loads(request.form.get('selected_ids', '[]'))
+        
+        if not selected_ids:
+            flash('No contacts selected')
+            return redirect(url_for('contacts'))
+        
+        contacts = Contact.query.filter(Contact.id.in_(selected_ids)).all()
+        
+        data = []
+        for contact in contacts:
+            data.append({
+                'Name': contact.name,
+                'Email': contact.email or '',
+                'Phone': contact.phone or '',
+                'Company': contact.company or '',
+                'Type': contact.type or '',
+                'Notes': contact.notes or ''
+            })
+        
+        df = pd.DataFrame(data)
+        
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, sheet_name='Selected Contacts')
+        
+        output.seek(0)
+        
+        from datetime import datetime
+        filename = f"selected_contacts_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+        
+        return send_file(
+            output,
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            as_attachment=True,
+            download_name=filename
+        )
+    
+    except Exception as e:
+        flash(f'Error downloading contacts: {str(e)}')
+        return redirect(url_for('contacts'))
+
+@app.route('/contacts/<int:contact_id>/details')
+@login_required
+def get_contact_details(contact_id):
+    contact = Contact.query.get_or_404(contact_id)
+    return jsonify({
+        'id': contact.id,
+        'name': contact.name,
+        'email': contact.email,
+        'phone': contact.phone,
+        'company': contact.company,
+        'type': contact.type,
+        'notes': contact.notes
+    })
+
+@app.route('/contacts/<int:contact_id>/edit', methods=['POST'])
+@login_required
+def edit_contact(contact_id):
+    contact = Contact.query.get_or_404(contact_id)
+    contact.name = request.form.get('name')
+    contact.email = request.form.get('email')
+    contact.phone = request.form.get('phone')
+    contact.company = request.form.get('company')
+    contact.type = request.form.get('type')
+    contact.notes = request.form.get('notes')
+    
+    db.session.commit()
+    flash('Contact updated successfully')
+    return redirect(url_for('contacts'))
+
+@app.route('/contacts/bulk-delete', methods=['POST'])
+@login_required
+def bulk_delete_contacts():
+    data = request.get_json()
+    ids = data.get('ids', [])
+    
+    if ids:
+        Contact.query.filter(Contact.id.in_(ids)).delete(synchronize_session=False)
+        db.session.commit()
+        return jsonify({'success': True, 'count': len(ids)})
+    
+    return jsonify({'success': False}), 400
 
 if __name__ == '__main__':
     with app.app_context():
