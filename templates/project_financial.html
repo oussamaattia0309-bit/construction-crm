@@ -3,14 +3,18 @@
 {% block content %}
 <div class="container-fluid">
     <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h2" style="color: var(--primary);">
-            <i class="fas fa-hard-hat me-2"></i>{{ project.name }}
-        </h1>
-        <div>
-            <span class="badge bg-warning fs-6 p-2">En cours</span>
-        </div>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2" style="color: var(--primary);">
+        <i class="fas fa-hard-hat me-2"></i>{{ project.name }}
+    </h1>
+    <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-warning fs-6 p-2">En cours</span>
+        <!-- Delete All Data Button -->
+        <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAllDataModal">
+            <i class="fas fa-trash-alt me-2"></i>Delete All Data
+        </button>
     </div>
+</div>
 
 <!-- Financial Summary Cards -->
 <div class="card mb-4">
@@ -558,6 +562,28 @@
                     <button type="submit" class="btn btn-success">Import</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+<!-- Delete All Data Modal -->
+<div class="modal fade" id="deleteAllDataModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Delete All Financial Data</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="fw-bold">⚠️ Warning: This action cannot be undone!</p>
+                <p>You are about to delete <strong>{{ expenses|length }}</strong> expense entries.</p>
+                <p class="text-danger">All financial data for this project will be permanently removed.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{{ url_for('delete_all_project_financial', project_id=project.id) }}" method="POST">
+                    <button type="submit" class="btn btn-danger">Delete Everything</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
