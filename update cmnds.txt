@@ -1,4 +1,4 @@
-# on local
+==============================# on local
 
 
 cd C:\Users\USER\Desktop\stuff\web\CRM CAE
@@ -6,7 +6,7 @@ git add .
 git commit -m "Describe your changes"
 git push
 
-#On PythonAnywhere
+==============================#On PythonAnywhere
 
 
 cd ~/mysite
@@ -14,6 +14,26 @@ git pull
 touch /var/www/oussamaattia1994_pythonanywhere_com_wsgi.py
 
 
-#acess :
+==============================#acess :
 
 http://localhost:5000
+
+
+
+==============================#pull from github 
+
+cd "C:\Users\USER\Desktop\stuff\web\CRM CAE"; `
+git reset --hard HEAD; `
+git clean -fd; `
+git pull origin main; `
+venv\Scripts\activate; `
+pip install -r requirements.txt; `
+Remove-Item -Path "construction_crm.db" -ErrorAction SilentlyContinue; `
+Remove-Item -Path "construction_crm.db-journal" -ErrorAction SilentlyContinue; `
+Remove-Item -Path "construction_crm.db-wal" -ErrorAction SilentlyContinue; `
+Remove-Item -Path "construction_crm.db-shm" -ErrorAction SilentlyContinue; `
+Remove-Item -Recurse -Force "instance" -ErrorAction SilentlyContinue; `
+Remove-Item -Recurse -Force "__pycache__" -ErrorAction SilentlyContinue; `
+Write-Host "✅ Database deleted. Starting Flask..." -ForegroundColor Green; `
+python app.py
+=====================================
