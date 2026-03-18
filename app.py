@@ -108,6 +108,32 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 # ==================== AUTH ROUTES ====================
+@app.route('/project/<int:project_id>/financial/update-summary', methods=['POST'])
+@login_required
+def update_financial_summary(project_id):
+    """Update all financial summary values"""
+    try:
+        financial = ProjectFinancialParams.query.filter_by(project_id=project_id).first()
+        if not financial:
+            financial = ProjectFinancialParams(project_id=project_id)
+            db.session.add(financial)
+        
+        data = request.get_json()
+        
+        # Update financial params
+        financial.sale_price = float(data.get('sale_price', 0))
+        financial.estimated_budget = float(data.get('estimated_budget', 0))
+        financial.devis_ref = float(data.get('devis_ref', 0))
+        
+        # Update receipts total (you may want to create receipts instead)
+        # This is simplified - you might want to create actual receipt entries
+        
+        db.session.commit()
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
 @app.route('/')
 def index():
     if current_user.is_authenticated:
@@ -817,7 +843,25 @@ def delete_expense(project_id, expense_id):
     expense = ProjectExpense.query.get_or_404(expense_id)
     db.session.delete(expense)
     db.session.commit()
-    return jsonify({'success': True})
+    flash('Expense deleted successfully')
+    return redirect(url_for('project_financial', project_id=project_id))
+
+# ===== NEW ROUTE ADDED HERE =====
+@app.route('/project/<int:project_id>/financial/delete-all', methods=['POST'])
+@login_required
+def delete_all_project_financial(project_id):
+    """Delete all financial data for a project"""
+    try:
+        # Delete all expenses
+        ProjectExpense.query.filter_by(project_id=project_id).delete()
+        # Delete all receipts
+        ProjectReceipt.query.filter_by(project_id=project_id).delete()
+        db.session.commit()
+        flash('✅ All financial data deleted successfully')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'❌ Error deleting data: {str(e)}')
+    return redirect(url_for('project_financial', project_id=project_id))
 
 # ==================== PROJECT FINANCIAL EXPORT/IMPORT ====================
 @app.route('/project/<int:project_id>/financial/export')
