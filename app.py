@@ -7,6 +7,7 @@ import os
 import pandas as pd
 import io
 import csv
+import json  # Make sure this is imported
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
@@ -307,17 +308,22 @@ def upload_contacts():
         error_count = 0
         errors = []
         
+        # Define clean function once
+        def clean(val):
+            s = str(val).strip()
+            return '' if s.lower() == 'nan' else s
+        
         # Process each row
         for index, row in df.iterrows():
             try:
                 # Map Excel columns to database fields
                 contact = Contact(
-                    name=str(row.get('Name', '')),
-                    phone=str(row.get('Phone', '')),
-                    email=str(row.get('Email', '')),
-                    company=str(row.get('Company', '')),
-                    type='client',  # Default type
-                    notes=f"Speciality: {row.get('Speciality', '')} | Address: {row.get('Address', '')} | Comments: {row.get('Comments', '')}"
+                    name=clean(row.get('Name', '')),
+                    phone=clean(row.get('Phone', '')),
+                    email=clean(row.get('Email', '')),
+                    company=clean(row.get('Company', '')),
+                    type='client',
+                    notes=f"Speciality: {clean(row.get('Speciality', ''))} | Address: {clean(row.get('Address', ''))} | Comments: {clean(row.get('Comments', ''))}"
                 )
 
                 # Basic validation
@@ -377,18 +383,23 @@ def upload_providers():
         error_count = 0
         errors = []
         
+        # Define clean function
+        def clean(val):
+            s = str(val).strip()
+            return '' if s.lower() == 'nan' else s
+        
         # Process each row
         for index, row in df.iterrows():
             try:
                 # Map Excel columns to database fields
                 provider = Provider(
-                    name=str(row.get('Company Name', '')),
-                    contact_person=str(row.get('Contact Person', '')),
-                    phone=str(row.get('Phone', '')),
-                    email=str(row.get('Email', '')),
-                    address=str(row.get('Address', '')),
-                    service_type=str(row.get('Speciality', '')),  # Map Speciality to service_type
-                    notes=str(row.get('Comments', ''))
+                    name=clean(row.get('Company Name', '')),
+                    contact_person=clean(row.get('Contact Person', '')),
+                    phone=clean(row.get('Phone', '')),
+                    email=clean(row.get('Email', '')),
+                    address=clean(row.get('Address', '')),
+                    service_type=clean(row.get('Speciality', '')),  # Map Speciality to service_type
+                    notes=clean(row.get('Comments', ''))
                 )
                 
                 # Basic validation
@@ -613,6 +624,38 @@ def bulk_delete_contacts():
         return jsonify({'success': True, 'count': len(ids)})
     
     return jsonify({'success': False}), 400
+@app.route('/contacts/<int:contact_id>/update-type', methods=['POST'])
+@login_required
+def update_contact_type(contact_id):
+    contact = Contact.query.get_or_404(contact_id)
+    data = request.get_json()
+    new_type = data.get('type')
+    if new_type:
+        contact.type = new_type
+        db.session.commit()
+        return jsonify({'success': True})
+    return jsonify({'success': False}), 400
+
+@app.route('/contacts/<int:contact_id>/update-relation', methods=['POST'])
+@login_required
+def update_contact_relation(contact_id):
+    contact = Contact.query.get_or_404(contact_id)
+    data = request.get_json()
+    relation = data.get('relation', '')
+    
+    # Store relation in notes (you could also create a separate field)
+    # Remove any existing relation marker
+    notes = contact.notes or ''
+    import re
+    notes = re.sub(r'relation:(good|average|bad)\s*', '', notes)
+    
+    # Add new relation if not empty
+    if relation:
+        notes = notes.strip() + f' relation:{relation}'
+    
+    contact.notes = notes.strip()
+    db.session.commit()
+    return jsonify({'success': True})
 
 if __name__ == '__main__':
     with app.app_context():

@@ -11,27 +11,18 @@
 <div class="row mb-4">
     <div class="col-12">
         <div class="btn-group" role="group">
-            <!-- Add New Contact Button -->
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addContactModal">
                 <i class="fas fa-plus-circle me-2"></i>Add New Contact
             </button>
-            
-            <!-- Upload Contacts Button -->
             <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#uploadContactsModal">
                 <i class="fas fa-upload me-2"></i>Upload Contacts
             </button>
-            
-            <!-- Download All Contacts Button -->
             <a href="{{ url_for('download_all_contacts') }}" class="btn btn-info">
                 <i class="fas fa-download me-2"></i>Download All Contacts
             </a>
-            
-            <!-- Download Selected Contacts Button -->
             <button class="btn btn-secondary" id="downloadSelectedBtn" style="display: none;">
                 <i class="fas fa-download me-2"></i>Download Selected
             </button>
-            
-            <!-- Download Template Button -->
             <a href="{{ url_for('download_contacts_template') }}" class="btn btn-warning">
                 <i class="fas fa-file-excel me-2"></i>Download Template
             </a>
@@ -46,8 +37,7 @@
             <span class="input-group-text bg-primary text-white">
                 <i class="fas fa-search"></i>
             </span>
-            <input type="text" id="searchInput" class="form-control" 
-                   placeholder="Search...">
+            <input type="text" id="searchInput" class="form-control" placeholder="Search...">
         </div>
     </div>
     <div class="col-md-4">
@@ -84,6 +74,7 @@
                                 <th class="sortable" data-sort="phone">Phone <i class="fas fa-sort ms-1"></i></th>
                                 <th class="sortable" data-sort="company">Company <i class="fas fa-sort ms-1"></i></th>
                                 <th class="sortable" data-sort="type">Type <i class="fas fa-sort ms-1"></i></th>
+                                <th>Relation</th>
                                 <th style="width: 120px;">Actions</th>
                             </tr>
                         </thead>
@@ -108,13 +99,21 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <button class="btn btn-sm btn-primary edit-contact" 
+                                    <select class="relation-select" onchange="updateRelation({{ contact.id }}, this.value)">
+                                        <option value="" {% if not contact.notes or 'relation:' not in contact.notes %}selected{% endif %}>-- --</option>
+                                        <option value="good"    {% if contact.notes and 'relation:good' in contact.notes %}selected{% endif %}>✅ Good</option>
+                                        <option value="average" {% if contact.notes and 'relation:average' in contact.notes %}selected{% endif %}>⚠️ Average</option>
+                                        <option value="bad"     {% if contact.notes and 'relation:bad' in contact.notes %}selected{% endif %}>❌ Bad</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary edit-contact"
                                             data-contact-id="{{ contact.id }}"
-                                            data-bs-toggle="modal" 
+                                            data-bs-toggle="modal"
                                             data-bs-target="#editContactModal">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-danger delete-contact" 
+                                    <button class="btn btn-sm btn-danger delete-contact"
                                             data-contact-id="{{ contact.id }}"
                                             data-contact-name="{{ contact.name }}">
                                         <i class="fas fa-trash"></i>
@@ -125,7 +124,7 @@
                         </tbody>
                     </table>
                 </div>
-                
+
                 <!-- Pagination Info -->
                 <div class="row mt-3">
                     <div class="col-md-6">
@@ -144,7 +143,7 @@
                         </nav>
                     </div>
                 </div>
-                
+
                 <!-- No results message -->
                 <div id="noResults" class="text-center py-4" style="display: none;">
                     <i class="fas fa-search fa-3x text-muted mb-3"></i>
@@ -312,12 +311,10 @@
                         <i class="fas fa-info-circle me-2"></i>
                         <strong>File Format:</strong> CSV or Excel (.xlsx, .xls)
                     </div>
-                    
                     <div class="mb-3">
                         <label for="file" class="form-label">Choose File</label>
                         <input type="file" class="form-control" id="file" name="file" accept=".csv,.xlsx,.xls" required>
                     </div>
-                    
                     <div class="alert alert-warning">
                         <strong>Expected columns:</strong>
                         <ul class="mb-0 mt-2">
@@ -329,7 +326,6 @@
                             <li>Notes</li>
                         </ul>
                     </div>
-                    
                     <p class="text-muted small">
                         <i class="fas fa-download me-1"></i>
                         <a href="{{ url_for('download_contacts_template') }}">Download template</a> for correct format
@@ -347,6 +343,41 @@
 </div>
 
 <script>
+// ========== RELATION FUNCTIONS (defined first) ==========
+function applyAllRelationColors() {
+    document.querySelectorAll('.relation-select').forEach(select => {
+        const colors = {
+            'good':    { bg: '#d4edda', color: '#155724' },
+            'average': { bg: '#fff3cd', color: '#856404' },
+            'bad':     { bg: '#f8d7da', color: '#721c24' },
+            '':        { bg: '#f8f9fa', color: '#6c757d' }
+        };
+        const c = colors[select.value] || colors[''];
+        select.style.backgroundColor = c.bg;
+        select.style.color = c.color;
+        select.style.border = 'none';
+        select.style.borderRadius = '20px';
+        select.style.padding = '4px 8px';
+        select.style.fontWeight = '600';
+        select.style.cursor = 'pointer';
+    });
+}
+
+function updateRelation(contactId, value) {
+    fetch(`/contacts/${contactId}/update-relation`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ relation: value })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            applyAllRelationColors();
+        }
+    })
+    .catch(console.error);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // ========== VARIABLES ==========
     const searchInput = document.getElementById('searchInput');
@@ -354,70 +385,72 @@ document.addEventListener('DOMContentLoaded', function() {
     const rows = Array.from(tableBody.getElementsByTagName('tr'));
     const noResults = document.getElementById('noResults');
     const resultCount = document.getElementById('resultCount');
-    
-    // Pagination variables - 100 rows per page
+
     const rowsPerPage = 100;
     let currentPage = 1;
     let filteredRows = rows;
-    
+
     // ========== SEARCH FUNCTIONALITY ==========
     function filterTable() {
         const searchTerm = searchInput.value.toLowerCase().trim();
-        
+
         if (searchTerm === '') {
             filteredRows = rows;
         } else {
             const searchDigits = searchTerm.replace(/\D/g, '');
             const searchWords = searchTerm.split(/\s+/).filter(word => word.length > 0);
-            
+
             filteredRows = rows.filter(row => {
                 const cells = row.getElementsByTagName('td');
-                const nameText = cells[1]?.textContent.toLowerCase() || '';
-                const emailText = cells[2]?.textContent.toLowerCase() || '';
-                const phoneText = cells[3]?.textContent.toLowerCase() || '';
+                const nameText    = cells[1]?.textContent.toLowerCase() || '';
+                const emailText   = cells[2]?.textContent.toLowerCase() || '';
+                const phoneText   = cells[3]?.textContent.toLowerCase() || '';
                 const companyText = cells[4]?.textContent.toLowerCase() || '';
-                const typeSelect = cells[5]?.querySelector('select');
-                const typeText = typeSelect ? typeSelect.options[typeSelect.selectedIndex].text.toLowerCase() : '';
+                const typeSelect  = cells[5]?.querySelector('select');
+                const typeText    = typeSelect ? typeSelect.options[typeSelect.selectedIndex].text.toLowerCase() : '';
+                const relationSelect = cells[6]?.querySelector('select');
+                const relationText = relationSelect ? relationSelect.options[relationSelect.selectedIndex].text.toLowerCase() : '';
                 const phoneDigits = phoneText.replace(/\D/g, '');
-                
+
                 for (let word of searchWords) {
                     const wordFound = nameText.includes(word) ||
-                                    emailText.includes(word) ||
-                                    phoneText.includes(word) ||
-                                    phoneDigits.includes(word) ||
-                                    companyText.includes(word) ||
-                                    typeText.includes(word);
+                                     emailText.includes(word) ||
+                                     phoneText.includes(word) ||
+                                     phoneDigits.includes(word) ||
+                                     companyText.includes(word) ||
+                                     typeText.includes(word) ||
+                                     relationText.includes(word);
                     if (!wordFound) return false;
                 }
-                
+
                 if (searchDigits.length > 0 && phoneDigits.includes(searchDigits)) {
                     return true;
                 }
-                
+
                 return true;
             });
         }
-        
+
         currentPage = 1;
         updateDisplay();
     }
-    
+
     searchInput.addEventListener('keyup', filterTable);
-    
+
     // ========== PAGINATION ==========
     function updateDisplay() {
         const start = (currentPage - 1) * rowsPerPage;
         const end = start + rowsPerPage;
         const visibleRows = filteredRows.slice(start, end);
-        
+
         rows.forEach(row => row.style.display = 'none');
         visibleRows.forEach(row => row.style.display = '');
-        
+
         const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
-        
+
         document.getElementById('prevPage').classList.toggle('disabled', currentPage === 1);
         document.getElementById('nextPage').classList.toggle('disabled', currentPage === totalPages || totalPages === 0);
-        
+
         if (filteredRows.length === 0) {
             noResults.style.display = 'block';
             resultCount.textContent = 'No contacts found';
@@ -426,73 +459,65 @@ document.addEventListener('DOMContentLoaded', function() {
             resultCount.textContent = `Showing ${start + 1}-${Math.min(end, filteredRows.length)} of ${filteredRows.length} contacts`;
         }
     }
-    
+
     document.getElementById('prevPage').addEventListener('click', (e) => {
         e.preventDefault();
-        if (currentPage > 1) {
-            currentPage--;
-            updateDisplay();
-        }
+        if (currentPage > 1) { currentPage--; updateDisplay(); }
     });
-    
+
     document.getElementById('nextPage').addEventListener('click', (e) => {
         e.preventDefault();
         const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
-        if (currentPage < totalPages) {
-            currentPage++;
-            updateDisplay();
-        }
+        if (currentPage < totalPages) { currentPage++; updateDisplay(); }
     });
-    
+
     // ========== SORTING ==========
     let currentSort = { column: null, direction: 'asc' };
-    
+
     document.querySelectorAll('.sortable').forEach(header => {
         header.addEventListener('click', function() {
             const column = this.dataset.sort;
             const direction = currentSort.column === column && currentSort.direction === 'asc' ? 'desc' : 'asc';
-            
             currentSort = { column, direction };
-            
+
             filteredRows.sort((a, b) => {
                 const aCells = a.getElementsByTagName('td');
                 const bCells = b.getElementsByTagName('td');
                 let aVal, bVal;
-                
+
                 switch(column) {
-                    case 'name': aVal = aCells[1].textContent; bVal = bCells[1].textContent; break;
-                    case 'email': aVal = aCells[2].textContent; bVal = bCells[2].textContent; break;
-                    case 'phone': aVal = aCells[3].textContent; bVal = bCells[3].textContent; break;
+                    case 'name':    aVal = aCells[1].textContent; bVal = bCells[1].textContent; break;
+                    case 'email':   aVal = aCells[2].textContent; bVal = bCells[2].textContent; break;
+                    case 'phone':   aVal = aCells[3].textContent; bVal = bCells[3].textContent; break;
                     case 'company': aVal = aCells[4].textContent; bVal = bCells[4].textContent; break;
-                    case 'type': 
+                    case 'type':
                         aVal = aCells[5].querySelector('select').options[aCells[5].querySelector('select').selectedIndex].text;
                         bVal = bCells[5].querySelector('select').options[bCells[5].querySelector('select').selectedIndex].text;
                         break;
                 }
-                
+
                 const comparison = aVal.localeCompare(bVal);
                 return direction === 'asc' ? comparison : -comparison;
             });
-            
+
             updateDisplay();
-            
-            // Update sort icons
+
             document.querySelectorAll('.sortable i').forEach(icon => {
                 icon.className = 'fas fa-sort ms-1';
             });
             this.querySelector('i').className = `fas fa-sort-${direction === 'asc' ? 'up' : 'down'} ms-1`;
         });
     });
-    
+
     // ========== TYPE DROPDOWN CHANGES ==========
     document.querySelectorAll('.type-select').forEach(select => {
         select.addEventListener('change', function() {
             const contactId = this.dataset.contactId;
             const newType = this.value;
-            
+
             this.disabled = true;
             this.style.opacity = '0.5';
-            
+
             fetch('/contacts/' + contactId + '/update-type', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -512,19 +537,18 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
-    
+
     // ========== SELECT ALL CHECKBOXES ==========
     const selectAllCheckbox = document.getElementById('selectAllCheckbox');
     const contactCheckboxes = document.querySelectorAll('.contact-checkbox');
     const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
     const downloadSelectedBtn = document.getElementById('downloadSelectedBtn');
-    
+
     function updateBulkActionButtons() {
         const checkedCount = document.querySelectorAll('.contact-checkbox:checked').length;
         if (checkedCount > 0) {
             bulkDeleteBtn.style.display = 'inline-block';
             bulkDeleteBtn.innerHTML = `<i class="fas fa-trash-alt me-1"></i>Delete Selected (${checkedCount})`;
-            
             downloadSelectedBtn.style.display = 'inline-block';
             downloadSelectedBtn.innerHTML = `<i class="fas fa-download me-2"></i>Download Selected (${checkedCount})`;
         } else {
@@ -532,7 +556,7 @@ document.addEventListener('DOMContentLoaded', function() {
             downloadSelectedBtn.style.display = 'none';
         }
     }
-    
+
     selectAllCheckbox.addEventListener('change', function() {
         const visibleRows = Array.from(rows).filter(row => row.style.display !== 'none');
         visibleRows.forEach(row => {
@@ -541,7 +565,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         updateBulkActionButtons();
     });
-    
+
     contactCheckboxes.forEach(checkbox => {
         checkbox.addEventListener('change', function() {
             const visibleCheckboxes = document.querySelectorAll('.contact-checkbox:checked');
@@ -550,102 +574,92 @@ document.addEventListener('DOMContentLoaded', function() {
             updateBulkActionButtons();
         });
     });
-    
+
     document.getElementById('selectAllBtn').addEventListener('click', () => {
         document.querySelectorAll('.contact-checkbox').forEach(cb => cb.checked = true);
         selectAllCheckbox.checked = true;
         updateBulkActionButtons();
     });
-    
+
     document.getElementById('deselectAllBtn').addEventListener('click', () => {
         document.querySelectorAll('.contact-checkbox').forEach(cb => cb.checked = false);
         selectAllCheckbox.checked = false;
         updateBulkActionButtons();
     });
-    
-    // ========== DOWNLOAD SELECTED CONTACTS ==========
+
+    // ========== DOWNLOAD SELECTED ==========
     downloadSelectedBtn.addEventListener('click', function() {
         const selectedIds = Array.from(document.querySelectorAll('.contact-checkbox:checked'))
             .map(cb => cb.value);
-        
         if (selectedIds.length === 0) return;
-        
-        // Create form to submit selected IDs
+
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = '/contacts/download-selected';
-        
         const input = document.createElement('input');
         input.type = 'hidden';
         input.name = 'selected_ids';
         input.value = JSON.stringify(selectedIds);
-        
         form.appendChild(input);
         document.body.appendChild(form);
         form.submit();
         document.body.removeChild(form);
     });
-    
+
     // ========== DELETE SINGLE CONTACT ==========
     const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
-    
+
     document.querySelectorAll('.delete-contact').forEach(btn => {
         btn.addEventListener('click', function() {
             const contactId = this.dataset.contactId;
             const contactName = this.dataset.contactName;
-            
             document.getElementById('deleteContactName').textContent = contactName;
             document.getElementById('confirmDeleteBtn').href = `/contacts/delete/${contactId}`;
-            
             deleteModal.show();
         });
     });
-    
+
     // ========== BULK DELETE ==========
     const bulkDeleteModal = new bootstrap.Modal(document.getElementById('bulkDeleteConfirmModal'));
-    
+
     bulkDeleteBtn.addEventListener('click', () => {
         const selectedCount = document.querySelectorAll('.contact-checkbox:checked').length;
         document.getElementById('selectedCount').textContent = selectedCount;
         bulkDeleteModal.show();
     });
-    
+
     document.getElementById('confirmBulkDeleteBtn').addEventListener('click', function() {
         const selectedIds = Array.from(document.querySelectorAll('.contact-checkbox:checked'))
             .map(cb => cb.value);
-        
+
         fetch('/contacts/bulk-delete', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ids: selectedIds })
         })
         .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            }
-        })
+        .then(data => { if (data.success) location.reload(); })
         .catch(console.error);
     });
-    
+
     // ========== EDIT CONTACT ==========
     const editModal = new bootstrap.Modal(document.getElementById('editContactModal'));
-    
+
     document.querySelectorAll('.edit-contact').forEach(btn => {
         btn.addEventListener('click', function() {
             const contactId = this.dataset.contactId;
             const row = this.closest('tr');
             const cells = row.getElementsByTagName('td');
-            
+
             document.getElementById('edit_contact_id').value = contactId;
-            document.getElementById('edit_name').value = cells[1].textContent;
-            document.getElementById('edit_email').value = cells[2].textContent;
-            document.getElementById('edit_phone').value = cells[3].textContent;
-            document.getElementById('edit_company').value = cells[4].textContent;
-            
+            document.getElementById('edit_name').value    = cells[1].textContent.trim();
+            document.getElementById('edit_email').value   = cells[2].textContent.trim();
+            document.getElementById('edit_phone').value   = cells[3].textContent.trim();
+            document.getElementById('edit_company').value = cells[4].textContent.trim();
+
             const typeSelect = cells[5].querySelector('select');
             document.getElementById('edit_type').value = typeSelect.value;
-            
+
             // Fetch full contact details including notes
             fetch('/contacts/' + contactId + '/details')
                 .then(response => response.json())
@@ -653,49 +667,42 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('edit_notes').value = data.notes || '';
                 })
                 .catch(console.error);
-            
+
             document.getElementById('editContactForm').action = '/contacts/' + contactId + '/edit';
         });
     });
-    
+
+    // Apply relation colors on load
+    applyAllRelationColors();
+
     // Initial display
     updateDisplay();
 });
 </script>
 
 <style>
-/* Button group styling */
 .btn-group {
     flex-wrap: wrap;
     gap: 5px;
 }
-
 .btn-group .btn {
     border-radius: 5px !important;
     margin-bottom: 5px;
 }
-
-/* Search bar styling */
 .input-group-text {
     border-radius: 10px 0 0 10px;
 }
-
 #searchInput {
     border-radius: 0 10px 10px 0;
     border-left: none;
 }
-
 #searchInput:focus {
     box-shadow: none;
     border-color: #ced4da;
 }
-
-/* Table styling */
 .table td {
     vertical-align: middle;
 }
-
-/* Type select styling */
 .type-select {
     min-width: 120px;
     border-radius: 20px;
@@ -705,56 +712,42 @@ document.addEventListener('DOMContentLoaded', function() {
     transition: all 0.3s;
     background-color: white;
 }
-
 .type-select:focus {
     border-color: #80bdff;
     outline: 0;
     box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
 }
-
-/* Sortable headers */
 .sortable {
     cursor: pointer;
     user-select: none;
 }
-
 .sortable:hover {
     background-color: rgba(0,0,0,0.05);
 }
-
-/* Animation for no results */
 #noResults {
     animation: fadeIn 0.5s;
 }
-
 @keyframes fadeIn {
     from { opacity: 0; }
-    to { opacity: 1; }
+    to   { opacity: 1; }
 }
-
-/* Pagination styling */
 .pagination {
     margin-bottom: 0;
 }
-
 .page-link {
     cursor: pointer;
 }
-
-/* Responsive adjustments */
+.relation-select {
+    border-radius: 20px;
+    padding: 4px 8px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+}
 @media (max-width: 768px) {
-    .btn-group .btn {
-        width: 100%;
-        margin-bottom: 5px;
-    }
-    
-    #searchInput {
-        margin-bottom: 10px;
-    }
-    
-    .type-select {
-        min-width: 100px;
-    }
+    .btn-group .btn { width: 100%; margin-bottom: 5px; }
+    #searchInput { margin-bottom: 10px; }
+    .type-select { min-width: 100px; }
 }
 </style>
 {% endblock %}
