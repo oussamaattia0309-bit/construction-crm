@@ -99,13 +99,12 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <select class="relation-select" onchange="updateRelation({{ contact.id }}, this.value)">
-                                        <option value="" {% if not contact.notes or 'relation:' not in contact.notes %}selected{% endif %}>-- --</option>
-                                        <option value="good"    {% if contact.notes and 'relation:good' in contact.notes %}selected{% endif %}>✅ Good</option>
-                                        <option value="average" {% if contact.notes and 'relation:average' in contact.notes %}selected{% endif %}>⚠️ Average</option>
-                                        <option value="bad"     {% if contact.notes and 'relation:bad' in contact.notes %}selected{% endif %}>❌ Bad</option>
+                                    <select class="form-select form-select-sm relation-select" data-contact-id="{{ contact.id }}">
+                                        <option value="" {% if not contact.relation %}selected{% endif %}>No Relation</option>
+                                        <option value="good" {% if contact.relation == 'good' %}selected{% endif %}>Good</option>
+                                        <option value="average" {% if contact.relation == 'average' %}selected{% endif %}>Average</option>
+                                        <option value="bad" {% if contact.relation == 'bad' %}selected{% endif %}>Bad</option>
                                     </select>
-                                </td>
                                 <td>
                                     <button class="btn btn-sm btn-primary edit-contact"
                                             data-contact-id="{{ contact.id }}"
