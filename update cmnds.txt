@@ -8,6 +8,7 @@ git push
 
 ==============================#On PythonAnywhere
 
+https://www.pythonanywhere.com/user/Oussamaattia1994/consoles/45814647/
 
 cd ~/mysite
 git pull
