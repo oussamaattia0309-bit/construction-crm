@@ -62,6 +62,8 @@ class Project(db.Model):
     status = db.Column(db.String(50))
     description = db.Column(db.Text)
     budget_total = db.Column(db.Float, default=0.0)
+    selling_price = db.Column(db.Float, default=0.0)
+    client_receipts = db.Column(db.Float, default=0.0)
 
 class Budget(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -347,6 +349,28 @@ def add_project():
 def project_detail(id):
     project = Project.query.get_or_404(id)
     return render_template('project_detail.html', project=project)
+
+@app.route('/projects/<int:id>', methods=['POST'])
+@login_required
+def update_project(id):
+    project = Project.query.get_or_404(id)
+    
+    # Update basic fields
+    project.name = request.form.get('name')
+    project.client_name = request.form.get('client_name')
+    project.status = request.form.get('status')
+    
+    # Handle financial fields
+    selling_price = request.form.get('selling_price', '0')
+    project.selling_price = float(selling_price) if selling_price else 0.0
+    
+    client_receipts = request.form.get('client_receipts', '0')
+    project.client_receipts = float(client_receipts) if client_receipts else 0.0
+    
+    db.session.commit()
+    flash('Project updated successfully')
+    
+    return redirect(url_for('project_detail', id=id))
 
 @app.route('/projects/delete/<int:id>')
 @login_required
