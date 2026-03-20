@@ -32,3 +32,96 @@ Remove-Item -Recurse -Force "__pycache__" -ErrorAction SilentlyContinue; `
 Write-Host "✅ Database deleted. Starting Flask..." -ForegroundColor Green; `
 python app.py
 =====================================
+
+
+================================================================================
+                        DATA SYNC COMMANDS
+================================================================================
+
+CREATE SCRIPTS (RUN ONCE):
+
+On LOCAL (PowerShell):
+cd "C:\Users\USER\Desktop\stuff\web\CRM CAE"
+notepad export_local.py
+# Paste code below, save, close
+
+On PYTHONANYWHERE (Bash):
+cd ~/mysite
+nano export_pa.py
+# Paste code below, save (Ctrl+X, Y, Enter)
+
+
+================================================================================
+SCRIPT CODE:
+
+export_local.py (for LOCAL):
+--------------------------------
+import sqlite3, json
+conn = sqlite3.connect('instance/construction_crm.db')
+conn.row_factory = sqlite3.Row
+c = conn.cursor()
+c.execute("SELECT name FROM sqlite_master WHERE type='table'")
+data = {}
+for t in [r[0] for r in c.fetchall()]:
+    data[t] = [dict(r) for r in c.execute(f'SELECT * FROM {t}')]
+json.dump(data, open('data.json','w'), default=str)
+print("Exported to data.json")
+conn.close()
+
+export_pa.py (for PYTHONANYWHERE):
+--------------------------------
+import sqlite3, json
+conn = sqlite3.connect('instance/construction_crm.db')
+conn.row_factory = sqlite3.Row
+c = conn.cursor()
+c.execute("SELECT name FROM sqlite_master WHERE type='table'")
+data = {}
+for t in [r[0] for r in c.fetchall()]:
+    data[t] = [dict(r) for r in c.execute(f'SELECT * FROM {t}')]
+json.dump(data, open('data.json','w'), default=str)
+print("Exported to data.json")
+conn.close()
+
+import.py (for BOTH machines):
+--------------------------------
+import sqlite3, json
+data = json.load(open('data.json'))
+conn = sqlite3.connect('instance/construction_crm.db')
+c = conn.cursor()
+for t, rows in data.items():
+    if rows:
+        cols = ','.join(rows[0].keys())
+        q = ','.join(['?' for _ in rows[0].keys()])
+        c.execute(f'DELETE FROM {t}')
+        for r in rows:
+            c.execute(f'INSERT INTO {t} ({cols}) VALUES ({q})', [r.get(k) for k in rows[0].keys()])
+        conn.commit()
+print("Import complete")
+conn.close()
+
+
+================================================================================
+HOW TO USE:
+
+SEND LOCAL DATA TO PYTHONANYWHERE:
+----------------------------------
+1. Local: python export_local.py
+2. Upload data.json to PythonAnywhere (Files tab)
+3. PythonAnywhere: python import.py
+4. PythonAnywhere: touch /var/www/oussamaattia1994_pythonanywhere_com_wsgi.py
+
+GET DATA FROM PYTHONANYWHERE TO LOCAL:
+--------------------------------------
+1. PythonAnywhere: python export_pa.py
+2. Download data.json from PythonAnywhere (Files tab)
+3. Local: python import.py
+
+
+================================================================================
+ONE-LINE SUMMARY:
+
+Send Local → PythonAnywhere:
+Local: python export_local.py → Upload data.json → PythonAnywhere: python import.py
+
+Get PythonAnywhere → Local:
+PythonAnywhere: python export_pa.py → Download data.json → Local: python import.py

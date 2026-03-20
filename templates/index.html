@@ -108,6 +108,15 @@
             </div>
         </div>
     </div>
+
+    <!-- Info Line - Call button (tel: link triggers phone dialer on mobile) -->
+    <div class="row mt-5 mb-4">
+        <div class="col-12 text-center">
+            <a href="tel:+21622488665" class="btn btn-outline-primary btn-lg info-line-btn">
+                <i class="fas fa-phone-alt me-2"></i>Info line +216 22 488 665
+            </a>
+        </div>
+    </div>
 </div>
 
 <!-- Delete Confirmation Modal -->
@@ -345,6 +354,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .modal-header .btn-close-white {
     filter: brightness(0) invert(1);
+}
+
+.info-line-btn {
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+}
+.info-line-btn:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
 }
 
 /* Responsive adjustments */

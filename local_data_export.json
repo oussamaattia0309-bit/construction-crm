@@ -1,0 +1,5566 @@
+{
+  "user": [
+    {
+      "id": 1,
+      "username": "admin",
+      "password_hash": "pbkdf2:sha256:600000$KJyMWNLQv7Q59KxI$6649ae99edb739f8d9429f314a3880abc103de5fd36229aa3206765b34f19ddf"
+    }
+  ],
+  "contact": [
+    {
+      "id": 1,
+      "name": "3smn Print",
+      "email": "",
+      "phone": "+216 90 174 705",
+      "company": "nan",
+      "type": "fournisseur",
+      "notes": "Speciality: nan | Address: nan | Comments: nan relation:good",
+      "created_at": "2026-03-17 15:31:57.243767"
+    },
+    {
+      "id": 2,
+      "name": "Abd Fatteh Alucobond",
+      "email": "nan",
+      "phone": "21698271752",
+      "company": "nan",
+      "type": "fournisseur",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243772"
+    },
+    {
+      "id": 3,
+      "name": "Abd Lwaheb Plombier",
+      "email": "nan",
+      "phone": "+216 55 617 260",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243773"
+    },
+    {
+      "id": 4,
+      "name": "Abdelkader Bejaoui Pvc",
+      "email": "nan",
+      "phone": "+216 29 133 544",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243775"
+    },
+    {
+      "id": 5,
+      "name": "Abdelkader Camion",
+      "email": "nan",
+      "phone": "95 047 288",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243776"
+    },
+    {
+      "id": 6,
+      "name": "Abdesattar Pemapref",
+      "email": "nan",
+      "phone": "21629762785",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243777"
+    },
+    {
+      "id": 7,
+      "name": "Abdessattar Pemapref",
+      "email": "nan",
+      "phone": "+216 55 811 694",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243778"
+    },
+    {
+      "id": 8,
+      "name": "Achraf SOMABE",
+      "email": "nan",
+      "phone": "52354932",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243780"
+    },
+    {
+      "id": 9,
+      "name": "Achref Quin Pro",
+      "email": "nan",
+      "phone": "+216 95 695 709",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243781"
+    },
+    {
+      "id": 10,
+      "name": "Adel \u00c3\u2030lectricit\u00c3\u00a9",
+      "email": "nan",
+      "phone": "23674711",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243782"
+    },
+    {
+      "id": 11,
+      "name": "adel Pemabat",
+      "email": "nan",
+      "phone": "25325756",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243783"
+    },
+    {
+      "id": 12,
+      "name": "Adil Staff",
+      "email": "nan",
+      "phone": "214-570-93",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243784"
+    },
+    {
+      "id": 13,
+      "name": "Adnen Amar",
+      "email": "nan",
+      "phone": "+216 58 833 823",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243785"
+    },
+    {
+      "id": 14,
+      "name": "Ahmed Dhaouadi",
+      "email": "nan",
+      "phone": "+974 5527 8318",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243787"
+    },
+    {
+      "id": 15,
+      "name": "Ahmed Dhaouadi Mourouj",
+      "email": "nan",
+      "phone": "20 141 207",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243788"
+    },
+    {
+      "id": 16,
+      "name": "Ahmed Dhaouadi Qatar",
+      "email": "nan",
+      "phone": "+974 7039 9000",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243789"
+    },
+    {
+      "id": 17,
+      "name": "Ahmed Pemapref",
+      "email": "nan",
+      "phone": "22 379 017",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243790"
+    },
+    {
+      "id": 18,
+      "name": "Ahmed Plomberie TNA",
+      "email": "nan",
+      "phone": "21656088759",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243791"
+    },
+    {
+      "id": 19,
+      "name": "Ahmed Rgaya Ferrimix",
+      "email": "nan",
+      "phone": "96 507 720",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243792"
+    },
+    {
+      "id": 20,
+      "name": "Ahmed Slama",
+      "email": "nan",
+      "phone": "21694051005",
+      "company": "Ahmed Slama",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243794"
+    },
+    {
+      "id": 21,
+      "name": "Aida Construction 2",
+      "email": "nan",
+      "phone": "22 432 235",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243795"
+    },
+    {
+      "id": 22,
+      "name": "Ala Chebbi Pemabat",
+      "email": "nan",
+      "phone": "58229849",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243796"
+    },
+    {
+      "id": 23,
+      "name": "Ala Topo Pemabat",
+      "email": "nan",
+      "phone": "29839411",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243797"
+    },
+    {
+      "id": 24,
+      "name": "Alessandro Pemapref",
+      "email": "nan",
+      "phone": "+216 20 200 707",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243798"
+    },
+    {
+      "id": 25,
+      "name": "Alex Fricano TNA",
+      "email": "nan",
+      "phone": "21626130512",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243799"
+    },
+    {
+      "id": 26,
+      "name": "Ali CAT transport",
+      "email": "nan",
+      "phone": "27 543 207",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243800"
+    },
+    {
+      "id": 27,
+      "name": "Ali Citerne Eau",
+      "email": "nan",
+      "phone": "+216 99 049 692",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243802"
+    },
+    {
+      "id": 28,
+      "name": "Ali Pemapref",
+      "email": "nan",
+      "phone": "95 684 823",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243803"
+    },
+    {
+      "id": 29,
+      "name": "Ali Plastec Tunisie",
+      "email": "nan",
+      "phone": "21698134110",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243804"
+    },
+    {
+      "id": 30,
+      "name": "Ali Poseur",
+      "email": "nan",
+      "phone": "21626249027",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243805"
+    },
+    {
+      "id": 31,
+      "name": "Aluminum Rades",
+      "email": "nan",
+      "phone": "71449733",
+      "company": "nan",
+      "type": "fournisseur",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243806"
+    },
+    {
+      "id": 32,
+      "name": "Ameur Abdelmalek",
+      "email": "nan",
+      "phone": "29 712 152",
+      "company": "PemaBat",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243807"
+    },
+    {
+      "id": 33,
+      "name": "Ameur Abdelmalek Perso",
+      "email": "nan",
+      "phone": "+216 52 340 744",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243808"
+    },
+    {
+      "id": 34,
+      "name": "Amin Ben Gdira 4",
+      "email": "nan",
+      "phone": "+216 46 992 566",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243809"
+    },
+    {
+      "id": 35,
+      "name": "Amine Marbre Tunis Carthage",
+      "email": "nan",
+      "phone": "29081822",
+      "company": "Marbre",
+      "type": "fournisseur",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243811"
+    },
+    {
+      "id": 36,
+      "name": "Amine Metallique",
+      "email": "nan",
+      "phone": "55150988",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243812"
+    },
+    {
+      "id": 37,
+      "name": "Amine WhatsApp Ben G",
+      "email": "nan",
+      "phone": "21627045645",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243813"
+    },
+    {
+      "id": 38,
+      "name": "Amorr Hadded",
+      "email": "nan",
+      "phone": "21656190125",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243814"
+    },
+    {
+      "id": 39,
+      "name": "Amorr Pemabat",
+      "email": "nan",
+      "phone": "29740795",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243815"
+    },
+    {
+      "id": 40,
+      "name": "Anis Pemabat",
+      "email": "nan",
+      "phone": "29 715 961\n22381698",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243816"
+    },
+    {
+      "id": 41,
+      "name": "Anwar Ctmccv",
+      "email": "nan",
+      "phone": "99 611 943",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243817"
+    },
+    {
+      "id": 42,
+      "name": "Arafet Placo Tna",
+      "email": "nan",
+      "phone": "21256145",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243818"
+    },
+    {
+      "id": 43,
+      "name": "Arbi Conducteur Chariot",
+      "email": "nan",
+      "phone": "29 745 533",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243819"
+    },
+    {
+      "id": 44,
+      "name": "Arbi Neffatti Pf",
+      "email": "nan",
+      "phone": "21655662955",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243821"
+    },
+    {
+      "id": 45,
+      "name": "Aslam Hamdoun Luxor",
+      "email": "nan",
+      "phone": "98760888",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243822"
+    },
+    {
+      "id": 46,
+      "name": "Atef Ceramic",
+      "email": "nan",
+      "phone": "21626211840",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243823"
+    },
+    {
+      "id": 47,
+      "name": "Atef Slemaa Rdam 55 Dinar",
+      "email": "nan",
+      "phone": "21626067755",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243824"
+    },
+    {
+      "id": 48,
+      "name": "Atlas M\u00c3\u00a9tallique",
+      "email": "nan",
+      "phone": "98 641 059",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243825"
+    },
+    {
+      "id": 49,
+      "name": "Ayari Ma\u00c3\u00a7on Ben Arous",
+      "email": "nan",
+      "phone": "97 198 581",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243826"
+    },
+    {
+      "id": 50,
+      "name": "Ayari Pemabat",
+      "email": "nan",
+      "phone": "+216 28 462 376",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243827"
+    },
+    {
+      "id": 51,
+      "name": "Ayari Tracteur Traktour Yasminet",
+      "email": "nan",
+      "phone": "21623702701",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243828"
+    },
+    {
+      "id": 52,
+      "name": "Aydi Raki Vis Chargeur",
+      "email": "nan",
+      "phone": "21658539701",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243829"
+    },
+    {
+      "id": 53,
+      "name": "Aymen Charfi Architecte",
+      "email": "nan",
+      "phone": "29 431 830",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243831"
+    },
+    {
+      "id": 54,
+      "name": "Aymen Climatisation",
+      "email": "nan",
+      "phone": "+216 20 757 600",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243832"
+    },
+    {
+      "id": 55,
+      "name": "Aymen Dhaker Tn",
+      "email": "nan",
+      "phone": "21656779438",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243833"
+    },
+    {
+      "id": 56,
+      "name": "Aymen General Beton",
+      "email": "nan",
+      "phone": "28 824 823",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243834"
+    },
+    {
+      "id": 57,
+      "name": "Aymen Ghanoudi Ambassadeur",
+      "email": "nan",
+      "phone": "21652016230",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243835"
+    },
+    {
+      "id": 58,
+      "name": "Aymen Ghanoudi Lambassadeur",
+      "email": "nan",
+      "phone": "21655400019",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243836"
+    },
+    {
+      "id": 59,
+      "name": "Aziz Mat\u00c3\u00a9riaux",
+      "email": "nan",
+      "phone": "+216 27 247 410",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243837"
+    },
+    {
+      "id": 60,
+      "name": "Aziz Pemabat",
+      "email": "nan",
+      "phone": "+216 22 645 653",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243838"
+    },
+    {
+      "id": 61,
+      "name": "Azouz Pemabat",
+      "email": "nan",
+      "phone": "24463480",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243839"
+    },
+    {
+      "id": 62,
+      "name": "basma Pemapref",
+      "email": "nan",
+      "phone": "+216 58 093 517 ::: +216 27 513 106\n+21670284370",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243841"
+    },
+    {
+      "id": 63,
+      "name": "Bassem Fenetre TNA",
+      "email": "nan",
+      "phone": "21698344663",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243842"
+    },
+    {
+      "id": 64,
+      "name": "Belgacem Beton Cellulaire",
+      "email": "nan",
+      "phone": "98 957 560",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243843"
+    },
+    {
+      "id": 65,
+      "name": "belhassane Pemabat",
+      "email": "nan",
+      "phone": "52458185",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243844"
+    },
+    {
+      "id": 66,
+      "name": "Bem Building",
+      "email": "nan",
+      "phone": "29 885 416",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243845"
+    },
+    {
+      "id": 67,
+      "name": "B\u00c3\u00a9ton Block",
+      "email": "nan",
+      "phone": "23114999191",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243846"
+    },
+    {
+      "id": 68,
+      "name": "Betonblock",
+      "email": "nan",
+      "phone": "+31 72 503 9340",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243847"
+    },
+    {
+      "id": 69,
+      "name": "Bilel Geometre",
+      "email": "nan",
+      "phone": "50402448",
+      "company": "PemaBat",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243848"
+    },
+    {
+      "id": 70,
+      "name": "Bilel Jabbes",
+      "email": "nan",
+      "phone": "+216 99 280 311",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243850"
+    },
+    {
+      "id": 71,
+      "name": "Bolbeba Koubaa Cic",
+      "email": "nan",
+      "phone": "24 341 695",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243851"
+    },
+    {
+      "id": 72,
+      "name": "Bureau Karim Derbel",
+      "email": "nan",
+      "phone": "79 350 343",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243852"
+    },
+    {
+      "id": 73,
+      "name": "Carte Visite",
+      "email": "nan",
+      "phone": "52801601",
+      "company": "Fabrikaa",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243853"
+    },
+    {
+      "id": 74,
+      "name": "Centre Abdelaziz Jema\u00c3\u00afel",
+      "email": "nan",
+      "phone": "+216 71 741 926",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Ariana/Ben Arous/Carthage/Tunis, Tunisia\nAriana/Ben Arous | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243854"
+    },
+    {
+      "id": 75,
+      "name": "CHAHED Selim",
+      "email": "nan",
+      "phone": "21698329994",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243855"
+    },
+    {
+      "id": 76,
+      "name": "Chakir Beton Cellulaire",
+      "email": "nan",
+      "phone": "27960572",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243856"
+    },
+    {
+      "id": 77,
+      "name": "Chams Plombier",
+      "email": "nan",
+      "phone": "+216 97 416 506 ::: +216 55 287 999",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243857"
+    },
+    {
+      "id": 78,
+      "name": "Chariot Megrine",
+      "email": "nan",
+      "phone": "+216 20 307 424",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243859"
+    },
+    {
+      "id": 79,
+      "name": "Chauffeur Mat\u00c3\u00a9riaux Ben Arous",
+      "email": "nan",
+      "phone": "+216 94 547 336",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: https://maps.app.goo.gl/vUSnRQ5EqnzpkgTLA\nhttps://maps.app.goo.gl/vUSnRQ5EqnzpkgTLA | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243860"
+    },
+    {
+      "id": 80,
+      "name": "Chawki Hammemi \u00c3\u2030quipement",
+      "email": "nan",
+      "phone": "58 026 585",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243861"
+    },
+    {
+      "id": 81,
+      "name": "Chedli Mourad Drissi",
+      "email": "nan",
+      "phone": "21624309687",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243862"
+    },
+    {
+      "id": 82,
+      "name": "Chema Quinpro",
+      "email": "nan",
+      "phone": "29 566 926",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243863"
+    },
+    {
+      "id": 83,
+      "name": "Cherif Architect",
+      "email": "nan",
+      "phone": "+216 54 206 830",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243864"
+    },
+    {
+      "id": 84,
+      "name": "Chokri Drissi",
+      "email": "nan",
+      "phone": "27 368 301",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243865"
+    },
+    {
+      "id": 85,
+      "name": "Citerne 1000 Litre",
+      "email": "nan",
+      "phone": "53971680 ::: 26 119 620",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Dropped pin\nhttps://maps.google.com/?q=36.794581,10.118914&entry=gps\nDropped pin https://maps.google.com/?q=36.794581,10.118914&entry=gps | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243866"
+    },
+    {
+      "id": 86,
+      "name": "Cks Fix",
+      "email": "nan",
+      "phone": "71840343",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243867"
+    },
+    {
+      "id": 87,
+      "name": "Comar",
+      "email": "nan",
+      "phone": "COMAR",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243869"
+    },
+    {
+      "id": 88,
+      "name": "Commercial Prefab",
+      "email": "nan",
+      "phone": "+216 27 401 074",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243870"
+    },
+    {
+      "id": 89,
+      "name": "Conseiller Comar",
+      "email": "nan",
+      "phone": "21 702 812",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243871"
+    },
+    {
+      "id": 90,
+      "name": "Contrat Civil",
+      "email": "nan",
+      "phone": "99 058 308",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243872"
+    },
+    {
+      "id": 91,
+      "name": "Cuvelage Lac",
+      "email": "nan",
+      "phone": "+216 23 590 415",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243873"
+    },
+    {
+      "id": 92,
+      "name": "Dali Derbel OiLibya",
+      "email": "nan",
+      "phone": "98 745 358",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243874"
+    },
+    {
+      "id": 93,
+      "name": "Dali Pemabat",
+      "email": "nan",
+      "phone": "90277951",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243875"
+    },
+    {
+      "id": 94,
+      "name": "David Pemabat",
+      "email": "nan",
+      "phone": "24696561",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243877"
+    },
+    {
+      "id": 95,
+      "name": "Decortion Art",
+      "email": "nan",
+      "phone": "21658152324",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243878"
+    },
+    {
+      "id": 96,
+      "name": "Dhekra Const Gammarth",
+      "email": "nan",
+      "phone": "46 946 240",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243879"
+    },
+    {
+      "id": 97,
+      "name": "Dhouha Omrani Architecte",
+      "email": "nan",
+      "phone": "20 728 574",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243880"
+    },
+    {
+      "id": 98,
+      "name": "Elbaraka Group",
+      "email": "nan",
+      "phone": "21658836652",
+      "company": "Elbaraka Group",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243881"
+    },
+    {
+      "id": 99,
+      "name": "Electricien Lotfi",
+      "email": "nan",
+      "phone": "98 101 474",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243882"
+    },
+    {
+      "id": 100,
+      "name": "Electricien Pemabat",
+      "email": "nan",
+      "phone": "58882540",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243883"
+    },
+    {
+      "id": 101,
+      "name": "Elyes Hannachi Technolab",
+      "email": "nan",
+      "phone": "21629908442",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243884"
+    },
+    {
+      "id": 102,
+      "name": "Emna CNT",
+      "email": "nan",
+      "phone": "21625800873",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243885"
+    },
+    {
+      "id": 103,
+      "name": "Emna Pemabat",
+      "email": "nan",
+      "phone": "97977925 ::: +216 52 977 925",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243886"
+    },
+    {
+      "id": 104,
+      "name": "Emna Sassi Pemabat",
+      "email": "nan",
+      "phone": "+216 44 310 231",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243887"
+    },
+    {
+      "id": 105,
+      "name": "Eppm",
+      "email": "nan",
+      "phone": "71 168 100",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243889"
+    },
+    {
+      "id": 106,
+      "name": "Ezdine Ma\u00c3\u00a7on",
+      "email": "nan",
+      "phone": "+216 94 266 717",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243890"
+    },
+    {
+      "id": 107,
+      "name": "Ezzine Garde Nationale",
+      "email": "nan",
+      "phone": "+216 22 253 372",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243891"
+    },
+    {
+      "id": 108,
+      "name": "Fabio Biancoli Mamma Mia",
+      "email": "nan",
+      "phone": "3451150084\n+3451150084",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243892"
+    },
+    {
+      "id": 109,
+      "name": "Fabio Isoltech",
+      "email": "nan",
+      "phone": "+34 511 50 08 4",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243893"
+    },
+    {
+      "id": 110,
+      "name": "Fabio Moroni",
+      "email": "nan",
+      "phone": "+39 345 703 5741",
+      "company": "TNA",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243894"
+    },
+    {
+      "id": 111,
+      "name": "Fabrikaa Impression",
+      "email": "nan",
+      "phone": "21652563457",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243895"
+    },
+    {
+      "id": 112,
+      "name": "Fahd Sassi Marbre",
+      "email": "nan",
+      "phone": "54246923",
+      "company": "nan",
+      "type": "fournisseur",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243896"
+    },
+    {
+      "id": 113,
+      "name": "Faouzi Rdam 40 Dinar",
+      "email": "nan",
+      "phone": "21627874597",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243897"
+    },
+    {
+      "id": 114,
+      "name": "Fares B\u00c3\u00a9ton",
+      "email": "nan",
+      "phone": "+216 58 743 413",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243898"
+    },
+    {
+      "id": 115,
+      "name": "Fares Sika",
+      "email": "nan",
+      "phone": "50 068 982",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243899"
+    },
+    {
+      "id": 116,
+      "name": "Farhani Luxor",
+      "email": "nan",
+      "phone": "98780510",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243901"
+    },
+    {
+      "id": 117,
+      "name": "Farid \u00c3\u2030lectricien",
+      "email": "nan",
+      "phone": "+216 97 113 011",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243902"
+    },
+    {
+      "id": 118,
+      "name": "Farid Zarga Mdd",
+      "email": "nan",
+      "phone": "+216 29 999 178",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243903"
+    },
+    {
+      "id": 119,
+      "name": "Farouk Garde Nationale",
+      "email": "nan",
+      "phone": "27 831 765",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243904"
+    },
+    {
+      "id": 120,
+      "name": "Farouk GN",
+      "email": "nan",
+      "phone": "55 831 765",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243905"
+    },
+    {
+      "id": 121,
+      "name": "Fawzi Sogel",
+      "email": "nan",
+      "phone": "28 781 608",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243906"
+    },
+    {
+      "id": 122,
+      "name": "Fawzi Tna",
+      "email": "nan",
+      "phone": "51857058",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243907"
+    },
+    {
+      "id": 123,
+      "name": "Faysal Alum",
+      "email": "nan",
+      "phone": "24758057",
+      "company": "nan",
+      "type": "fournisseur",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243908"
+    },
+    {
+      "id": 124,
+      "name": "Ferid Technician T\u00c3\u00a9l\u00c3\u00a9com",
+      "email": "nan",
+      "phone": "98510195",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243909"
+    },
+    {
+      "id": 125,
+      "name": "fioretti Luigi",
+      "email": "nan",
+      "phone": "+39 334 252 9265",
+      "company": "fioretti Luigi",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243910"
+    },
+    {
+      "id": 126,
+      "name": "fioretti Luigi Ita",
+      "email": "nan",
+      "phone": "+39 328 424 7228",
+      "company": "fioretti Luigi",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243912"
+    },
+    {
+      "id": 127,
+      "name": "Firas Blocstar",
+      "email": "nan",
+      "phone": "55 023 487",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243913"
+    },
+    {
+      "id": 128,
+      "name": "Firas Lak'hal Sogel",
+      "email": "nan",
+      "phone": "+216 54 604 097",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243914"
+    },
+    {
+      "id": 129,
+      "name": "Firas Sogel 2",
+      "email": "nan",
+      "phone": "28 781 308",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243915"
+    },
+    {
+      "id": 130,
+      "name": "Firas Sogel Whatsapp",
+      "email": "nan",
+      "phone": "21658586767",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243916"
+    },
+    {
+      "id": 131,
+      "name": "Fraj Electricien",
+      "email": "nan",
+      "phone": "98 695 863",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243917"
+    },
+    {
+      "id": 132,
+      "name": "Franco Bellotti",
+      "email": "nan",
+      "phone": "+39 340 388 3750",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243918"
+    },
+    {
+      "id": 133,
+      "name": "Gaddour Pemabat",
+      "email": "nan",
+      "phone": "+216 93 011 875",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243920"
+    },
+    {
+      "id": 134,
+      "name": "Gaddour Saber",
+      "email": "nan",
+      "phone": "26 570 007",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243921"
+    },
+    {
+      "id": 135,
+      "name": "Gafsi Pemabat",
+      "email": "nan",
+      "phone": "+216 97 929 355",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243922"
+    },
+    {
+      "id": 136,
+      "name": "Garde National Mghira",
+      "email": "nan",
+      "phone": "+216 79 408 602",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Ben Arous, Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243923"
+    },
+    {
+      "id": 137,
+      "name": "General B\u00c3\u00a9ton Sidi Thabet",
+      "email": "nan",
+      "phone": "22 131 995",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243924"
+    },
+    {
+      "id": 138,
+      "name": "Ghada Boumaiza",
+      "email": "nan",
+      "phone": "21629293799",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243925"
+    },
+    {
+      "id": 139,
+      "name": "Ghassen Zarok Kp1",
+      "email": "nan",
+      "phone": "21654723413",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243926"
+    },
+    {
+      "id": 140,
+      "name": "Ghassen Zarrouk",
+      "email": "nan",
+      "phone": "21653430415",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243927"
+    },
+    {
+      "id": 141,
+      "name": "Ghassen Zarrouk 2",
+      "email": "nan",
+      "phone": "21629688645",
+      "company": "Sicep",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243928"
+    },
+    {
+      "id": 142,
+      "name": "Ghazi Biat Tunis",
+      "email": "nan",
+      "phone": "56 697 217",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243930"
+    },
+    {
+      "id": 143,
+      "name": "Ghieth Chaar",
+      "email": "nan",
+      "phone": "21652818283",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243931"
+    },
+    {
+      "id": 144,
+      "name": "Hafedh Plombier Maatougui",
+      "email": "nan",
+      "phone": "98 224 459",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243932"
+    },
+    {
+      "id": 145,
+      "name": "Hajer Chariot Megrine",
+      "email": "nan",
+      "phone": "24 088 432",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243933"
+    },
+    {
+      "id": 146,
+      "name": "Hajer Quinpro",
+      "email": "nan",
+      "phone": "29 566 193",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243934"
+    },
+    {
+      "id": 147,
+      "name": "Hakim Ben Ounis Sable",
+      "email": "nan",
+      "phone": "+216 55 555 675",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243935"
+    },
+    {
+      "id": 148,
+      "name": "Hamdi Pemapref",
+      "email": "nan",
+      "phone": "+216 51 368 761",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243936"
+    },
+    {
+      "id": 149,
+      "name": "Hamma Mecanique",
+      "email": "nan",
+      "phone": "22 740 450",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243938"
+    },
+    {
+      "id": 150,
+      "name": "Hammadi Attia",
+      "email": "nan",
+      "phone": "21 349 570",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243939"
+    },
+    {
+      "id": 151,
+      "name": "Hamza Belgacem Luxor",
+      "email": "nan",
+      "phone": "21698760828",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243940"
+    },
+    {
+      "id": 152,
+      "name": "Hamza Pemabat",
+      "email": "nan",
+      "phone": "29 763 734",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243941"
+    },
+    {
+      "id": 153,
+      "name": "Hamza Plombier",
+      "email": "nan",
+      "phone": "21655042218",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243943"
+    },
+    {
+      "id": 154,
+      "name": "Hamza Saidi",
+      "email": "nan",
+      "phone": "532-361-64 ::: +21629788885",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243944"
+    },
+    {
+      "id": 155,
+      "name": "Hamza Veganet",
+      "email": "nan",
+      "phone": "+216 23 422 347",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243945"
+    },
+    {
+      "id": 156,
+      "name": "Hanen Aluminium De Carthage",
+      "email": "nan",
+      "phone": "+216 55 036 691",
+      "company": "nan",
+      "type": "fournisseur",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243946"
+    },
+    {
+      "id": 157,
+      "name": "Hassen Marbrerie Sidi Rzig",
+      "email": "nan",
+      "phone": "58567601",
+      "company": "nan",
+      "type": "fournisseur",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243947"
+    },
+    {
+      "id": 158,
+      "name": "Haykel Fellah Marbre",
+      "email": "nan",
+      "phone": "21698999760",
+      "company": "nan",
+      "type": "fournisseur",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243948"
+    },
+    {
+      "id": 159,
+      "name": "H\u00c3\u00a9di K\u00c3\u00a9fi",
+      "email": "nan",
+      "phone": "21623648519",
+      "company": "Cks ",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243949"
+    },
+    {
+      "id": 160,
+      "name": "Heni Entreprises",
+      "email": "nan",
+      "phone": "+216 55 392 422",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243950"
+    },
+    {
+      "id": 161,
+      "name": "Hichem Ben Doudou",
+      "email": "nan",
+      "phone": "98 101 475",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243951"
+    },
+    {
+      "id": 162,
+      "name": "Hichem Bennaceur",
+      "email": "nan",
+      "phone": "+216 98 315 960",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243952"
+    },
+    {
+      "id": 163,
+      "name": "Hichem Cherif",
+      "email": "cher.hich@yahoo.fr",
+      "phone": "98 316 002",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243954"
+    },
+    {
+      "id": 164,
+      "name": "Hichem Ma\u00c3\u00a7on",
+      "email": "nan",
+      "phone": "21695835049",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243955"
+    },
+    {
+      "id": 165,
+      "name": "Hichem Ma\u00c3\u00a7on Bois",
+      "email": "nan",
+      "phone": "+216 97 132 391",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243956"
+    },
+    {
+      "id": 166,
+      "name": "Hichem Ma\u00c3\u00a7on Megrine",
+      "email": "nan",
+      "phone": "+216 93 788 493",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243957"
+    },
+    {
+      "id": 167,
+      "name": "Hosni Pema",
+      "email": "nan",
+      "phone": "21621696365",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243958"
+    },
+    {
+      "id": 168,
+      "name": "hosni Pemabat",
+      "email": "nan",
+      "phone": "22140183",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243959"
+    },
+    {
+      "id": 169,
+      "name": "houssem Werteni Meca",
+      "email": "nan",
+      "phone": "25470138",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243960"
+    },
+    {
+      "id": 170,
+      "name": "Ibrahim Police 3*",
+      "email": "nan",
+      "phone": "56 611 638",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243961"
+    },
+    {
+      "id": 171,
+      "name": "Idriss Ben Doudou",
+      "email": "nan",
+      "phone": "26 401 174",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243962"
+    },
+    {
+      "id": 172,
+      "name": "Idriss Pemapref",
+      "email": "nan",
+      "phone": "+216 51 312 580",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243963"
+    },
+    {
+      "id": 173,
+      "name": "Ilyes SICEP",
+      "email": "nan",
+      "phone": "99950910",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243964"
+    },
+    {
+      "id": 174,
+      "name": "Imed Alucarthage",
+      "email": "nan",
+      "phone": "+216 53 757 108",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243965"
+    },
+    {
+      "id": 175,
+      "name": "Imed Poseur TNA",
+      "email": "nan",
+      "phone": "21695327968",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243967"
+    },
+    {
+      "id": 176,
+      "name": "Ines Materiaux",
+      "email": "nan",
+      "phone": "+216 51 057 929",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243968"
+    },
+    {
+      "id": 177,
+      "name": "Ines Pemabat",
+      "email": "nan",
+      "phone": "+216 50 518 980",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243969"
+    },
+    {
+      "id": 178,
+      "name": "Ines Sotucob",
+      "email": "nan",
+      "phone": "24 907 515",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243970"
+    },
+    {
+      "id": 179,
+      "name": "Ismail Nsiri Comptable",
+      "email": "nan",
+      "phone": "58 552 635",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243971"
+    },
+    {
+      "id": 180,
+      "name": "Jalel Genarl Beton",
+      "email": "nan",
+      "phone": "28 988 709",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243972"
+    },
+    {
+      "id": 181,
+      "name": "Jamel Ghith Mat\u00c3\u00a9riaux",
+      "email": "nan",
+      "phone": "29 576 314",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243973"
+    },
+    {
+      "id": 182,
+      "name": "Jamel Salibi",
+      "email": "nan",
+      "phone": "23320520",
+      "company": "Arabesque Marbre",
+      "type": "fournisseur",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243974"
+    },
+    {
+      "id": 183,
+      "name": "Jamel Sicep",
+      "email": "nan",
+      "phone": "+216 20 581 851",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243975"
+    },
+    {
+      "id": 184,
+      "name": "Jean Yves Moulin",
+      "email": "nan",
+      "phone": "+33 6 52 62 58 12",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243976"
+    },
+    {
+      "id": 185,
+      "name": "Kais Baklouti Ing Gc",
+      "email": "",
+      "phone": "+216 29 671 918",
+      "company": "nan",
+      "type": "ingenieur",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243978"
+    },
+    {
+      "id": 186,
+      "name": "Kais Chaaben",
+      "email": "nan",
+      "phone": "290-668-00",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243979"
+    },
+    {
+      "id": 187,
+      "name": "Kamel Dabbebi Pemapref",
+      "email": "nan",
+      "phone": "+216 26 606 860",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243980"
+    },
+    {
+      "id": 188,
+      "name": "Kamel Mag Pemapref",
+      "email": "nan",
+      "phone": "27 247 410 ::: 29 896 086",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243981"
+    },
+    {
+      "id": 189,
+      "name": "Kamel Pemapref",
+      "email": "nan",
+      "phone": "+216 20 043 920",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243982"
+    },
+    {
+      "id": 190,
+      "name": "Kaouthar jedda - Architect - BIM manager",
+      "email": "nan",
+      "phone": "+216 20 355 395",
+      "company": "Kaouthar jedda - Architect - BIM manager",
+      "type": "client",
+      "notes": "Speciality: nan | Address: al raoudha, Rue Mosquee, Tunis 2036, Tunisia\nal raoudha, Rue Mosquee | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243983"
+    },
+    {
+      "id": 191,
+      "name": "Karim Construction Sokra",
+      "email": "nan",
+      "phone": "21622373918",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243984"
+    },
+    {
+      "id": 192,
+      "name": "Karim SGS",
+      "email": "nan",
+      "phone": "26 019 775",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243985"
+    },
+    {
+      "id": 193,
+      "name": "kawthar Pemabat",
+      "email": "nan",
+      "phone": "20980984",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243986"
+    },
+    {
+      "id": 194,
+      "name": "Kays Cha3ben",
+      "email": "nan",
+      "phone": "219-668-00",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243987"
+    },
+    {
+      "id": 195,
+      "name": "khaled Bobcat Pemabat",
+      "email": "nan",
+      "phone": "50716407",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243988"
+    },
+    {
+      "id": 196,
+      "name": "Khaled Construction France",
+      "email": "nan",
+      "phone": "33620853220",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243990"
+    },
+    {
+      "id": 197,
+      "name": "Khaled Ghalebi Pemapref",
+      "email": "nan",
+      "phone": "20 698 640",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243991"
+    },
+    {
+      "id": 198,
+      "name": "Khaled Harabi",
+      "email": "nan",
+      "phone": "+216 98 230 230 ::: 262-970-29",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243992"
+    },
+    {
+      "id": 199,
+      "name": "Khaled Nouri Pemabat",
+      "email": "nan",
+      "phone": "54949037",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243993"
+    },
+    {
+      "id": 200,
+      "name": "Khaled Pemapref",
+      "email": "nan",
+      "phone": "25 915 067",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243994"
+    },
+    {
+      "id": 201,
+      "name": "Khalfallah Tarek Daf Ambassadeur",
+      "email": "nan",
+      "phone": "21628880620",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243995"
+    },
+    {
+      "id": 202,
+      "name": "Khalifa Ksouri",
+      "email": "nan",
+      "phone": "+216 21 787 877\n92 905 302",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243996"
+    },
+    {
+      "id": 203,
+      "name": "Khalil Best B\u00c3\u00a9ton",
+      "email": "nan",
+      "phone": "29 246 332",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243997"
+    },
+    {
+      "id": 204,
+      "name": "Khalil Ferchichi",
+      "email": "nan",
+      "phone": "21628611548",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243998"
+    },
+    {
+      "id": 205,
+      "name": "Khalil Ferchichi Sicep",
+      "email": "nan",
+      "phone": "+216 20 567 657",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.243999"
+    },
+    {
+      "id": 206,
+      "name": "Khalil Mdd",
+      "email": "nan",
+      "phone": "+216 29 999 184",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244001"
+    },
+    {
+      "id": 207,
+      "name": "Khalil Pemapref",
+      "email": "nan",
+      "phone": "28 041 218",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244002"
+    },
+    {
+      "id": 208,
+      "name": "Khalil Trabelsi Kaita",
+      "email": "nan",
+      "phone": "21624954957",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244003"
+    },
+    {
+      "id": 209,
+      "name": "Khemais Ouvrier",
+      "email": "nan",
+      "phone": "21624773300",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244004"
+    },
+    {
+      "id": 210,
+      "name": "Khmaies Ma\u00c3\u00a7on Ben Arous",
+      "email": "nan",
+      "phone": "22 514 535",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244005"
+    },
+    {
+      "id": 211,
+      "name": "Khmaies Pemapref",
+      "email": "nan",
+      "phone": "+216 97 169 683",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244006"
+    },
+    {
+      "id": 212,
+      "name": "Khouloud Extra Bizerte",
+      "email": "nan",
+      "phone": "+216 20 842 000",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244007"
+    },
+    {
+      "id": 213,
+      "name": "Lakhdhar Ma\u00c3\u00a7on",
+      "email": "nan",
+      "phone": "95 315 863",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244008"
+    },
+    {
+      "id": 214,
+      "name": "Lasaad Marroki",
+      "email": "nan",
+      "phone": "98 335 602",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244009"
+    },
+    {
+      "id": 215,
+      "name": "Lasaad Marroki 2",
+      "email": "nan",
+      "phone": "29772254",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244010"
+    },
+    {
+      "id": 216,
+      "name": "Lassaad Ma\u00c3\u00a7on",
+      "email": "nan",
+      "phone": "23 954 603",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244012"
+    },
+    {
+      "id": 217,
+      "name": "Location Mat\u00c3\u00a9riel",
+      "email": "nan",
+      "phone": "52 526 939",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244013"
+    },
+    {
+      "id": 218,
+      "name": "Location Voiture 2",
+      "email": "nan",
+      "phone": "00 216 54 637 108",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244014"
+    },
+    {
+      "id": 219,
+      "name": "Location Voiture 3",
+      "email": "nan",
+      "phone": "+216 27 293 035",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244015"
+    },
+    {
+      "id": 220,
+      "name": "Lotfi Ben Doudou Elect",
+      "email": "nan",
+      "phone": "50691689",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244016"
+    },
+    {
+      "id": 221,
+      "name": "Lotfi Tna",
+      "email": "nan",
+      "phone": "98991813",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244017"
+    },
+    {
+      "id": 222,
+      "name": "Luca Isoltech",
+      "email": "nan",
+      "phone": "393496100845",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244018"
+    },
+    {
+      "id": 223,
+      "name": "Luigi Pemapref",
+      "email": "nan",
+      "phone": "+216 27 153 628",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244019"
+    },
+    {
+      "id": 224,
+      "name": "M Konstruktor",
+      "email": "nan",
+      "phone": "79118934104",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244020"
+    },
+    {
+      "id": 225,
+      "name": "Mahdi \u00c3\u2030tanch\u00c3\u00a9it\u00c3\u00a9 TNA",
+      "email": "nan",
+      "phone": "21424065",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244021"
+    },
+    {
+      "id": 226,
+      "name": "Mahdi Impression",
+      "email": "nan",
+      "phone": "25 930 801",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244023"
+    },
+    {
+      "id": 227,
+      "name": "Mahdi Moussa Dgb",
+      "email": "nan",
+      "phone": "+216 29 739 725",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244024"
+    },
+    {
+      "id": 228,
+      "name": "Maher Arru",
+      "email": "nan",
+      "phone": "98 786 112",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244025"
+    },
+    {
+      "id": 229,
+      "name": "Maher El Baraka",
+      "email": "nan",
+      "phone": "+216 29 324 104",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244026"
+    },
+    {
+      "id": 230,
+      "name": "Maher Menuiserie",
+      "email": "nan",
+      "phone": "50 554 277",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244027"
+    },
+    {
+      "id": 231,
+      "name": "Mahmoud CAT COLACEM",
+      "email": "nan",
+      "phone": "98 457 168",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244028"
+    },
+    {
+      "id": 232,
+      "name": "Mahmoud Kammoun Gaz",
+      "email": "nan",
+      "phone": "21623517721",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244029"
+    },
+    {
+      "id": 233,
+      "name": "Mahmoud Pemabat",
+      "email": "nan",
+      "phone": "55362915",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244031"
+    },
+    {
+      "id": 234,
+      "name": "Maitre Anas Kaddoussi",
+      "email": "nan",
+      "phone": "23 192 531",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244032"
+    },
+    {
+      "id": 235,
+      "name": "Maitre Karim Ben Derbel",
+      "email": "nan",
+      "phone": "+216 20 872 216",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244033"
+    },
+    {
+      "id": 236,
+      "name": "Maitre Safouane Jallouli",
+      "email": "nan",
+      "phone": "22598451",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244034"
+    },
+    {
+      "id": 237,
+      "name": "Maitre Zidi Walid",
+      "email": "nan",
+      "phone": "21623529366",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244036"
+    },
+    {
+      "id": 238,
+      "name": "Majdi Colle",
+      "email": "nan",
+      "phone": "+216 53 059 818",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244037"
+    },
+    {
+      "id": 239,
+      "name": "Majdi Darwich tn",
+      "email": "nan",
+      "phone": "21626453515",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244038"
+    },
+    {
+      "id": 240,
+      "name": "Majdi Derouich",
+      "email": "nan",
+      "phone": "97455370886",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244039"
+    },
+    {
+      "id": 241,
+      "name": "majdi gassara",
+      "email": "nan",
+      "phone": "240-919-92",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244040"
+    },
+    {
+      "id": 242,
+      "name": "Malek Pemapref",
+      "email": "nan",
+      "phone": "92 720 919",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244041"
+    },
+    {
+      "id": 243,
+      "name": "Malek Taktak",
+      "email": "nan",
+      "phone": "21621758405",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244042"
+    },
+    {
+      "id": 244,
+      "name": "Manel Jrad Cnt",
+      "email": "nan",
+      "phone": "21629793418",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244043"
+    },
+    {
+      "id": 245,
+      "name": "mansour Pemabat",
+      "email": "nan",
+      "phone": "25507164",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244044"
+    },
+    {
+      "id": 246,
+      "name": "Marbre Megrine",
+      "email": "nan",
+      "phone": "22 465 183",
+      "company": "nan",
+      "type": "fournisseur",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244046"
+    },
+    {
+      "id": 247,
+      "name": "Marcel Daoud",
+      "email": "nan",
+      "phone": "+33642300195 ::: +33616438534",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244047"
+    },
+    {
+      "id": 248,
+      "name": "Marco Ertolupi",
+      "email": "nan",
+      "phone": "+216 29 896 362",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244048"
+    },
+    {
+      "id": 249,
+      "name": "Marco Ortoloppi",
+      "email": "nan",
+      "phone": "+216 25 373 370",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244049"
+    },
+    {
+      "id": 250,
+      "name": "Marco Pelizzari",
+      "email": "mape.admin@pemabat.com.tn",
+      "phone": "21236009 ::: +21636109515",
+      "company": "PemaBat",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244050"
+    },
+    {
+      "id": 251,
+      "name": "Mariem Informaticienne Blocstar",
+      "email": "nan",
+      "phone": "99 290 781",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244051"
+    },
+    {
+      "id": 252,
+      "name": "Marwa Mathlouthi Luxor",
+      "email": "nan",
+      "phone": "+21654755705\n98780511",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244052"
+    },
+    {
+      "id": 253,
+      "name": "Marwen Designer",
+      "email": "nan",
+      "phone": "509-786-86",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244053"
+    },
+    {
+      "id": 254,
+      "name": "Marwen M'BARKI France",
+      "email": "nan",
+      "phone": "+33 6 05 71 52 48",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244054"
+    },
+    {
+      "id": 255,
+      "name": "Marwen Mbarki",
+      "email": "nan",
+      "phone": "53388891",
+      "company": "Cks",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244056"
+    },
+    {
+      "id": 256,
+      "name": "Marwen Mbarki 2",
+      "email": "nan",
+      "phone": "93551216",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244057"
+    },
+    {
+      "id": 257,
+      "name": "Marwen Mbarki Tn",
+      "email": "nan",
+      "phone": "+216 28 739 862",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244058"
+    },
+    {
+      "id": 258,
+      "name": "Marwen M\u00c3\u00a9canicien Pemabat",
+      "email": "nan",
+      "phone": "21628747867",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: TN | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244059"
+    },
+    {
+      "id": 259,
+      "name": "Material Kamel",
+      "email": "nan",
+      "phone": "21621648605",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244060"
+    },
+    {
+      "id": 260,
+      "name": "Mat\u00c3\u00a9riau Ben Aissa",
+      "email": "nan",
+      "phone": "21693707479",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244061"
+    },
+    {
+      "id": 261,
+      "name": "Mayssa Jannen Architecte",
+      "email": "nan",
+      "phone": "55 453 467",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244062"
+    },
+    {
+      "id": 262,
+      "name": "Med Ali Bou Alu",
+      "email": "nan",
+      "phone": "+216 22 737 053",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244064"
+    },
+    {
+      "id": 263,
+      "name": "Med Ali Carthage ALU",
+      "email": "nan",
+      "phone": "+216 53 757 033",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244065"
+    },
+    {
+      "id": 264,
+      "name": "Med Ali Remorquage",
+      "email": "nan",
+      "phone": "28 111 113",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244066"
+    },
+    {
+      "id": 265,
+      "name": "Med Amin Pemabat",
+      "email": "nan",
+      "phone": "21622193920",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244067"
+    },
+    {
+      "id": 266,
+      "name": "Med Guebsi Engin",
+      "email": "nan",
+      "phone": "95748175",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244068"
+    },
+    {
+      "id": 267,
+      "name": "med salah Pemabat",
+      "email": "nan",
+      "phone": "29366619",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244069"
+    },
+    {
+      "id": 268,
+      "name": "Mehdi Ben Rejeb",
+      "email": "nan",
+      "phone": "+216 52 945 351",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244070"
+    },
+    {
+      "id": 269,
+      "name": "Mehdi Ghrari Tolier",
+      "email": "nan",
+      "phone": "21654440197",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244071"
+    },
+    {
+      "id": 270,
+      "name": "Mejed Sel3a Ben L5adhra",
+      "email": "nan",
+      "phone": "+216 28 390 876",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244072"
+    },
+    {
+      "id": 271,
+      "name": "Mhamed Ouvrier Libi",
+      "email": "nan",
+      "phone": "93 143 843",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244074"
+    },
+    {
+      "id": 272,
+      "name": "Mme Manoubia",
+      "email": "nan",
+      "phone": "+33 7 81 18 34 05",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244075"
+    },
+    {
+      "id": 273,
+      "name": "Mnawar Klai",
+      "email": "nan",
+      "phone": "97 803 893",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244076"
+    },
+    {
+      "id": 274,
+      "name": "Mocef Pemabat",
+      "email": "nan",
+      "phone": "24983284",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244077"
+    },
+    {
+      "id": 275,
+      "name": "Moez Moelhi Architecte",
+      "email": "nan",
+      "phone": "21621045203",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244078"
+    },
+    {
+      "id": 276,
+      "name": "Mohamed Ali Abid",
+      "email": "nan",
+      "phone": "+216 55 373 041",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244079"
+    },
+    {
+      "id": 277,
+      "name": "Mohamed Ali Najjar",
+      "email": "nan",
+      "phone": "96 602 118",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244080"
+    },
+    {
+      "id": 278,
+      "name": "Mohamed Amine Pemapref",
+      "email": "nan",
+      "phone": "+216 55 601 325",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244081"
+    },
+    {
+      "id": 279,
+      "name": "Mohamed \u00c3\u2030lectricien",
+      "email": "nan",
+      "phone": "+216 265-000-06",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244082"
+    },
+    {
+      "id": 280,
+      "name": "Mohamed \u00c3\u2030lectricien Vectorys",
+      "email": "nan",
+      "phone": "29481154",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244083"
+    },
+    {
+      "id": 281,
+      "name": "Mohamed Emballages",
+      "email": "nan",
+      "phone": "98223533",
+      "company": "Genpack",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244085"
+    },
+    {
+      "id": 282,
+      "name": "Mohamed Engin Pemabat",
+      "email": "nan",
+      "phone": "97 301 153",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244086"
+    },
+    {
+      "id": 283,
+      "name": "Mohamed Fatnassi Pemabat",
+      "email": "nan",
+      "phone": "29571365",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244087"
+    },
+    {
+      "id": 284,
+      "name": "Mohamed Jeljeli Escalier M\u00c3\u00a9tallique",
+      "email": "nan",
+      "phone": "21628268254",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244088"
+    },
+    {
+      "id": 285,
+      "name": "Mohamed Karoui",
+      "email": "nan",
+      "phone": "98341533",
+      "company": "SOMABE",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244089"
+    },
+    {
+      "id": 286,
+      "name": "Mohamed Karoui Fix",
+      "email": "nan",
+      "phone": "+216 79 408 208",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Ben Arous, Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244090"
+    },
+    {
+      "id": 287,
+      "name": "Mohamed Labo Beja",
+      "email": "nan",
+      "phone": "58 257 562",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244091"
+    },
+    {
+      "id": 288,
+      "name": "Mohamed Mansour Pemabat",
+      "email": "nan",
+      "phone": "29066641",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244092"
+    },
+    {
+      "id": 289,
+      "name": "Mohamed Mdd",
+      "email": "nan",
+      "phone": "25 227 530",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244094"
+    },
+    {
+      "id": 290,
+      "name": "Mohamed Mongi Sahbani",
+      "email": "nan",
+      "phone": "21626414011",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244095"
+    },
+    {
+      "id": 291,
+      "name": "Mohamed Najar",
+      "email": "nan",
+      "phone": "27 007 692",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244096"
+    },
+    {
+      "id": 292,
+      "name": "Mohamed Pemapref",
+      "email": "nan",
+      "phone": "22 549 670",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244097"
+    },
+    {
+      "id": 293,
+      "name": "Mohammed Bouattour Architecte",
+      "email": "nan",
+      "phone": "+216 94 898 540",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244098"
+    },
+    {
+      "id": 294,
+      "name": "Mohsen Coursier Grand Tunis",
+      "email": "nan",
+      "phone": "24 732 120",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244099"
+    },
+    {
+      "id": 295,
+      "name": "Mohsen \u00c3\u2030lectricit\u00c3\u00a9",
+      "email": "nan",
+      "phone": "29406081",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244100"
+    },
+    {
+      "id": 296,
+      "name": "Mondher Hathroubi Remorquage",
+      "email": "nan",
+      "phone": "21693609208",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244101"
+    },
+    {
+      "id": 297,
+      "name": "Mondher Placo",
+      "email": "nan",
+      "phone": "41 720 890",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244102"
+    },
+    {
+      "id": 298,
+      "name": "Mondher Placo 2",
+      "email": "nan",
+      "phone": "94 528 233",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244103"
+    },
+    {
+      "id": 299,
+      "name": "Monji Rev\u00c3\u00aatement TNA",
+      "email": "nan",
+      "phone": "97102125",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244104"
+    },
+    {
+      "id": 300,
+      "name": "Monji Sahbeni",
+      "email": "nan",
+      "phone": "98348453",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244106"
+    },
+    {
+      "id": 301,
+      "name": "Montage Climatiseur",
+      "email": "nan",
+      "phone": "21621199144",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244107"
+    },
+    {
+      "id": 302,
+      "name": "Mouheb Somabe",
+      "email": "nan",
+      "phone": "26 039 987",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244108"
+    },
+    {
+      "id": 303,
+      "name": "Mourad Ben Makklouf",
+      "email": "nan",
+      "phone": "+216 23 098 198 ::: +216 58 345 294 ::: +21620282360",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244109"
+    },
+    {
+      "id": 304,
+      "name": "Mourad El Bjewi Pemapref",
+      "email": "nan",
+      "phone": "+216 20 612 619",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244110"
+    },
+    {
+      "id": 305,
+      "name": "mourad Pemabat",
+      "email": "nan",
+      "phone": "29757184",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244111"
+    },
+    {
+      "id": 306,
+      "name": "Mustfa Zdiri",
+      "email": "nan",
+      "phone": "+216 28 128 494",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244112"
+    },
+    {
+      "id": 307,
+      "name": "Nabil Amt",
+      "email": "nan",
+      "phone": "+216 21 352 135",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244113"
+    },
+    {
+      "id": 308,
+      "name": "Nabil Belgacem",
+      "email": "nan",
+      "phone": "58 281 112",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244114"
+    },
+    {
+      "id": 309,
+      "name": "Nabil Belgacem Perso",
+      "email": "nan",
+      "phone": "53 820 778",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244115"
+    },
+    {
+      "id": 310,
+      "name": "Nabil Tourneur Mghira",
+      "email": "nan",
+      "phone": "20 320 669",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244117"
+    },
+    {
+      "id": 311,
+      "name": "Naceur Marbre",
+      "email": "nan",
+      "phone": "21650818464",
+      "company": "nan",
+      "type": "fournisseur",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244118"
+    },
+    {
+      "id": 312,
+      "name": "Nader Garde Nationale",
+      "email": "nan",
+      "phone": "+216 23 988 550",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244119"
+    },
+    {
+      "id": 313,
+      "name": "Nahla Sicilferro",
+      "email": "nan",
+      "phone": "+216 90 392 400",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244120"
+    },
+    {
+      "id": 314,
+      "name": "Naim M\u00c3\u00a9tallique",
+      "email": "nan",
+      "phone": "21650438449",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244121"
+    },
+    {
+      "id": 315,
+      "name": "Najjar Lafayette",
+      "email": "nan",
+      "phone": "53 304 330",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244122"
+    },
+    {
+      "id": 316,
+      "name": "Naser Ayari D\u00c3\u00a9charge",
+      "email": "nan",
+      "phone": "21621065663",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244123"
+    },
+    {
+      "id": 317,
+      "name": "Nasser Najar",
+      "email": "nan",
+      "phone": "+216 22 661 976",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244124"
+    },
+    {
+      "id": 318,
+      "name": "Nazih Atitallah",
+      "email": "nan",
+      "phone": "95 199 303",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244126"
+    },
+    {
+      "id": 319,
+      "name": "Nemella Pemapref",
+      "email": "nan",
+      "phone": "+216 25 714 355",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244128"
+    },
+    {
+      "id": 320,
+      "name": "Nesrine Sotumar",
+      "email": "nan",
+      "phone": "28555548",
+      "company": "Marbre",
+      "type": "fournisseur",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244129"
+    },
+    {
+      "id": 321,
+      "name": "nidhal Pemabat",
+      "email": "nan",
+      "phone": "28747552",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244130"
+    },
+    {
+      "id": 322,
+      "name": "Nizar Ing Structure",
+      "email": "nan",
+      "phone": "99 331 808",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244131"
+    },
+    {
+      "id": 323,
+      "name": "Nourdine G\u00c3\u00a9n\u00c3\u00a9ral Beton",
+      "email": "nan",
+      "phone": "28 913 256",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244132"
+    },
+    {
+      "id": 324,
+      "name": "Nouri Location Manar1 Tunis",
+      "email": "nan",
+      "phone": "21622895157",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244133"
+    },
+    {
+      "id": 325,
+      "name": "novembr cov",
+      "email": "nan",
+      "phone": "546-686-46",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244134"
+    },
+    {
+      "id": 326,
+      "name": "Olfa Oueslati Sogel",
+      "email": "nan",
+      "phone": "+216 22 939 775",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244136"
+    },
+    {
+      "id": 327,
+      "name": "olfa Pemabat",
+      "email": "nan",
+      "phone": "52518962",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244137"
+    },
+    {
+      "id": 328,
+      "name": "Omar Emballage",
+      "email": "nan",
+      "phone": "29834234",
+      "company": "Toupack",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244138"
+    },
+    {
+      "id": 329,
+      "name": "Omar Kabboudi Topo",
+      "email": "nan",
+      "phone": "21621445696",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244139"
+    },
+    {
+      "id": 330,
+      "name": "Omar Raboudi",
+      "email": "nan",
+      "phone": "21621304621",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Nabeul, Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244140"
+    },
+    {
+      "id": 331,
+      "name": "Omar Sotukrema",
+      "email": "nan",
+      "phone": "50 200 684",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244141"
+    },
+    {
+      "id": 332,
+      "name": "Omayma Africa Industry",
+      "email": "nan",
+      "phone": "29 446 416",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244142"
+    },
+    {
+      "id": 333,
+      "name": "Pemabat Bureau",
+      "email": "nan",
+      "phone": "36380011",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244143"
+    },
+    {
+      "id": 334,
+      "name": "Pierluigi Bacchis",
+      "email": "nan",
+      "phone": "98 406 647",
+      "company": "CAT COLACEM",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244145"
+    },
+    {
+      "id": 335,
+      "name": "Pippo Longhin",
+      "email": "nan",
+      "phone": "+216 20 242 688",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244146"
+    },
+    {
+      "id": 336,
+      "name": "Plasmacem Italy",
+      "email": "nan",
+      "phone": "+39 342 798 0876",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Italy | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244147"
+    },
+    {
+      "id": 337,
+      "name": "Plombier Multi",
+      "email": "nan",
+      "phone": "28 566 122",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244148"
+    },
+    {
+      "id": 338,
+      "name": "Poseur Megrine",
+      "email": "nan",
+      "phone": "22 760 033",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244149"
+    },
+    {
+      "id": 339,
+      "name": "Ppm",
+      "email": "nan",
+      "phone": "20 374 724",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244150"
+    },
+    {
+      "id": 340,
+      "name": "rached Pemabat",
+      "email": "nan",
+      "phone": "23197115",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244151"
+    },
+    {
+      "id": 341,
+      "name": "Rached Pemabat",
+      "email": "nan",
+      "phone": "29769307",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244152"
+    },
+    {
+      "id": 342,
+      "name": "Rachid Elmay \u00c3\u2030lectricit\u00c3\u00a9",
+      "email": "nan",
+      "phone": "+216 21 223 914",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244153"
+    },
+    {
+      "id": 343,
+      "name": "Rachid Lybien Pemabat",
+      "email": "nan",
+      "phone": "21628682214",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244155"
+    },
+    {
+      "id": 344,
+      "name": "Radhwen Sable",
+      "email": "nan",
+      "phone": "+216 22 747 242",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244156"
+    },
+    {
+      "id": 345,
+      "name": "Rafik Mdd",
+      "email": "nan",
+      "phone": "+216 29 999 182",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244157"
+    },
+    {
+      "id": 346,
+      "name": "Rami Pemapref",
+      "email": "nan",
+      "phone": "27 942 369",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244158"
+    },
+    {
+      "id": 347,
+      "name": "Ramzi Chauffeur Elbaraka",
+      "email": "nan",
+      "phone": "+216 90 789 971",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244159"
+    },
+    {
+      "id": 348,
+      "name": "Ramzi Derwich",
+      "email": "nan",
+      "phone": "+216 28 822 464",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244160"
+    },
+    {
+      "id": 349,
+      "name": "Ramzi Pemapref",
+      "email": "nan",
+      "phone": "54564422",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244161"
+    },
+    {
+      "id": 350,
+      "name": "Ramzi Transport",
+      "email": "nan",
+      "phone": "96 398 813",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244162"
+    },
+    {
+      "id": 351,
+      "name": "Rania Abdltif",
+      "email": "nan",
+      "phone": "21623418276",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244164"
+    },
+    {
+      "id": 352,
+      "name": "Rania Ezzina",
+      "email": "nan",
+      "phone": "21621273184",
+      "company": "nan",
+      "type": "architecte",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244165"
+    },
+    {
+      "id": 353,
+      "name": "Rania Lassoued Aluminium",
+      "email": "nan",
+      "phone": "21653757924",
+      "company": "nan",
+      "type": "fournisseur",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244166"
+    },
+    {
+      "id": 354,
+      "name": "Rchid Libi",
+      "email": "nan",
+      "phone": "20 162 797",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244167"
+    },
+    {
+      "id": 355,
+      "name": "Rchid Libi 2",
+      "email": "nan",
+      "phone": "58 181 419",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244168"
+    },
+    {
+      "id": 356,
+      "name": "rchid Pemabat",
+      "email": "nan",
+      "phone": "29399638",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244169"
+    },
+    {
+      "id": 357,
+      "name": "Riadh Ghali Africa Industry",
+      "email": "nan",
+      "phone": "98308363",
+      "company": "DG Africa Industry ",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244170"
+    },
+    {
+      "id": 358,
+      "name": "Rihab Sicep",
+      "email": "nan",
+      "phone": "29 508 859",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244171"
+    },
+    {
+      "id": 359,
+      "name": "Rim Mart Walid",
+      "email": "nan",
+      "phone": "21646389009",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244173"
+    },
+    {
+      "id": 360,
+      "name": "Roland Merlin",
+      "email": "nan",
+      "phone": "33766307858",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244174"
+    },
+    {
+      "id": 361,
+      "name": "Saad Tractopelle",
+      "email": "nan",
+      "phone": "+216 23 001 214",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244175"
+    },
+    {
+      "id": 362,
+      "name": "Saber Bazid 2",
+      "email": "nan",
+      "phone": "21623025934",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244176"
+    },
+    {
+      "id": 363,
+      "name": "Saber General B\u00c3\u00a9ton",
+      "email": "nan",
+      "phone": "+216 28 913 258",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244177"
+    },
+    {
+      "id": 364,
+      "name": "Saber Khanfir Sanitaire",
+      "email": "nan",
+      "phone": "+216 50 033 015",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244178"
+    },
+    {
+      "id": 365,
+      "name": "Saber Mghira",
+      "email": "nan",
+      "phone": "+216 29 297 484",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244179"
+    },
+    {
+      "id": 366,
+      "name": "Saber Police Fst",
+      "email": "nan",
+      "phone": "21621261417",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244180"
+    },
+    {
+      "id": 367,
+      "name": "Saber Transporteur Mghira",
+      "email": "nan",
+      "phone": "+216 54 190 178",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244181"
+    },
+    {
+      "id": 368,
+      "name": "Saber Vrd Sous Traitance",
+      "email": "nan",
+      "phone": "21658807371",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244183"
+    },
+    {
+      "id": 369,
+      "name": "Sabri Sicilferro",
+      "email": "nan",
+      "phone": "21696542548",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244184"
+    },
+    {
+      "id": 370,
+      "name": "Sadok Sicilferro",
+      "email": "nan",
+      "phone": "+216 29 428 748",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244185"
+    },
+    {
+      "id": 371,
+      "name": "Safa Webmedia",
+      "email": "nan",
+      "phone": "29292291",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244186"
+    },
+    {
+      "id": 372,
+      "name": "Safouene Jouili Maitre",
+      "email": "nan",
+      "phone": "21654598451",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244187"
+    },
+    {
+      "id": 373,
+      "name": "Saiida Fcs CALE Plastic",
+      "email": "nan",
+      "phone": "98 422 224",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244188"
+    },
+    {
+      "id": 374,
+      "name": "Saiida Njim",
+      "email": "nan",
+      "phone": "20 422 224",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244189"
+    },
+    {
+      "id": 375,
+      "name": "Sameh Ben Rezig Const Hay Khadhra",
+      "email": "nan",
+      "phone": "21652019980",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244190"
+    },
+    {
+      "id": 376,
+      "name": "Sami Bois Coffrage",
+      "email": "nan",
+      "phone": "+216 52 994 836",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244191"
+    },
+    {
+      "id": 377,
+      "name": "Sami General Beton",
+      "email": "nan",
+      "phone": "21 443 903",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244193"
+    },
+    {
+      "id": 378,
+      "name": "Sami Khalfaoui Ma\u00c3\u00a7on",
+      "email": "nan",
+      "phone": "21622069553",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244194"
+    },
+    {
+      "id": 379,
+      "name": "Samu Tna Rached",
+      "email": "nan",
+      "phone": "29988917",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244195"
+    },
+    {
+      "id": 380,
+      "name": "Samy Riahi CAT COLACEM",
+      "email": "nan",
+      "phone": "+216 98 703 204",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244196"
+    },
+    {
+      "id": 381,
+      "name": "Sarra Chantier Ksar Said",
+      "email": "nan",
+      "phone": "95 861 178",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244197"
+    },
+    {
+      "id": 382,
+      "name": "Sava Chariot Mohamed",
+      "email": "nan",
+      "phone": "21629888310",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244198"
+    },
+    {
+      "id": 383,
+      "name": "Sebti Dahen",
+      "email": "nan",
+      "phone": "+216 22 019 015",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244199"
+    },
+    {
+      "id": 384,
+      "name": "Secomet",
+      "email": "nan",
+      "phone": "+216 72 399 444",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244201"
+    },
+    {
+      "id": 385,
+      "name": "Sel3a Khlifa \u00c3\u20acyari Beb Khadhra",
+      "email": "nan",
+      "phone": "21622553016",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244202"
+    },
+    {
+      "id": 386,
+      "name": "Serge Adderio",
+      "email": "nan",
+      "phone": "21 599 583",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244203"
+    },
+    {
+      "id": 387,
+      "name": "Settimio Tna",
+      "email": "nan",
+      "phone": "29935994",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244204"
+    },
+    {
+      "id": 388,
+      "name": "Sevac Asma",
+      "email": "nan",
+      "phone": "21697576751",
+      "company": "nan",
+      "type": "fournisseur",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244205"
+    },
+    {
+      "id": 389,
+      "name": "Sihem Cic",
+      "email": "nan",
+      "phone": "24 341 698",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244206"
+    },
+    {
+      "id": 390,
+      "name": "Sil3a 3D",
+      "email": "nan",
+      "phone": "58999020",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244207"
+    },
+    {
+      "id": 391,
+      "name": "Sirine Themri Architecte",
+      "email": "nan",
+      "phone": "93 150 787",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244208"
+    },
+    {
+      "id": 392,
+      "name": "Skandar Lamiin",
+      "email": "nan",
+      "phone": "22 633 317",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244209"
+    },
+    {
+      "id": 393,
+      "name": "Skandar Sogel",
+      "email": "nan",
+      "phone": "53 304 475",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244210"
+    },
+    {
+      "id": 394,
+      "name": "Sleh Banney Lac",
+      "email": "nan",
+      "phone": "20 904 810",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244212"
+    },
+    {
+      "id": 395,
+      "name": "Slim Bbm Brique",
+      "email": "nan",
+      "phone": "99 696 359",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244213"
+    },
+    {
+      "id": 396,
+      "name": "Slim Chahed",
+      "email": "nan",
+      "phone": "+216 24 874 815",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244214"
+    },
+    {
+      "id": 397,
+      "name": "Sofien DT general B\u00c3\u00a9ton",
+      "email": "nan",
+      "phone": "22 131 993",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244215"
+    },
+    {
+      "id": 398,
+      "name": "Sofien Plombier Lafayette",
+      "email": "nan",
+      "phone": "23 646 848",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244216"
+    },
+    {
+      "id": 399,
+      "name": "Sofien Police",
+      "email": "nan",
+      "phone": "29662172",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244217"
+    },
+    {
+      "id": 400,
+      "name": "Sofien Sahbeni Dahen",
+      "email": "nan",
+      "phone": "94 588 000",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244218"
+    },
+    {
+      "id": 401,
+      "name": "Sofien Technicien Telecom",
+      "email": "nan",
+      "phone": "94 691 115",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244220"
+    },
+    {
+      "id": 402,
+      "name": "Sogecom",
+      "email": "nan",
+      "phone": "71427733",
+      "company": "Construction M\u00c3\u00a9tallique ",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244221"
+    },
+    {
+      "id": 403,
+      "name": "Somabe",
+      "email": "nan",
+      "phone": "79408168",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244223"
+    },
+    {
+      "id": 404,
+      "name": "Soodod Ing\u00c3\u00a9nieur B\u00c3\u00a9ton",
+      "email": "sooded.hajri@gmail.com",
+      "phone": "94 846 200",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244224"
+    },
+    {
+      "id": 405,
+      "name": "Souhail AMT",
+      "email": "nan",
+      "phone": "20 063 925",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244225"
+    },
+    {
+      "id": 406,
+      "name": "Souhir Ep Cherif",
+      "email": "nan",
+      "phone": "26 637 727",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244226"
+    },
+    {
+      "id": 407,
+      "name": "Taher Peinture",
+      "email": "nan",
+      "phone": "53 521 617",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244227"
+    },
+    {
+      "id": 408,
+      "name": "Taieb Zaanouni",
+      "email": "nan",
+      "phone": "21699891888",
+      "company": "Luxor Adjuvants",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244228"
+    },
+    {
+      "id": 409,
+      "name": "Taoufic Adjuvant",
+      "email": "nan",
+      "phone": "96 810 703",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244229"
+    },
+    {
+      "id": 410,
+      "name": "Tarak Mechanicien",
+      "email": "nan",
+      "phone": "+216 54 185 053",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244230"
+    },
+    {
+      "id": 411,
+      "name": "Tawfik Ma\u00c3\u00a7on",
+      "email": "nan",
+      "phone": "21625324807",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244231"
+    },
+    {
+      "id": 412,
+      "name": "Tayari Hassin Palette",
+      "email": "tayarihassin510@gmail.com",
+      "phone": "21629724430",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244233"
+    },
+    {
+      "id": 413,
+      "name": "Telescopique Megrine Massoud Freres",
+      "email": "nan",
+      "phone": "+216 21 430 702",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244234"
+    },
+    {
+      "id": 414,
+      "name": "Terrin Mnihla",
+      "email": "nan",
+      "phone": "21 111 130",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244235"
+    },
+    {
+      "id": 415,
+      "name": "Transporteur Camion Moyen",
+      "email": "nan",
+      "phone": "22 047 045",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244236"
+    },
+    {
+      "id": 416,
+      "name": "Transporteur OM",
+      "email": "nan",
+      "phone": "22 577 051",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244237"
+    },
+    {
+      "id": 417,
+      "name": "Transporteur Tunis Isuzu",
+      "email": "nan",
+      "phone": "52455624",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244238"
+    },
+    {
+      "id": 418,
+      "name": "Wajdi Miladi",
+      "email": "nan",
+      "phone": "21655707578",
+      "company": "Vis Chargeur",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244239"
+    },
+    {
+      "id": 419,
+      "name": "Walid Affes 2",
+      "email": "nan",
+      "phone": "24 197 560",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244240"
+    },
+    {
+      "id": 420,
+      "name": "Walid affess pemapref",
+      "email": "nan",
+      "phone": "28 048 422",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244241"
+    },
+    {
+      "id": 421,
+      "name": "Walid Ayari Pemapref",
+      "email": "nan",
+      "phone": "22 730 408",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244242"
+    },
+    {
+      "id": 422,
+      "name": "Walid Ben Salah",
+      "email": "nan",
+      "phone": "+216 24 101 068",
+      "company": "DG Prefab Industries ",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244244"
+    },
+    {
+      "id": 423,
+      "name": "Walid Elect Whatsapp",
+      "email": "nan",
+      "phone": "21653267013",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244245"
+    },
+    {
+      "id": 424,
+      "name": "Walid Electric Youssef",
+      "email": "nan",
+      "phone": "21623305736",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244246"
+    },
+    {
+      "id": 425,
+      "name": "Walid Plombier",
+      "email": "nan",
+      "phone": "21625517030",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244247"
+    },
+    {
+      "id": 426,
+      "name": "Wam",
+      "email": "nan",
+      "phone": "390535618111",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244248"
+    },
+    {
+      "id": 427,
+      "name": "Wassim ing pemabat",
+      "email": "nan",
+      "phone": "52117068",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244249"
+    },
+    {
+      "id": 428,
+      "name": "wassim Pemabat",
+      "email": "nan",
+      "phone": "28538986",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244250"
+    },
+    {
+      "id": 429,
+      "name": "Wassim Pemabat 2",
+      "email": "nan",
+      "phone": "+216 24 280 140",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244251"
+    },
+    {
+      "id": 430,
+      "name": "Wassim Pemabat Whatsapp",
+      "email": "nan",
+      "phone": "+216 22 318 816",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244252"
+    },
+    {
+      "id": 431,
+      "name": "Wejden Blocstar",
+      "email": "nan",
+      "phone": "96 944 998",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244253"
+    },
+    {
+      "id": 432,
+      "name": "Yassin Pemapref",
+      "email": "nan",
+      "phone": "21711976",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244255"
+    },
+    {
+      "id": 433,
+      "name": "Youssef Ayari Vectorys",
+      "email": "nan",
+      "phone": "29910179",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244256"
+    },
+    {
+      "id": 434,
+      "name": "Youssef Belheni",
+      "email": "belhaniyoussef3@gmail.com",
+      "phone": "+216 26 065 161",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244257"
+    },
+    {
+      "id": 435,
+      "name": "Youssef Sanheji Comar",
+      "email": "nan",
+      "phone": "22 314 999",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244258"
+    },
+    {
+      "id": 436,
+      "name": "Zayd Engin Mghira",
+      "email": "nan",
+      "phone": "22 322 344",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244259"
+    },
+    {
+      "id": 437,
+      "name": "Zied Arous Mdd",
+      "email": "nan",
+      "phone": "+216 56 833 190",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244260"
+    },
+    {
+      "id": 438,
+      "name": "Zied Ben Othmen",
+      "email": "nan",
+      "phone": "21622531973",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244261"
+    },
+    {
+      "id": 439,
+      "name": "zied garde nationale 2",
+      "email": "nan",
+      "phone": "+216 22 696 229",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244262"
+    },
+    {
+      "id": 440,
+      "name": "Zied Ma\u00c3\u00a7on",
+      "email": "nan",
+      "phone": "+216 26 289 905",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244263"
+    },
+    {
+      "id": 441,
+      "name": "Zied Mdd",
+      "email": "nan",
+      "phone": "+216 56 833 192",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244264"
+    },
+    {
+      "id": 442,
+      "name": "Zied Mezghani Meubles",
+      "email": "nan",
+      "phone": "21622130370",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244265"
+    },
+    {
+      "id": 443,
+      "name": "Zied Nweja3",
+      "email": "nan",
+      "phone": "+216 52 261 114",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244267"
+    },
+    {
+      "id": 444,
+      "name": "Zied Sika",
+      "email": "nan",
+      "phone": "+216 58 515 305",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244268"
+    },
+    {
+      "id": 445,
+      "name": "Zouhair Akkeri Sicep",
+      "email": "nan",
+      "phone": "+216 27 373 174",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244269"
+    },
+    {
+      "id": 446,
+      "name": "Zouhair Bonna B\u00c3\u00a9ton",
+      "email": "nan",
+      "phone": "+216 20 315 053",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244270"
+    },
+    {
+      "id": 447,
+      "name": "Zouhair Brique",
+      "email": "nan",
+      "phone": "99 403 224",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244271"
+    },
+    {
+      "id": 448,
+      "name": "Zouhair Camion Megrine",
+      "email": "nan",
+      "phone": "27 127 788",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: nan | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244272"
+    },
+    {
+      "id": 449,
+      "name": "Zouhair Pemapref",
+      "email": "nan",
+      "phone": "+216 22 067 202",
+      "company": "nan",
+      "type": "client",
+      "notes": "Speciality: nan | Address: Tunisia | Comments: nan",
+      "created_at": "2026-03-17 15:31:57.244273"
+    },
+    {
+      "id": 450,
+      "name": "oussama attia",
+      "email": "",
+      "phone": "22488665",
+      "company": "CAE",
+      "type": "client",
+      "notes": "test",
+      "created_at": "2026-03-17 16:20:35.995680"
+    }
+  ],
+  "provider": [],
+  "project": [
+    {
+      "id": 1,
+      "name": "Zoo Bar",
+      "client_name": "Aymen Ghanoudi",
+      "address": "https://maps.app.goo.gl/A8RN8DGRBkcomnW57",
+      "start_date": "2026-03-10",
+      "end_date": "2026-03-27",
+      "status": "in_progress",
+      "description": "R\u00e9novation \r\najout de  4 urinaires , Bar \r\ncouverture en charpente m\u00e9tallique du terrasse",
+      "budget_total": 0.0,
+      "selling_price": 13860.0,
+      "client_receipts": 4000.0
+    },
+    {
+      "id": 2,
+      "name": "Chantier Cherif",
+      "client_name": "Hichem Cherif",
+      "address": "",
+      "start_date": null,
+      "end_date": null,
+      "status": "completed",
+      "description": "",
+      "budget_total": 0.0,
+      "selling_price": 5040.0,
+      "client_receipts": 0.0
+    },
+    {
+      "id": 3,
+      "name": "Appartement Ennasr",
+      "client_name": "Wissem Jaiden",
+      "address": "",
+      "start_date": "2026-02-12",
+      "end_date": "2026-03-09",
+      "status": "completed",
+      "description": "Installation plomberie apparente",
+      "budget_total": 0.0,
+      "selling_price": 4400.0,
+      "client_receipts": 4400.0
+    }
+  ],
+  "budget": [],
+  "speciality": [
+    {
+      "id": 1,
+      "name": "Ing\u00e9nieur",
+      "created_at": "2026-03-17 15:50:08.893675"
+    },
+    {
+      "id": 2,
+      "name": "Architecte",
+      "created_at": "2026-03-17 15:50:08.893681"
+    },
+    {
+      "id": 3,
+      "name": "Fournisseur",
+      "created_at": "2026-03-17 15:50:08.893683"
+    },
+    {
+      "id": 4,
+      "name": "dzad",
+      "created_at": "2026-03-17 16:08:41.151685"
+    }
+  ],
+  "type": [],
+  "contact_type": [
+    {
+      "id": 1,
+      "name": "Client",
+      "color": "primary",
+      "created_at": "2026-03-17 16:55:17.463325"
+    },
+    {
+      "id": 2,
+      "name": "Fournisseur",
+      "color": "success",
+      "created_at": "2026-03-17 16:55:17.463328"
+    },
+    {
+      "id": 3,
+      "name": "Ing\u00e9nieur",
+      "color": "info",
+      "created_at": "2026-03-17 16:55:17.463330"
+    },
+    {
+      "id": 4,
+      "name": "Architecte",
+      "color": "warning",
+      "created_at": "2026-03-17 16:55:17.463331"
+    },
+    {
+      "id": 5,
+      "name": "Sous-traitant",
+      "color": "secondary",
+      "created_at": "2026-03-17 16:55:17.463332"
+    },
+    {
+      "id": 6,
+      "name": "Autre",
+      "color": "dark",
+      "created_at": "2026-03-17 16:55:17.463333"
+    }
+  ],
+  "project_expense": [
+    {
+      "id": 108,
+      "project_id": 1,
+      "date": "2026-10-03",
+      "nature": "Brique 12",
+      "amount": 45.0,
+      "comment": "50 pieces",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 109,
+      "project_id": 1,
+      "date": "2026-10-03",
+      "nature": "Brique 6",
+      "amount": 80.0,
+      "comment": "100 Pieces",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 110,
+      "project_id": 1,
+      "date": "2026-10-03",
+      "nature": "Ciment",
+      "amount": 75.0,
+      "comment": "5 Sac",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 111,
+      "project_id": 1,
+      "date": "2026-10-03",
+      "nature": "gravier",
+      "amount": 70.0,
+      "comment": "1mc",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 112,
+      "project_id": 1,
+      "date": "2026-10-03",
+      "nature": "hamza",
+      "amount": 120.0,
+      "comment": "avance",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 113,
+      "project_id": 1,
+      "date": "2026-10-03",
+      "nature": "lassaad",
+      "amount": 400.0,
+      "comment": "avance",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 114,
+      "project_id": 1,
+      "date": "2026-10-03",
+      "nature": "outillage",
+      "amount": 86.0,
+      "comment": "marteau pellle etc",
+      "category": "Divers"
+    },
+    {
+      "id": 115,
+      "project_id": 1,
+      "date": "2026-10-03",
+      "nature": "Sable",
+      "amount": 50.0,
+      "comment": "1mc",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 116,
+      "project_id": 1,
+      "date": "2026-11-03",
+      "nature": "Brique 12",
+      "amount": 17.0,
+      "comment": "20 Pieces",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 117,
+      "project_id": 1,
+      "date": "2026-11-03",
+      "nature": "Brique 6",
+      "amount": 14.0,
+      "comment": "20 Pieces",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 118,
+      "project_id": 1,
+      "date": "2026-11-03",
+      "nature": "meule a disque",
+      "amount": 30.0,
+      "comment": "r\u00e9paration",
+      "category": "Divers"
+    },
+    {
+      "id": 119,
+      "project_id": 1,
+      "date": "2026-11-03",
+      "nature": "Revetement Bar",
+      "amount": 504.0,
+      "comment": "11.34 m\u00b2",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 120,
+      "project_id": 1,
+      "date": "2026-12-03",
+      "nature": "baguette rvt",
+      "amount": 17.0,
+      "comment": "2 unit\u00e9",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 121,
+      "project_id": 1,
+      "date": "2026-12-03",
+      "nature": "Ciment",
+      "amount": 30.0,
+      "comment": "2 sac",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 122,
+      "project_id": 1,
+      "date": "2026-12-03",
+      "nature": "ciment colle",
+      "amount": 22.0,
+      "comment": "2 sac",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 123,
+      "project_id": 1,
+      "date": "2026-12-03",
+      "nature": "hammadi",
+      "amount": 65.0,
+      "comment": "avance",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 124,
+      "project_id": 1,
+      "date": "2026-12-03",
+      "nature": "hamza",
+      "amount": 200.0,
+      "comment": "avance",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 125,
+      "project_id": 1,
+      "date": "2026-12-03",
+      "nature": "lassaad",
+      "amount": 200.0,
+      "comment": "avance",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 126,
+      "project_id": 1,
+      "date": "2026-12-03",
+      "nature": "Plomberie",
+      "amount": 40.0,
+      "comment": "PVC etc",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 127,
+      "project_id": 1,
+      "date": "2026-12-03",
+      "nature": "Revetement toilette",
+      "amount": 418.0,
+      "comment": "22 m\u00b2",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 128,
+      "project_id": 1,
+      "date": "2026-12-03",
+      "nature": "Sanitaire",
+      "amount": 981.0,
+      "comment": "4 urinoire + 4 robinet",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 129,
+      "project_id": 1,
+      "date": "2026-03-20",
+      "nature": "barre 10",
+      "amount": 20.0,
+      "comment": "",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 130,
+      "project_id": 1,
+      "date": "2026-03-20",
+      "nature": "ciment",
+      "amount": 20.0,
+      "comment": "",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 131,
+      "project_id": 1,
+      "date": "2026-03-20",
+      "nature": "ciment blanc",
+      "amount": 20.0,
+      "comment": "",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 132,
+      "project_id": 1,
+      "date": "2026-03-20",
+      "nature": "disque diamon",
+      "amount": 27.0,
+      "comment": "",
+      "category": "Divers"
+    },
+    {
+      "id": 133,
+      "project_id": 1,
+      "date": "2026-03-20",
+      "nature": "fourniture elec",
+      "amount": 110.0,
+      "comment": "",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 134,
+      "project_id": 1,
+      "date": "2026-03-20",
+      "nature": "hamza",
+      "amount": 140.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 135,
+      "project_id": 1,
+      "date": "2026-03-20",
+      "nature": "lassaad",
+      "amount": 500.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 136,
+      "project_id": 1,
+      "date": "2026-03-20",
+      "nature": "marbre comptoir",
+      "amount": 120.0,
+      "comment": "",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 137,
+      "project_id": 1,
+      "date": "2026-03-20",
+      "nature": "plomberie conduite",
+      "amount": 200.0,
+      "comment": "",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 138,
+      "project_id": 1,
+      "date": "2026-03-20",
+      "nature": "rmal",
+      "amount": 60.0,
+      "comment": "1 m3",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 139,
+      "project_id": 1,
+      "date": "2026-03-20",
+      "nature": "outillage",
+      "amount": 16.0,
+      "comment": "disque diamond",
+      "category": "Divers"
+    },
+    {
+      "id": 140,
+      "project_id": 1,
+      "date": "2026-03-20",
+      "nature": "hamza",
+      "amount": 20.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 141,
+      "project_id": 1,
+      "date": "2026-03-20",
+      "nature": "lassaad",
+      "amount": 200.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 142,
+      "project_id": 1,
+      "date": "2026-03-20",
+      "nature": "baguette rvt",
+      "amount": 8.5,
+      "comment": "",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 143,
+      "project_id": 1,
+      "date": "2026-03-20",
+      "nature": "baguette rvt",
+      "amount": 8.0,
+      "comment": "",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 144,
+      "project_id": 1,
+      "date": "2026-03-20",
+      "nature": "ciment colle",
+      "amount": 8.0,
+      "comment": "",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 145,
+      "project_id": 1,
+      "date": "2026-03-20",
+      "nature": "lassaad",
+      "amount": 50.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 146,
+      "project_id": 1,
+      "date": "2026-03-20",
+      "nature": "location meule",
+      "amount": 15.0,
+      "comment": "",
+      "category": "Divers"
+    },
+    {
+      "id": 147,
+      "project_id": 1,
+      "date": "2026-03-20",
+      "nature": "reparation meule",
+      "amount": 10.0,
+      "comment": "",
+      "category": "Divers"
+    },
+    {
+      "id": 148,
+      "project_id": 1,
+      "date": "2026-03-20",
+      "nature": "sac vides",
+      "amount": 6.0,
+      "comment": "",
+      "category": "Divers"
+    },
+    {
+      "id": 149,
+      "project_id": 1,
+      "date": "2026-03-20",
+      "nature": "lassaad",
+      "amount": 350.0,
+      "comment": "totalit\u00e9 pay\u00e9e",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 150,
+      "project_id": 1,
+      "date": "2026-03-20",
+      "nature": "plomberie",
+      "amount": 110.0,
+      "comment": "",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 151,
+      "project_id": 1,
+      "date": "2026-03-20",
+      "nature": "rvt toilette",
+      "amount": 38.0,
+      "comment": "",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 152,
+      "project_id": 1,
+      "date": "2026-03-20",
+      "nature": "silicone",
+      "amount": 11.0,
+      "comment": "",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 153,
+      "project_id": 1,
+      "date": "2026-03-20",
+      "nature": "lumi\u00e8re wc",
+      "amount": 10.0,
+      "comment": "",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 154,
+      "project_id": 1,
+      "date": "2026-03-20",
+      "nature": "electricien",
+      "amount": 10.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 155,
+      "project_id": 2,
+      "date": "2026-03-20",
+      "nature": "rchid",
+      "amount": 50.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 156,
+      "project_id": 2,
+      "date": "2026-03-20",
+      "nature": "marteau",
+      "amount": 10.0,
+      "comment": "",
+      "category": "Divers"
+    },
+    {
+      "id": 157,
+      "project_id": 2,
+      "date": "2026-03-20",
+      "nature": "voiture",
+      "amount": 50.0,
+      "comment": "",
+      "category": "Divers"
+    },
+    {
+      "id": 158,
+      "project_id": 2,
+      "date": "2026-03-20",
+      "nature": "rchid",
+      "amount": 70.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 159,
+      "project_id": 2,
+      "date": "2026-03-20",
+      "nature": "rmal",
+      "amount": 120.0,
+      "comment": "2 m3",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 160,
+      "project_id": 2,
+      "date": "2026-03-20",
+      "nature": "concassage",
+      "amount": 140.0,
+      "comment": "2 m3",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 161,
+      "project_id": 2,
+      "date": "2026-03-20",
+      "nature": "ciment",
+      "amount": 75.0,
+      "comment": "6 sac",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 162,
+      "project_id": 2,
+      "date": "2026-03-20",
+      "nature": "rchid",
+      "amount": 50.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 163,
+      "project_id": 2,
+      "date": "2026-03-20",
+      "nature": "baba",
+      "amount": 50.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 164,
+      "project_id": 2,
+      "date": "2026-03-20",
+      "nature": "lasaad",
+      "amount": 40.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 165,
+      "project_id": 2,
+      "date": "2026-03-20",
+      "nature": "pelle",
+      "amount": 20.0,
+      "comment": "",
+      "category": "Divers"
+    },
+    {
+      "id": 166,
+      "project_id": 2,
+      "date": "2026-03-20",
+      "nature": "lasaad",
+      "amount": 50.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 167,
+      "project_id": 2,
+      "date": "2026-01-03",
+      "nature": "rchid",
+      "amount": 60.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 168,
+      "project_id": 2,
+      "date": "2026-02-03",
+      "nature": "mahdi",
+      "amount": 650.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 169,
+      "project_id": 2,
+      "date": "2026-03-03",
+      "nature": "walid",
+      "amount": 300.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 170,
+      "project_id": 2,
+      "date": "2026-03-03",
+      "nature": "ciment",
+      "amount": 45.0,
+      "comment": "3 sac",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 171,
+      "project_id": 2,
+      "date": "2026-03-03",
+      "nature": "ciment colle",
+      "amount": 65.0,
+      "comment": "5 sac",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 172,
+      "project_id": 2,
+      "date": "2026-04-03",
+      "nature": "barre 10",
+      "amount": 20.0,
+      "comment": "",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 173,
+      "project_id": 2,
+      "date": "2026-06-03",
+      "nature": "walid",
+      "amount": 200.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 174,
+      "project_id": 2,
+      "date": "2026-04-03",
+      "nature": "transport",
+      "amount": 20.0,
+      "comment": "",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 175,
+      "project_id": 2,
+      "date": "2026-06-03",
+      "nature": "rmal",
+      "amount": 30.0,
+      "comment": "",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 176,
+      "project_id": 2,
+      "date": "2026-04-03",
+      "nature": "colle",
+      "amount": 105.0,
+      "comment": "",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 177,
+      "project_id": 2,
+      "date": "2026-04-03",
+      "nature": "ciment",
+      "amount": 15.0,
+      "comment": "",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 178,
+      "project_id": 2,
+      "date": "2026-04-03",
+      "nature": "transport",
+      "amount": 20.0,
+      "comment": "",
+      "category": "Divers"
+    },
+    {
+      "id": 179,
+      "project_id": 2,
+      "date": "2026-04-03",
+      "nature": "walid",
+      "amount": 40.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 180,
+      "project_id": 2,
+      "date": "2026-04-03",
+      "nature": "carrejoint",
+      "amount": 17.0,
+      "comment": "",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 181,
+      "project_id": 2,
+      "date": "2026-04-03",
+      "nature": "walid",
+      "amount": 600.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 182,
+      "project_id": 2,
+      "date": "2026-03-20",
+      "nature": "rchid",
+      "amount": 50.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 183,
+      "project_id": 2,
+      "date": "2026-03-20",
+      "nature": "decharge pub",
+      "amount": 80.0,
+      "comment": "recupere 80 de rchid pay\u00e9 total 160",
+      "category": "Divers"
+    },
+    {
+      "id": 184,
+      "project_id": 2,
+      "date": "2026-03-20",
+      "nature": "walid",
+      "amount": 620.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 185,
+      "project_id": 3,
+      "date": "2026-12-02",
+      "nature": "hamza",
+      "amount": 50.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 186,
+      "project_id": 3,
+      "date": "2026-03-20",
+      "nature": "hamza",
+      "amount": 200.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 187,
+      "project_id": 3,
+      "date": "2026-03-20",
+      "nature": "hamza",
+      "amount": 100.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 188,
+      "project_id": 3,
+      "date": "2026-03-20",
+      "nature": "hamza",
+      "amount": 100.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 189,
+      "project_id": 3,
+      "date": "2026-03-20",
+      "nature": "nettoyage",
+      "amount": 20.0,
+      "comment": "",
+      "category": "Divers"
+    },
+    {
+      "id": 190,
+      "project_id": 3,
+      "date": "2026-03-20",
+      "nature": "hamza",
+      "amount": 90.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 191,
+      "project_id": 3,
+      "date": "2026-03-20",
+      "nature": "fourniture",
+      "amount": 10.0,
+      "comment": "",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 192,
+      "project_id": 3,
+      "date": "2026-03-20",
+      "nature": "hamza",
+      "amount": 460.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 193,
+      "project_id": 3,
+      "date": "2026-03-20",
+      "nature": "hamza",
+      "amount": 40.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 194,
+      "project_id": 3,
+      "date": "2026-02-03",
+      "nature": "hamza",
+      "amount": 70.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 195,
+      "project_id": 3,
+      "date": "2026-04-03",
+      "nature": "hamza",
+      "amount": 100.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 196,
+      "project_id": 3,
+      "date": "2026-05-03",
+      "nature": "ciment blanc",
+      "amount": 10.0,
+      "comment": "",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 197,
+      "project_id": 3,
+      "date": "2026-05-03",
+      "nature": "ciment",
+      "amount": 15.0,
+      "comment": "",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 198,
+      "project_id": 3,
+      "date": "2026-05-03",
+      "nature": "hamza",
+      "amount": 40.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 199,
+      "project_id": 3,
+      "date": "2026-05-03",
+      "nature": "marbre",
+      "amount": 30.0,
+      "comment": "",
+      "category": "Divers"
+    },
+    {
+      "id": 200,
+      "project_id": 3,
+      "date": "2026-05-03",
+      "nature": "hamza",
+      "amount": 50.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 201,
+      "project_id": 3,
+      "date": "2026-05-03",
+      "nature": "dohn",
+      "amount": 10.0,
+      "comment": "",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 202,
+      "project_id": 3,
+      "date": "2026-05-03",
+      "nature": "rmal",
+      "amount": 5.0,
+      "comment": "",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 203,
+      "project_id": 3,
+      "date": "2026-05-03",
+      "nature": "ciment blanc",
+      "amount": 10.0,
+      "comment": "",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 204,
+      "project_id": 3,
+      "date": "2026-05-03",
+      "nature": "lasaad",
+      "amount": 60.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 205,
+      "project_id": 3,
+      "date": "2026-05-03",
+      "nature": "lasad ouv",
+      "amount": 50.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 206,
+      "project_id": 3,
+      "date": "2026-05-03",
+      "nature": "couli",
+      "amount": 20.0,
+      "comment": "",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 207,
+      "project_id": 3,
+      "date": "2026-05-03",
+      "nature": "carlage",
+      "amount": 10.0,
+      "comment": "",
+      "category": "Mat\u00e9riau"
+    },
+    {
+      "id": 208,
+      "project_id": 3,
+      "date": "2026-05-03",
+      "nature": "hamza",
+      "amount": 500.0,
+      "comment": "",
+      "category": "Ouvrier"
+    },
+    {
+      "id": 209,
+      "project_id": 3,
+      "date": "2026-03-20",
+      "nature": "Fourniture Sanitaire",
+      "amount": 1045.0,
+      "comment": "Sanitaire",
+      "category": "Mat\u00e9riau"
+    }
+  ],
+  "project_receipt": [],
+  "project_financial_params": [
+    {
+      "id": 1,
+      "project_id": 1,
+      "sale_price": 13860.0,
+      "estimated_budget": 7298.62,
+      "devis_ref": 31860.0
+    },
+    {
+      "id": 2,
+      "project_id": null,
+      "sale_price": 0.0,
+      "estimated_budget": 0.0,
+      "devis_ref": 0.0
+    },
+    {
+      "id": 3,
+      "project_id": 2,
+      "sale_price": 5040.0,
+      "estimated_budget": 3662.0,
+      "devis_ref": 5040.0
+    },
+    {
+      "id": 4,
+      "project_id": 3,
+      "sale_price": 4400.0,
+      "estimated_budget": 3200.0,
+      "devis_ref": 4400.0
+    }
+  ]
+}
