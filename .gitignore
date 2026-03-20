@@ -1,2 +1,11 @@
 construction_crm.db
 instance/
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python/
+instance/
+*.db
+*.db-journal
