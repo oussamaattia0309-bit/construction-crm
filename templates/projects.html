@@ -1,30 +1,220 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1>Projects</h1>
-    
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Client</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for project in projects %}
-            <tr>
-                <td>{{ project.name }}</td>
-                <td>{{ project.client_name or 'N/A' }}</td>
-                <td>{{ project.status }}</td>
-                <td>
-                    <a href="{{ url_for('project_detail', id=project.id) }}" class="btn btn-sm btn-primary">View</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="section-title mb-2">Projects</h1>
+            <p class="text-muted">Manage your construction projects</p>
+        </div>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProjectModal" title="Add new project">
+                        <i class="fas fa-plus-circle me-2"></i>Add Project
+                    </button>
+                    {% if projects %}
+                    <div class="input-group" style="max-width: 300px;">
+                        <span class="input-group-text bg-primary text-white"><i class="fas fa-search"></i></span>
+                        <input type="text" class="form-control" id="searchProjects" placeholder="Search projects...">
+                    </div>
+                    {% endif %}
+                </div>
+                {% if projects %}
+                <span class="text-muted small" id="projectCount">{{ projects|length }} project(s)</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Projects Table -->
+    <div class="card dashboard-card">
+        <div class="card-body">
+            {% if projects %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="projectsTable">
+                    <thead>
+                        <tr>
+                            <th>Project</th>
+                            <th>Client</th>
+                            <th>Status</th>
+                            <th>Dates</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="projectsTableBody">
+                        {% for project in projects %}
+                        <tr class="project-row" data-name="{{ (project.name or '')|lower }}" data-client="{{ (project.client_name or '')|lower }}">
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 44px; height: 44px; background: var(--light-bg);">
+                                        <i class="fas fa-hard-hat" style="color: var(--primary);"></i>
+                                    </div>
+                                    <div>
+                                        <strong>{{ project.name }}</strong>
+                                        {% if project.address %}
+                                        <br><small class="text-muted">{{ project.address }}</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ project.client_name or '—' }}</td>
+                            <td>
+                                <span class="badge px-3 py-2 status-badge
+                                    {% if project.status == 'in_progress' %}bg-primary
+                                    {% elif project.status == 'completed' %}bg-success
+                                    {% else %}bg-warning text-dark{% endif %}">
+                                    {% if project.status == 'in_progress' %}<i class="fas fa-spinner me-1"></i>
+                                    {% elif project.status == 'completed' %}<i class="fas fa-check me-1"></i>
+                                    {% else %}<i class="fas fa-calendar me-1"></i>{% endif %}
+                                    {{ project.status.replace('_', ' ')|title }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if project.start_date or project.end_date %}
+                                <small>
+                                    {% if project.start_date %}{{ project.start_date.strftime('%d/%m/%Y') }}{% endif %}
+                                    {% if project.start_date and project.end_date %} – {% endif %}
+                                    {% if project.end_date %}{{ project.end_date.strftime('%d/%m/%Y') }}{% endif %}
+                                </small>
+                                {% else %}
+                                <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ url_for('project_detail', id=project.id) }}" class="btn btn-outline-primary" title="View details">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('project_financial', project_id=project.id) }}" class="btn btn-outline-info" title="Financial">
+                                        <i class="fas fa-coins"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="noProjectsResults" class="text-center py-5" style="display: none;">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <p class="text-muted">No projects match your search</p>
+            </div>
+            {% else %}
+            <!-- Empty State -->
+            <div class="text-center py-5" id="emptyState">
+                <i class="fas fa-folder-open fa-4x text-muted mb-4"></i>
+                <h4 class="text-muted">No projects yet</h4>
+                <p class="text-muted mb-4">Create your first project to get started</p>
+                <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#addProjectModal">
+                    <i class="fas fa-plus me-2"></i>Add Project
+                </button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
 </div>
+
+<!-- Add Project Modal -->
+<div class="modal fade" id="addProjectModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-plus-circle me-2"></i>Add New Project</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('add_project') }}" method="POST">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label"><i class="fas fa-hard-hat me-1 text-muted"></i>Project Name <span class="text-danger">*</span></label>
+                            <input type="text" name="name" class="form-control" required placeholder="e.g. Villa Dubois - Extension">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label"><i class="fas fa-flag me-1 text-muted"></i>Status</label>
+                            <select name="status" class="form-select">
+                                <option value="planned">Planned</option>
+                                <option value="in_progress" selected>In Progress</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><i class="fas fa-user me-1 text-muted"></i>Client Name</label>
+                            <input type="text" name="client_name" class="form-control" placeholder="Client name">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><i class="fas fa-map-marker-alt me-1 text-muted"></i>Address</label>
+                            <input type="text" name="address" class="form-control" placeholder="Project address">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><i class="fas fa-calendar-plus me-1 text-muted"></i>Start Date</label>
+                            <input type="date" name="start_date" class="form-control">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><i class="fas fa-calendar-check me-1 text-muted"></i>End Date</label>
+                            <input type="date" name="end_date" class="form-control">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-align-left me-1 text-muted"></i>Description</label>
+                        <textarea name="description" class="form-control" rows="3" placeholder="Project description (optional)"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-check me-1"></i>Add Project</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var searchInput = document.getElementById('searchProjects');
+    var tableBody = document.getElementById('projectsTableBody');
+    var noResults = document.getElementById('noProjectsResults');
+    var projectCount = document.getElementById('projectCount');
+    
+    if (!searchInput || !tableBody) return;
+    
+    // Set default start date to today in Add Project modal
+    var addForm = document.querySelector('#addProjectModal form');
+    if (addForm) {
+        var startInput = addForm.querySelector('input[name="start_date"]');
+        if (startInput) startInput.value = new Date().toISOString().split('T')[0];
+    }
+    
+    searchInput.addEventListener('keyup', function() {
+        var term = this.value.toLowerCase().trim();
+        var rows = tableBody.querySelectorAll('.project-row');
+        var visible = 0;
+        rows.forEach(function(row) {
+            var name = row.dataset.name || '';
+            var client = row.dataset.client || '';
+            var match = !term || name.includes(term) || client.includes(term);
+            row.style.display = match ? '' : 'none';
+            if (match) visible++;
+        });
+        if (noResults) noResults.style.display = (visible === 0 && rows.length > 0) ? 'block' : 'none';
+        if (projectCount) projectCount.textContent = visible + ' project(s)';
+    });
+});
+</script>
+
+<style>
+.status-badge { font-size: 0.85rem; }
+.project-row td { vertical-align: middle !important; }
+.input-group-text { border-radius: 8px 0 0 8px; }
+.input-group .form-control { border-radius: 0 8px 8px 0; border-left: none; }
+</style>
 {% endblock %}
