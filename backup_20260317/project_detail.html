@@ -51,50 +51,28 @@
     <div class="col-md-6">
         <div class="card mb-4">
             <div class="card-header">
-                <h4>Financial Information</h4>
+                <h4>Budget Summary</h4>
             </div>
             <div class="card-body">
+                {% set total_estimated = project.budget_items|sum(attribute='estimated_cost') %}
+                {% set total_actual = project.budget_items|sum(attribute='actual_cost') %}
                 <table class="table">
                     <tr>
+                        <th>Total Estimated:</th>
+                        <td>${{ "%.2f"|format(total_estimated) }}</td>
+                    </tr>
+                    <tr>
                         <th>Total Actual:</th>
-                        <td>
-                            <form action="{{ url_for('update_project_financial', id=project.id) }}" method="POST" style="display: inline;">
-                                <input type="hidden" name="field" value="total_actual">
-                                <div class="input-group input-group-sm">
-                                    <span class="input-group-text">TND</span>
-                                    <input type="number" step="0.01" class="form-control" name="value" value="{{ project.selling_price or 0 }}" required>
-                                    <button type="submit" class="btn btn-sm btn-outline-primary">
-                                        <i class="fas fa-save"></i>
-                                    </button>
-                                </div>
-                            </form>
-                        </td>
+                        <td>${{ "%.2f"|format(total_actual) }}</td>
                     </tr>
                     <tr>
-                        <th>Acompte:</th>
-                        <td>
-                            <form action="{{ url_for('update_project_financial', id=project.id) }}" method="POST" style="display: inline;">
-                                <input type="hidden" name="field" value="acompte">
-                                <div class="input-group input-group-sm">
-                                    <span class="input-group-text">TND</span>
-                                    <input type="number" step="0.01" class="form-control" name="value" value="{{ project.client_receipts or 0 }}" required>
-                                    <button type="submit" class="btn btn-sm btn-outline-primary">
-                                        <i class="fas fa-save"></i>
-                                    </button>
-                                </div>
-                            </form>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Caisse Actuelle:</th>
-                        <td>
-                            <div class="input-group input-group-sm">
-                                <span class="input-group-text">TND</span>
-                                <input type="text" class="form-control" value="{{ "%.2f"|format((project.client_receipts or 0) - (project.selling_price or 0)) }}" readonly style="background-color: #f8f9fa;">
-                            </div>
+                        <th>Variance:</th>
+                        <td class="{% if total_actual > total_estimated %}text-danger{% else %}text-success{% endif %}">
+                            ${{ "%.2f"|format(total_actual - total_estimated) }}
                         </td>
                     </tr>
                 </table>
+                <a href="{{ url_for('budgets') }}" class="btn btn-info">Manage Budget</a>
             </div>
         </div>
     </div>
@@ -122,10 +100,10 @@
                         <tr>
                             <td>{{ item.item_name }}</td>
                             <td>{{ item.category }}</td>
-                            <td>TND {{ "%.2f"|format(item.estimated_cost) if item.estimated_cost else '0.00' }}</td>
-                            <td>TND {{ "%.2f"|format(item.actual_cost) if item.actual_cost else '0.00' }}</td>
+                            <td>${{ "%.2f"|format(item.estimated_cost) if item.estimated_cost else '0.00' }}</td>
+                            <td>${{ "%.2f"|format(item.actual_cost) if item.actual_cost else '0.00' }}</td>
                             <td class="{% if item.actual_cost and item.estimated_cost and item.actual_cost > item.estimated_cost %}text-danger{% else %}text-success{% endif %}">
-                                TND {{ "%.2f"|format((item.actual_cost or 0) - (item.estimated_cost or 0)) }}
+                                ${{ "%.2f"|format((item.actual_cost or 0) - (item.estimated_cost or 0)) }}
                             </td>
                         </tr>
                         {% endfor %}

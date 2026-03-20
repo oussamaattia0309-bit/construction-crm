@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Dashboard</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-header">Contacts</div>
+            <div class="card-body">
+                <h5 class="card-title" id="contacts-count">Loading...</h5>
+                <a href="{{ url_for('contacts') }}" class="text-white">View all →</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-header">Providers</div>
+            <div class="card-body">
+                <h5 class="card-title" id="providers-count">Loading...</h5>
+                <a href="{{ url_for('providers') }}" class="text-white">View all →</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-header">Active Projects</div>
+            <div class="card-body">
+                <h5 class="card-title" id="projects-count">Loading...</h5>
+                <a href="{{ url_for('projects') }}" class="text-white">View all →</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-header">Total Budget</div>
+            <div class="card-body">
+                <h5 class="card-title" id="budget-total">Loading...</h5>
+                <a href="{{ url_for('budgets') }}" class="text-white">View all →</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4>Recent Projects</h4>
+            </div>
+            <div class="card-body">
+                <div class="list-group" id="recent-projects">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4>Quick Actions</h4>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('contacts') }}" class="btn btn-outline-primary">Add New Contact</a>
+                    <a href="{{ url_for('providers') }}" class="btn btn-outline-success">Add New Provider</a>
+                    <a href="{{ url_for('projects') }}" class="btn btn-outline-warning">Add New Project</a>
+                    <a href="{{ url_for('budgets') }}" class="btn btn-outline-info">Manage Budget</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

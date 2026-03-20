@@ -32,15 +32,10 @@
                 </p>
                 <p><strong>Start Date:</strong> {{ project.start_date.strftime('%Y-%m-%d') if project.start_date else 'Not set' }}</p>
                 <p><strong>End Date:</strong> {{ project.end_date.strftime('%Y-%m-%d') if project.end_date else 'Not set' }}</p>
-                <p><strong>Prix de Vente:</strong> {{ "%.2f"|format(project.selling_price or 0) }} TND</p>
-                <p><strong>Acompte:</strong> {{ "%.2f"|format(project.client_receipts or 0) }} TND</p>
                 <p class="text-truncate"><strong>Description:</strong> {{ project.description or 'No description' }}</p>
             </div>
             <div class="card-footer">
-                <a href="{{ url_for('project_detail', id=project.id) }}" class="btn btn-sm btn-primary me-2">View Details</a>
-                <a href="{{ url_for('project_simple_financial_page', project_id=project.id) }}" class="btn btn-sm btn-success">
-                    <i class="fas fa-chart-line me-1"></i>Financial
-                </a>
+                <a href="{{ url_for('project_detail', id=project.id) }}" class="btn btn-sm btn-primary">View Details</a>
             </div>
         </div>
     </div>
@@ -90,16 +85,6 @@
                     <div class="mb-3">
                         <label for="description" class="form-label">Description</label>
                         <textarea class="form-control" id="description" name="description" rows="3"></textarea>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="selling_price" class="form-label">Prix de Vente (TND)</label>
-                            <input type="number" step="0.01" class="form-control" id="selling_price" name="selling_price">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="client_receipts" class="form-label">Acompte (TND)</label>
-                            <input type="number" step="0.01" class="form-control" id="client_receipts" name="client_receipts">
-                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
