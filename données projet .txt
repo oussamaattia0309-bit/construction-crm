@@ -1,0 +1,16 @@
+================================================================================
+                    PROJECT MANAGEMENT FIELDS - SIMPLE VERSION
+================================================================================
+
+FIXED AMOUNTS (Input once):
+---------------------------
+1. Prix de Vente        = Project selling price (contract amount)
+2. Budget Prévisionnel  = What you thought you'd spend
+3. Montant Reçu         = Amount client has paid so far
+
+CALCULATED AUTOMATICALLY:
+---------------------------
+4. Marge Prévisionnelle = Prix de Vente - Budget Prévisionnel
+5. Dépenses Réelles     = Sum of all expenses (from Expense table)
+6. Gain Actuel          = Prix de Vente - Dépenses Réelles
+7. Solde Restant        = Prix de Vente - Montant Reçu
