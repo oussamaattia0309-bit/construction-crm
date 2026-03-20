@@ -3,14 +3,16 @@
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <h1 class="mb-4">Budget Management</h1>
+        <h1 class="mb-4">
+            <i class="fas fa-tools me-2"></i>Tools Management (Magazin)
+        </h1>
     </div>
 </div>
 
 <div class="row mb-4">
     <div class="col-12">
-        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#addBudgetModal">
-            Add Budget Item
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addToolModal">
+            <i class="fas fa-plus me-2"></i>Add New Tool
         </button>
     </div>
 </div>
@@ -22,91 +24,206 @@
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th>Project</th>
-                            <th>Item</th>
+                            <th>Tool Name</th>
                             <th>Category</th>
-                            <th>Estimated</th>
-                            <th>Actual</th>
-                            <th>Variance</th>
+                            <th>Quantity</th>
+                            <th>Condition</th>
+                            <th>Location</th>
+                            <th>Purchase Price</th>
+                            <th>Current Value</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for budget in budgets %}
+                        {% for tool in tools %}
                         <tr>
-                            <td>{{ budget.project.name if budget.project else 'N/A' }}</td>
-                            <td>{{ budget.item_name }}</td>
-                            <td>{{ budget.category }}</td>
-                            <td>TND {{ "%.2f"|format(budget.estimated_cost) if budget.estimated_cost else '0.00' }}</td>
-                            <td>TND {{ "%.2f"|format(budget.actual_cost) if budget.actual_cost else '0.00' }}</td>
-                            <td class="{% if budget.actual_cost and budget.estimated_cost and budget.actual_cost > budget.estimated_cost %}text-danger{% else %}text-success{% endif %}">
-                                TND {{ "%.2f"|format((budget.actual_cost or 0) - (budget.estimated_cost or 0)) }}
-                            </td>
+                            <td><strong>{{ tool.name }}</strong></td>
                             <td>
-                                <a href="{{ url_for('delete_budget', id=budget.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                                <span class="badge bg-secondary">{{ tool.category or 'N/A' }}</span>
+                            </td>
+                            <td>{{ tool.quantity }}</td>
+                            <td>
+                                <span class="badge bg-{{ 
+                                    'success' if tool.condition == 'New' else 
+                                    'primary' if tool.condition == 'Good' else 
+                                    'warning' if tool.condition == 'Used' else 
+                                    'danger' 
+                                }}">
+                                    {{ tool.condition }}
+                                </span>
+                            </td>
+                            <td>{{ tool.location or 'N/A' }}</td>
+                            <td>{{ "%.2f"|format(tool.purchase_price or 0) }} TND</td>
+                            <td>{{ "%.2f"|format(tool.current_value or 0) }} TND</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-outline-info" onclick="viewToolDetails({{ tool.id }})">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <a href="{{ url_for('delete_budget', id=tool.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this tool?')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
                             </td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
+                
+                {% if not tools %}
+                <div class="text-center py-5">
+                    <i class="fas fa-tools fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No Tools Found</h4>
+                    <p class="text-muted">Click "Add New Tool" to start managing your tools inventory.</p>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
 
-<!-- Add Budget Modal -->
-<div class="modal fade" id="addBudgetModal" tabindex="-1">
-    <div class="modal-dialog">
+<!-- Add Tool Modal -->
+<div class="modal fade" id="addToolModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add Budget Item</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="modal-header" style="background-color: var(--primary); color: white;">
+                <h5 class="modal-title">Add New Tool</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form action="{{ url_for('add_budget') }}" method="POST">
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="project_id" class="form-label">Project *</label>
-                        <select class="form-control" id="project_id" name="project_id" required>
-                            <option value="">Select Project</option>
-                            {% for project in projects %}
-                            <option value="{{ project.id }}">{{ project.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="item_name" class="form-label">Item Name *</label>
-                        <input type="text" class="form-control" id="item_name" name="item_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="category" class="form-label">Category</label>
-                        <select class="form-control" id="category" name="category">
-                            <option value="materials">Materials</option>
-                            <option value="labor">Labor</option>
-                            <option value="equipment">Equipment</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="estimated_cost" class="form-label">Estimated Cost</label>
-                            <input type="number" step="0.01" class="form-control" id="estimated_cost" name="estimated_cost">
+                            <label for="name" class="form-label fw-semibold">Tool Name *</label>
+                            <input type="text" class="form-control" id="name" name="name" required 
+                                   placeholder="Enter tool name">
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="actual_cost" class="form-label">Actual Cost</label>
-                            <input type="number" step="0.01" class="form-control" id="actual_cost" name="actual_cost">
+                            <label for="category" class="form-label fw-semibold">Category</label>
+                            <select class="form-control" id="category" name="category">
+                                <option value="">Select Category</option>
+                                <option value="Power Tools">Power Tools</option>
+                                <option value="Hand Tools">Hand Tools</option>
+                                <option value="Measuring">Measuring Tools</option>
+                                <option value="Safety">Safety Equipment</option>
+                                <option value="Storage">Storage & Organization</option>
+                                <option value="Other">Other</option>
+                            </select>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="notes" class="form-label">Notes</label>
-                        <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label for="quantity" class="form-label fw-semibold">Quantity</label>
+                            <input type="number" class="form-control" id="quantity" name="quantity" value="1" min="1">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="condition" class="form-label fw-semibold">Condition</label>
+                            <select class="form-control" id="condition" name="condition">
+                                <option value="New">New</option>
+                                <option value="Good" selected>Good</option>
+                                <option value="Used">Used</option>
+                                <option value="Damaged">Damaged</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="location" class="form-label fw-semibold">Location</label>
+                            <input type="text" class="form-control" id="location" name="location" 
+                                   placeholder="Where is this tool stored?">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="purchase_price" class="form-label fw-semibold">Purchase Price (TND)</label>
+                            <input type="number" step="0.01" class="form-control" id="purchase_price" name="purchase_price" 
+                                   placeholder="0.00">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="current_value" class="form-label fw-semibold">Current Value (TND)</label>
+                            <input type="number" step="0.01" class="form-control" id="current_value" name="current_value" 
+                                   placeholder="0.00">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="purchase_date" class="form-label fw-semibold">Purchase Date</label>
+                            <input type="date" class="form-control" id="purchase_date" name="purchase_date">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="notes" class="form-label fw-semibold">Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="1" 
+                                      placeholder="Additional notes..."></textarea>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-info">Add Budget Item</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Add Tool
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+<style>
+/* Tool Management Styles */
+.table th {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+}
+
+.badge {
+    font-size: 0.8em;
+}
+
+.btn-outline-info:hover {
+    background-color: #0dcaf0;
+    border-color: #0dcaf0;
+}
+
+.btn-outline-danger:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.modal-header {
+    border-bottom: none;
+}
+
+.form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.2rem rgba(30, 58, 95, 0.25);
+}
+
+.form-label {
+    color: var(--primary);
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.btn-primary {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-primary:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+/* Empty State */
+.text-center.py-5 i {
+    opacity: 0.5;
+}
+</style>
+
+<script>
+function viewToolDetails(toolId) {
+    // You can implement a modal to show detailed tool information
+    alert('Tool details feature coming soon!');
+}
+</script>
 {% endblock %}

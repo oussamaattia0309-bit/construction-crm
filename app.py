@@ -74,16 +74,20 @@ class Project(db.Model):
     selling_price = db.Column(db.Float, default=0.0)
     client_receipts = db.Column(db.Float, default=0.0)
 
-class Budget(db.Model):
+class Tool(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
-    item_name = db.Column(db.String(100), nullable=False)
-    estimated_cost = db.Column(db.Float)
-    actual_cost = db.Column(db.Float)
+    name = db.Column(db.String(100), nullable=False)
     category = db.Column(db.String(50))
+    quantity = db.Column(db.Integer, default=1)
+    purchase_price = db.Column(db.Float)
+    current_value = db.Column(db.Float)
+    condition = db.Column(db.String(20), default='Good')  # New, Good, Used, Damaged
+    location = db.Column(db.String(100))
+    purchase_date = db.Column(db.Date)
     notes = db.Column(db.Text)
     
-    project = db.relationship('Project', backref=db.backref('budget_items', lazy=True))
+    def __repr__(self):
+        return f'<Tool {self.name}>'
 
 class ProjectExpense(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -404,37 +408,40 @@ def delete_project(id):
         flash(f'❌ Error deleting project: {str(e)}')
     return redirect(url_for('index'))
 
-# ==================== BUDGET ROUTES ====================
+# ==================== TOOLS MANAGEMENT ROUTES ====================
 @app.route('/budgets')
 @login_required
 def budgets():
-    budgets_list = Budget.query.all()
-    projects_list = Project.query.all()
-    return render_template('budgets.html', budgets=budgets_list, projects=projects_list)
+    tools_list = Tool.query.all()
+    return render_template('budgets.html', tools=tools_list)
 
 @app.route('/budgets/add', methods=['POST'])
 @login_required
 def add_budget():
-    budget = Budget(
-        project_id=request.form.get('project_id'),
-        item_name=request.form.get('item_name'),
-        estimated_cost=float(request.form.get('estimated_cost')) if request.form.get('estimated_cost') else None,
-        actual_cost=float(request.form.get('actual_cost')) if request.form.get('actual_cost') else None,
+    from datetime import datetime
+    tool = Tool(
+        name=request.form.get('name'),
         category=request.form.get('category'),
+        quantity=int(request.form.get('quantity', 1)),
+        purchase_price=float(request.form.get('purchase_price')) if request.form.get('purchase_price') else None,
+        current_value=float(request.form.get('current_value')) if request.form.get('current_value') else None,
+        condition=request.form.get('condition', 'Good'),
+        location=request.form.get('location'),
+        purchase_date=datetime.strptime(request.form.get('purchase_date'), '%Y-%m-%d').date() if request.form.get('purchase_date') else None,
         notes=request.form.get('notes')
     )
-    db.session.add(budget)
+    db.session.add(tool)
     db.session.commit()
-    flash('Budget item added successfully')
+    flash('Tool added successfully')
     return redirect(url_for('budgets'))
 
 @app.route('/budgets/delete/<int:id>')
 @login_required
 def delete_budget(id):
-    budget = Budget.query.get_or_404(id)
-    db.session.delete(budget)
+    tool = Tool.query.get_or_404(id)
+    db.session.delete(tool)
     db.session.commit()
-    flash('Budget item deleted')
+    flash('Tool deleted')
     return redirect(url_for('budgets'))
 
 # ==================== API ROUTES ====================
@@ -444,13 +451,13 @@ def dashboard_data():
     total_contacts = Contact.query.count()
     total_providers = Provider.query.count()
     active_projects = Project.query.filter_by(status='in_progress').count()
-    total_budget = db.session.query(db.func.sum(Budget.estimated_cost)).scalar() or 0
+    total_tools_value = db.session.query(db.func.sum(Tool.current_value)).scalar() or 0
     
     return jsonify({
         'contacts': total_contacts,
         'providers': total_providers,
         'active_projects': active_projects,
-        'total_budget': total_budget
+        'total_budget': total_tools_value
     })
 
 @app.route('/api/projects/recent')
