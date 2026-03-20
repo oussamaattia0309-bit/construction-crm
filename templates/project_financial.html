@@ -2,160 +2,162 @@
 
 {% block content %}
 <div class="container-fluid">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h2" style="color: var(--primary);">
-            <i class="fas fa-hard-hat me-2"></i>{{ project.name }}
-        </h1>
-        <div class="d-flex align-items-center gap-2">
-            <span class="badge bg-warning fs-6 p-2">En cours</span>
-            <!-- Delete All Data Button -->
-            <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAllDataModal">
-                <i class="fas fa-trash-alt me-2"></i>Delete All Data
-            </button>
+    <!-- Project Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div>
+                    <h1 class="section-title mb-1">
+                        <i class="fas fa-hard-hat me-2" style="color: var(--accent);"></i>{{ project.name }}
+                    </h1>
+                    {% if project.client_name or project.address %}
+                    <div class="text-muted small mt-1">
+                        {% if project.client_name %}<i class="fas fa-user me-1"></i>{{ project.client_name }}{% endif %}
+                        {% if project.address %}<span class="ms-3"><i class="fas fa-map-marker-alt me-1"></i>{{ project.address }}</span>{% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <a href="{{ url_for('project_detail', id=project.id) }}" class="btn btn-outline-primary" title="Back to project details">
+                        <i class="fas fa-arrow-left me-2"></i>Project Details
+                    </a>
+                    <span class="badge fs-6 px-3 py-2" style="background-color: var(--primary); color: white;">
+                        <i class="fas fa-coins me-1"></i>Financial
+                    </span>
+                    <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAllDataModal" title="Delete all financial data">
+                        <i class="fas fa-trash-alt me-2"></i>Delete All Data
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Financial Summary Cards -->
-    <div class="card mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center" style="background-color: var(--primary); color: white;">
-            <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Financial Summary</h5>
-            <button class="btn btn-sm btn-light" id="editSummaryBtn" onclick="enableSummaryEdit()">
-                <i class="fas fa-edit me-1"></i>Edit Values
-            </button>
-            <button class="btn btn-sm btn-success" id="saveSummaryBtn" style="display: none;" onclick="saveSummaryEdit()">
-                <i class="fas fa-save me-1"></i>Save Changes
-            </button>
-            <button class="btn btn-sm btn-secondary" id="cancelSummaryBtn" style="display: none;" onclick="cancelSummaryEdit()">
-                <i class="fas fa-times me-1"></i>Cancel
-            </button>
+    <!-- FIXED AMOUNTS (Input once) - per données projet -->
+    <div class="card dashboard-card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <h5 class="mb-0">
+                <i class="fas fa-edit me-2" style="color: var(--accent);"></i>Montants fixes
+                <small class="d-block fw-normal fs-6 opacity-90 mt-1">Prix de vente, budget, montant reçu</small>
+            </h5>
+            <div>
+                <button class="btn btn-sm btn-light" id="editSummaryBtn" onclick="enableSummaryEdit()">
+                    <i class="fas fa-pen me-1"></i>Modifier
+                </button>
+                <button class="btn btn-sm btn-success" id="saveSummaryBtn" style="display: none;" onclick="saveSummaryEdit()">
+                    <i class="fas fa-check me-1"></i>Enregistrer
+                </button>
+                <button class="btn btn-sm btn-secondary" id="cancelSummaryBtn" style="display: none;" onclick="cancelSummaryEdit()">
+                    <i class="fas fa-times me-1"></i>Annuler
+                </button>
+            </div>
         </div>
         <div class="card-body">
-            <div class="row g-4">
-                <!-- Reçu de client -->
-                <div class="col-md-3">
-                    <div class="summary-card" id="card-client-received">
-                        <div class="summary-label">
-                            <i class="fas fa-hand-holding-usd me-1" style="color: var(--accent);"></i>
-                            Reçu de client
-                        </div>
-                        <div class="summary-value view-mode" id="view-client-received">
-                            {{ "%.2f"|format(financial.client_received or 0) }} TND
-                        </div>
-                        <div class="edit-mode" style="display: none;">
-                            <input type="number" step="0.01" class="form-control form-control-sm" id="edit-client-received" value="{{ financial.client_received or 0 }}">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="financial-card financial-card-primary">
+                        <div class="financial-card-icon"><i class="fas fa-tag"></i></div>
+                        <div class="financial-card-content">
+                            <span class="financial-card-label">Prix de vente</span>
+                            <span class="summary-value view-mode" id="view-sale-price">{{ "%.2f"|format(financial.sale_price or 0) }} TND</span>
+                            <div class="edit-mode" style="display: none;">
+                                <input type="number" step="0.01" class="form-control form-control-sm" id="edit-sale-price" value="{{ financial.sale_price or 0 }}">
+                            </div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Caisse actuellement -->
-                <div class="col-md-3">
-                    <div class="summary-card" id="card-current-cash">
-                        <div class="summary-label">
-                            <i class="fas fa-cash-register me-1" style="color: var(--accent);"></i>
-                            Caisse actuellement
-                        </div>
-                        <div class="summary-value view-mode {% if financial.current_cash < 0 %}text-danger{% endif %}" id="view-current-cash">
-                            {{ "%.2f"|format(financial.current_cash or 0) }} TND
-                        </div>
-                        <div class="edit-mode" style="display: none;">
-                            <input type="number" step="0.01" class="form-control form-control-sm" id="edit-current-cash" value="{{ financial.current_cash or 0 }}">
+                <div class="col-md-4">
+                    <div class="financial-card financial-card-primary">
+                        <div class="financial-card-icon"><i class="fas fa-chart-line"></i></div>
+                        <div class="financial-card-content">
+                            <span class="financial-card-label">Budget prévisionnel</span>
+                            <span class="summary-value view-mode" id="view-estimated-budget">{{ "%.2f"|format(financial.estimated_budget or 0) }} TND</span>
+                            <div class="edit-mode" style="display: none;">
+                                <input type="number" step="0.01" class="form-control form-control-sm" id="edit-estimated-budget" value="{{ financial.estimated_budget or 0 }}">
+                            </div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Prix de vente -->
-                <div class="col-md-3">
-                    <div class="summary-card" id="card-sale-price">
-                        <div class="summary-label">
-                            <i class="fas fa-tag me-1" style="color: var(--accent);"></i>
-                            Prix de vente
-                        </div>
-                        <div class="summary-value view-mode" id="view-sale-price">
-                            {{ "%.2f"|format(financial.sale_price or 0) }} TND
-                        </div>
-                        <div class="edit-mode" style="display: none;">
-                            <input type="number" step="0.01" class="form-control form-control-sm" id="edit-sale-price" value="{{ financial.sale_price or 0 }}">
+                <div class="col-md-4">
+                    <div class="financial-card financial-card-accent">
+                        <div class="financial-card-icon"><i class="fas fa-hand-holding-usd"></i></div>
+                        <div class="financial-card-content">
+                            <span class="financial-card-label">Montant reçu</span>
+                            <span class="summary-value view-mode text-success" id="view-client-received">{{ "%.2f"|format(financial.client_received or 0) }} TND</span>
+                            <div class="edit-mode" style="display: none;">
+                                <input type="number" step="0.01" class="form-control form-control-sm" id="edit-client-received" value="{{ financial.client_received or 0 }}">
+                                <small class="text-muted">(Synchro avec Acompte sur page Projet)</small>
+                            </div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Budget prévisionnel -->
-                <div class="col-md-3">
-                    <div class="summary-card" id="card-estimated-budget">
-                        <div class="summary-label">
-                            <i class="fas fa-chart-line me-1" style="color: var(--accent);"></i>
-                            Budget prévisionnel
-                        </div>
-                        <div class="summary-value view-mode" id="view-estimated-budget">
-                            {{ "%.2f"|format(financial.estimated_budget or 0) }} TND
-                        </div>
-                        <div class="edit-mode" style="display: none;">
-                            <input type="number" step="0.01" class="form-control form-control-sm" id="edit-estimated-budget" value="{{ financial.estimated_budget or 0 }}">
+                <div class="col-md-4">
+                    <div class="financial-card financial-card-muted">
+                        <div class="financial-card-icon"><i class="fas fa-file-invoice"></i></div>
+                        <div class="financial-card-content">
+                            <span class="financial-card-label">Référence devis</span>
+                            <span class="summary-value view-mode" id="view-devis-ref">{{ "%.2f"|format(financial.devis_ref or 0) }} TND</span>
+                            <div class="edit-mode" style="display: none;">
+                                <input type="number" step="0.01" class="form-control form-control-sm" id="edit-devis-ref" value="{{ financial.devis_ref or 0 }}">
+                            </div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Marge prévisionnelle -->
-                <div class="col-md-3">
-                    <div class="summary-card" id="card-estimated-margin">
-                        <div class="summary-label">
-                            <i class="fas fa-percent me-1" style="color: var(--accent);"></i>
-                            Marge prévisionnelle
-                        </div>
-                        <div class="summary-value view-mode text-success" id="view-estimated-margin">
-                            {{ "%.2f"|format(financial.estimated_margin or 0) }} TND
-                        </div>
-                        <div class="edit-mode" style="display: none;">
-                            <input type="number" step="0.01" class="form-control form-control-sm" id="edit-estimated-margin" value="{{ financial.estimated_margin or 0 }}">
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Total dépenses réelles -->
-                <div class="col-md-3">
-                    <div class="summary-card" id="card-total-expenses">
-                        <div class="summary-label">
-                            <i class="fas fa-receipt me-1" style="color: var(--accent);"></i>
-                            Total dépenses réelles
-                        </div>
-                        <div class="summary-value view-mode" id="view-total-expenses">
-                            {{ "%.2f"|format(financial.total_expenses or 0) }} TND
-                        </div>
-                        <div class="edit-mode" style="display: none;">
-                            <input type="number" step="0.01" class="form-control form-control-sm" id="edit-total-expenses" value="{{ financial.total_expenses or 0 }}">
+            </div>
+        </div>
+    </div>
+
+    <!-- CALCULATED AUTOMATICALLY - per données projet -->
+    <div class="card dashboard-card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-calculator me-2" style="color: var(--accent-glow);"></i>Calculés automatiquement
+                <small class="d-block fw-normal fs-6 opacity-90 mt-1">Marge, dépenses, gain, solde</small>
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3 col-6">
+                    <div class="financial-card financial-card-success">
+                        <i class="fas fa-percent me-2" style="color: var(--primary);"></i>
+                        <div>
+                            <span class="financial-card-label">Marge prévisionnelle</span>
+                            <span class="summary-value" id="view-estimated-margin">{{ "%.2f"|format(financial.estimated_margin or 0) }} TND</span>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Résultat actuel -->
-                <div class="col-md-3">
-                    <div class="summary-card" id="card-current-result">
-                        <div class="summary-label">
-                            <i class="fas fa-chart-bar me-1" style="color: var(--accent);"></i>
-                            Résultat actuel
-                        </div>
-                        <div class="summary-value view-mode {% if financial.current_result < 0 %}text-danger{% else %}text-success{% endif %}" id="view-current-result">
-                            {{ "%.2f"|format(financial.current_result or 0) }} TND
-                        </div>
-                        <div class="edit-mode" style="display: none;">
-                            <input type="number" step="0.01" class="form-control form-control-sm" id="edit-current-result" value="{{ financial.current_result or 0 }}">
+                <div class="col-md-3 col-6">
+                    <div class="financial-card financial-card-danger">
+                        <i class="fas fa-receipt me-2" style="color: #dc3545;"></i>
+                        <div>
+                            <span class="financial-card-label">Dépenses réelles</span>
+                            <span class="summary-value" id="view-total-expenses">{{ "%.2f"|format(financial.depenses_reelles or 0) }} TND</span>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Référence devis -->
-                <div class="col-md-3">
-                    <div class="summary-card" id="card-devis-ref">
-                        <div class="summary-label">
-                            <i class="fas fa-calculator me-1" style="color: var(--accent);"></i>
-                            Référence devis
+                <div class="col-md-3 col-6">
+                    <div class="financial-card {% if (financial.current_result or 0) >= 0 %}financial-card-success{% else %}financial-card-danger{% endif %}">
+                        <i class="fas fa-chart-line me-2" style="color: var(--primary);"></i>
+                        <div>
+                            <span class="financial-card-label">Gain actuel</span>
+                            <span class="summary-value {% if (financial.gain_actuel or 0) >= 0 %}text-success{% else %}text-danger{% endif %}" id="view-current-result">{{ "%.2f"|format(financial.gain_actuel or 0) }} TND</span>
                         </div>
-                        <div class="summary-value view-mode" id="view-devis-ref">
-                            {{ "%.2f"|format(financial.devis_ref or 0) }} TND
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="financial-card financial-card-info">
+                        <i class="fas fa-wallet me-2" style="color: var(--primary-mid);"></i>
+                        <div>
+                            <span class="financial-card-label">Solde restant</span>
+                            <span class="summary-value" id="view-balance-remaining">{{ "%.2f"|format(financial.balance_remaining or 0) }} TND</span>
                         </div>
-                        <div class="edit-mode" style="display: none;">
-                            <input type="number" step="0.01" class="form-control form-control-sm" id="edit-devis-ref" value="{{ financial.devis_ref or 0 }}">
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="financial-card {% if (financial.current_cash or 0) >= 0 %}financial-card-success{% else %}financial-card-danger{% endif %}">
+                        <i class="fas fa-cash-register me-2" style="color: var(--primary);"></i>
+                        <div>
+                            <span class="financial-card-label">Caisse actuellement</span>
+                            <span class="summary-value {% if (financial.current_cash or 0) >= 0 %}text-success{% else %}text-danger{% endif %}" id="view-current-cash">{{ "%.2f"|format(financial.current_cash or 0) }} TND</span>
                         </div>
                     </div>
                 </div>
@@ -166,88 +168,113 @@
     <!-- Action Buttons -->
     <div class="row mb-3">
         <div class="col-12">
-            <div class="btn-group" role="group">
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addExpenseModal">
+            <div class="btn-group flex-wrap" role="group">
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addExpenseModal" title="Add expense">
                     <i class="fas fa-plus-circle me-2"></i>Add Expense
                 </button>
-                
-                <!-- Download Template Button -->
-                <a href="{{ url_for('download_financial_template') }}" class="btn btn-info">
-                    <i class="fas fa-download me-2"></i>Download Template
-                </a>
-                
-                <!-- Import from Excel Button (opens modal) -->
-                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importExcelModal">
-                    <i class="fas fa-upload me-2"></i>Import from Excel
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addReceiptModal" title="Add client payment receipt">
+                    <i class="fas fa-money-check-alt me-2"></i>Add Receipt
                 </button>
-                
-                <!-- Export to Excel Button -->
-                <a href="{{ url_for('export_project_financial', project_id=project.id) }}" class="btn btn-warning">
-                    <i class="fas fa-file-excel me-2"></i>Export to Excel
+                <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#importExcelModal" title="Import expenses from Excel">
+                    <i class="fas fa-upload me-2"></i>Import Excel
+                </button>
+                <a href="{{ url_for('export_project_financial', project_id=project.id) }}" class="btn btn-warning" title="Export expenses to Excel">
+                    <i class="fas fa-file-excel me-2"></i>Export Excel
+                </a>
+                <a href="{{ url_for('download_financial_template') }}" class="btn btn-outline-secondary" title="Download import template">
+                    <i class="fas fa-download me-2"></i>Template
                 </a>
             </div>
         </div>
     </div>
 
+    <!-- Receipts Section (if any) -->
+    {% if receipts %}
+    <div class="card dashboard-card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-money-check-alt me-2" style="color: var(--accent);"></i>Reçus client ({{ receipts|length }})</h5>
+        </div>
+        <div class="card-body py-2">
+            <div class="table-responsive">
+                <table class="table table-sm table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Montant</th>
+                            <th>Commentaire</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in receipts %}
+                        <tr>
+                            <td>{{ r.date.strftime('%d/%m/%Y') }}</td>
+                            <td class="fw-bold text-success">{{ "%.2f"|format(r.amount) }} TND</td>
+                            <td class="text-muted">{{ r.comment or '—' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Expenses Table -->
-    <div class="card mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center" style="background-color: var(--primary); color: rgb(253, 253, 253);">
-            <h5 class="mb-0"><i class="fas fa-list me-2"></i>Détail des dépenses</h5>
-            <div>
-                <span class="badge bg-dark me-2">{{ expenses|length }} entrées</span>
-                <button class="btn btn-sm btn-light" type="button" data-bs-toggle="collapse" data-bs-target="#searchFilterCollapse">
-                    <i class="fas fa-search me-1"></i>Search & Filter
+    <div class="card dashboard-card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <h5 class="mb-0"><i class="fas fa-list me-2" style="color: var(--accent);"></i>Détail des dépenses</h5>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge px-3 py-2" style="background-color: var(--primary-mid);">{{ expenses|length }} entrées</span>
+                <button class="btn btn-sm btn-light" type="button" data-bs-toggle="collapse" data-bs-target="#searchFilterCollapse" title="Search and filter expenses">
+                    <i class="fas fa-search me-1"></i>Filtrer
                 </button>
             </div>
         </div>
         
-        <!-- Search and Filter Bar (Collapsible) -->
         <div class="collapse" id="searchFilterCollapse">
-            <div class="card-body border-bottom">
+            <div class="card-body border-bottom" style="background: var(--light-bg);">
                 <div class="row g-3">
                     <div class="col-md-4">
-                        <label class="form-label fw-bold"><i class="fas fa-search me-1"></i>Search</label>
-                        <input type="text" class="form-control" id="searchInput" placeholder="Search by nature, commentaire, catégorie...">
+                        <label class="form-label fw-bold"><i class="fas fa-search me-1 text-muted"></i>Recherche</label>
+                        <input type="text" class="form-control" id="searchInput" placeholder="Nature, commentaire, catégorie...">
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label fw-bold"><i class="fas fa-calendar me-1"></i>Date Range</label>
+                        <label class="form-label fw-bold"><i class="fas fa-calendar-alt me-1 text-muted"></i>Période</label>
                         <select class="form-select" id="dateFilter">
-                            <option value="all">All Dates</option>
-                            <option value="today">Today</option>
-                            <option value="week">This Week</option>
-                            <option value="month">This Month</option>
-                            <option value="year">This Year</option>
-                            <option value="custom">Custom Range</option>
+                            <option value="all">Toutes les dates</option>
+                            <option value="today">Aujourd'hui</option>
+                            <option value="week">Cette semaine</option>
+                            <option value="month">Ce mois</option>
+                            <option value="year">Cette année</option>
+                            <option value="custom">Période personnalisée</option>
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label fw-bold"><i class="fas fa-tag me-1"></i>Category</label>
+                        <label class="form-label fw-bold"><i class="fas fa-tag me-1 text-muted"></i>Catégorie</label>
                         <select class="form-select" id="categoryFilter">
-                            <option value="all">All Categories</option>
-                            <option value="Ouvrier">👷 Ouvrier</option>
-                            <option value="Matériau">🧱 Matériau</option>
-                            <option value="Divers">📦 Divers</option>
+                            <option value="all">Toutes</option>
+                            <option value="Ouvrier">Ouvrier</option>
+                            <option value="Matériau">Matériau</option>
+                            <option value="Divers">Divers</option>
                         </select>
                     </div>
                     <div class="col-md-2 d-flex align-items-end">
                         <button class="btn btn-outline-secondary w-100" id="clearFiltersBtn">
-                            <i class="fas fa-undo me-1"></i>Clear
+                            <i class="fas fa-undo me-1"></i>Réinitialiser
                         </button>
                     </div>
                 </div>
-                
-                <!-- Custom Date Range (hidden by default) -->
                 <div class="row mt-3" id="customDateRange" style="display: none;">
                     <div class="col-md-4">
-                        <label class="form-label">From</label>
+                        <label class="form-label">Du</label>
                         <input type="date" class="form-control" id="dateFrom">
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">To</label>
+                        <label class="form-label">Au</label>
                         <input type="date" class="form-control" id="dateTo">
                     </div>
                     <div class="col-md-4 d-flex align-items-end">
-                        <button class="btn btn-primary" id="applyDateRangeBtn">Apply Range</button>
+                        <button class="btn btn-primary" id="applyDateRangeBtn">Appliquer</button>
                     </div>
                 </div>
             </div>
@@ -255,24 +282,14 @@
         
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-hover" id="expensesTable">
+                <table class="table table-hover mb-0" id="expensesTable">
                     <thead>
                         <tr>
-                            <th class="sortable" data-sort="date">
-                                Date <i class="fas fa-sort ms-1"></i>
-                            </th>
-                            <th class="sortable" data-sort="nature">
-                                Nature <i class="fas fa-sort ms-1"></i>
-                            </th>
-                            <th class="sortable" data-sort="amount">
-                                Montant (TND) <i class="fas fa-sort ms-1"></i>
-                            </th>
-                            <th class="sortable" data-sort="comment">
-                                Commentaire <i class="fas fa-sort ms-1"></i>
-                            </th>
-                            <th class="sortable" data-sort="category">
-                                Catégorie <i class="fas fa-sort ms-1"></i>
-                            </th>
+                            <th class="sortable" data-sort="date">Date <i class="fas fa-sort ms-1"></i></th>
+                            <th class="sortable" data-sort="nature">Nature <i class="fas fa-sort ms-1"></i></th>
+                            <th class="sortable" data-sort="amount">Montant (TND) <i class="fas fa-sort ms-1"></i></th>
+                            <th class="sortable" data-sort="comment">Commentaire <i class="fas fa-sort ms-1"></i></th>
+                            <th class="sortable" data-sort="category">Catégorie <i class="fas fa-sort ms-1"></i></th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -284,16 +301,19 @@
                             data-amount="{{ expense.amount }}"
                             data-comment="{{ (expense.comment or '')|lower }}"
                             data-category="{{ expense.category|lower }}">
-                            <td>{{ expense.date.strftime('%d/%m/%Y') }}</td>
+                            <td><i class="fas fa-calendar-day me-1 text-muted small"></i>{{ expense.date.strftime('%d/%m/%Y') }}</td>
                             <td>{{ expense.nature }}</td>
-                            <td class="fw-bold">{{ "%.2f"|format(expense.amount) }}</td>
-                            <td>{{ expense.comment or '-' }}</td>
+                            <td class="fw-bold" style="color: var(--primary);">{{ "%.2f"|format(expense.amount) }}</td>
+                            <td class="text-muted">{{ expense.comment or '—' }}</td>
                             <td>
                                 <span class="badge-category 
-                                    {% if expense.category == 'Ouvrier' %}bg-info text-white
-                                    {% elif expense.category == 'Matériau' %}bg-success text-white
-                                    {% elif expense.category == 'Divers' %}bg-warning text-dark
-                                    {% else %}bg-secondary text-white{% endif %}">
+                                    {% if expense.category == 'Ouvrier' %}cat-ouvrier
+                                    {% elif expense.category == 'Matériau' %}cat-materiau
+                                    {% elif expense.category == 'Divers' %}cat-divers
+                                    {% else %}cat-other{% endif %}">
+                                    {% if expense.category == 'Ouvrier' %}<i class="fas fa-hard-hat me-1"></i>{% endif %}
+                                    {% if expense.category == 'Matériau' %}<i class="fas fa-box me-1"></i>{% endif %}
+                                    {% if expense.category == 'Divers' %}<i class="fas fa-cubes me-1"></i>{% endif %}
                                     {{ expense.category }}
                                 </span>
                             </td>
@@ -307,12 +327,14 @@
                                             data-comment="{{ expense.comment or '' }}"
                                             data-category="{{ expense.category }}"
                                             data-bs-toggle="modal" 
-                                            data-bs-target="#editExpenseModal">
+                                            data-bs-target="#editExpenseModal"
+                                            title="Modifier">
                                         <i class="fas fa-edit"></i>
                                     </button>
                                     <button class="btn btn-outline-danger delete-expense" 
                                             data-id="{{ expense.id }}"
-                                            data-nature="{{ expense.nature }}">
+                                            data-nature="{{ expense.nature }}"
+                                            title="Supprimer">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
@@ -320,22 +342,25 @@
                         </tr>
                         {% else %}
                         <tr>
-                            <td colspan="6" class="text-center py-4">
-                                <i class="fas fa-receipt fa-3x text-muted mb-3"></i>
-                                <p class="text-muted">No expenses yet. Click "Add Expense" to get started.</p>
+                            <td colspan="6" class="text-center py-5">
+                                <i class="fas fa-receipt fa-4x mb-3" style="color: var(--light-bg);"></i>
+                                <p class="text-muted mb-2">Aucune dépense pour le moment</p>
+                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addExpenseModal">
+                                    <i class="fas fa-plus me-1"></i>Add Expense
+                                </button>
                             </td>
                         </tr>
                         {% endfor %}
                     </tbody>
-                    <tfoot style="background-color: #e9ecef; font-weight: 600;">
+                    <tfoot style="background: var(--light-bg); font-weight: 600;">
                         <tr>
-                            <td colspan="2"><strong>Total</strong></td>
-                            <td><strong id="totalAmount">{{ "%.2f"|format(total_expenses) }} TND</strong></td>
+                            <td colspan="2"><i class="fas fa-calculator me-1 text-muted"></i>Total</td>
+                            <td style="color: var(--primary);"><strong id="totalAmount">{{ "%.2f"|format(total_expenses) }} TND</strong></td>
                             <td colspan="3"></td>
                         </tr>
                         <tr id="noResultsRow" style="display: none;">
                             <td colspan="6" class="text-center py-3 text-muted">
-                                <i class="fas fa-filter me-2"></i>No expenses match your filters
+                                <i class="fas fa-filter me-2"></i>Aucune dépense ne correspond aux filtres
                             </td>
                         </tr>
                     </tfoot>
@@ -346,47 +371,50 @@
 
     <!-- Cash Summary & Category Breakdown -->
     <div class="row">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header" style="background-color: var(--primary); color: white;">
-                    <i class="fas fa-cash-register me-2"></i>Synthèse financière
+        <div class="col-lg-6 mb-4">
+            <div class="card dashboard-card h-100">
+                <div class="card-header">
+                    <i class="fas fa-cash-register me-2" style="color: var(--accent);"></i>Synthèse financière
                 </div>
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span>Total reçu client:</span>
+                    <div class="d-flex justify-content-between align-items-center mb-3 py-2 border-bottom">
+                        <span><i class="fas fa-hand-holding-usd me-2 text-success"></i>Total reçu client</span>
                         <span class="fw-bold text-success">{{ "%.2f"|format(financial.client_received or 0) }} TND</span>
                     </div>
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span>Total dépenses:</span>
+                    <div class="d-flex justify-content-between align-items-center mb-3 py-2 border-bottom">
+                        <span><i class="fas fa-receipt me-2 text-danger"></i>Total dépenses</span>
                         <span class="fw-bold text-danger">{{ "%.2f"|format(financial.total_expenses or 0) }} TND</span>
                     </div>
-                    <hr>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="fw-bold">Solde:</span>
-                        <span class="fw-bold {% if (financial.client_received|float - financial.total_expenses|float) < 0 %}text-danger{% else %}text-success{% endif %}">
+                    <div class="d-flex justify-content-between align-items-center pt-2">
+                        <span class="fw-bold"><i class="fas fa-wallet me-2" style="color: var(--primary);"></i>Solde caisse</span>
+                        <span class="fw-bold fs-5 {% if (financial.client_received|float - financial.total_expenses|float) >= 0 %}text-success{% else %}text-danger{% endif %}">
                             {{ "%.2f"|format(financial.client_received|float - financial.total_expenses|float) }} TND
                         </span>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header" style="background-color: var(--primary); color: white;">
-                    <i class="fas fa-chart-simple me-2"></i>Répartition par catégorie
+        <div class="col-lg-6 mb-4">
+            <div class="card dashboard-card h-100">
+                <div class="card-header">
+                    <i class="fas fa-chart-pie me-2" style="color: var(--accent);"></i>Répartition par catégorie
                 </div>
                 <div class="card-body">
+                    {% if category_totals %}
                     {% for cat in category_totals %}
-                    <div class="mb-2">
-                        <div class="d-flex justify-content-between">
-                            <span>{{ cat.category }}</span>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span><strong>{{ cat.category }}</strong></span>
                             <span>{{ "%.2f"|format(cat.total) }} TND ({{ "%.1f"|format(cat.percentage) }}%)</span>
                         </div>
-                        <div class="progress mb-3" style="height: 8px;">
+                        <div class="progress mb-2" style="height: 10px; border-radius: 5px;">
                             <div class="progress-bar" style="width: {{ cat.percentage }}%; background-color: {{ cat.color }};"></div>
                         </div>
                     </div>
                     {% endfor %}
+                    {% else %}
+                    <p class="text-muted text-center py-4 mb-0"><i class="fas fa-chart-bar me-2"></i>Aucune dépense à répartir</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -395,42 +423,78 @@
 
 <!-- Add Expense Modal -->
 <div class="modal fade" id="addExpenseModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header" style="background-color: var(--primary); color: white;">
-                <h5 class="modal-title">Add New Expense</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-plus-circle me-2"></i>Add Expense</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form action="{{ url_for('add_project_expense', project_id=project.id) }}" method="POST">
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Date</label>
-                        <input type="date" class="form-control" name="date" required>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><i class="fas fa-calendar me-1 text-muted"></i>Date</label>
+                            <input type="date" class="form-control" name="date" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><i class="fas fa-coins me-1 text-muted"></i>Montant (TND)</label>
+                            <input type="number" step="0.01" class="form-control" name="amount" required>
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Nature</label>
-                        <input type="text" class="form-control" name="nature" required>
+                        <label class="form-label"><i class="fas fa-tag me-1 text-muted"></i>Nature</label>
+                        <input type="text" class="form-control" name="nature" required placeholder="Description de la dépense">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Montant (TND)</label>
-                        <input type="number" step="0.01" class="form-control" name="amount" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Commentaire</label>
-                        <textarea class="form-control" name="comment" rows="2"></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Catégorie</label>
+                        <label class="form-label"><i class="fas fa-folder me-1 text-muted"></i>Catégorie</label>
                         <select class="form-select" name="category" required>
                             <option value="Ouvrier">Ouvrier</option>
                             <option value="Matériau">Matériau</option>
                             <option value="Divers">Divers</option>
                         </select>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-comment me-1 text-muted"></i>Commentaire</label>
+                        <textarea class="form-control" name="comment" rows="2" placeholder="Optionnel"></textarea>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Add Expense</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-check me-1"></i>Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Receipt Modal -->
+<div class="modal fade" id="addReceiptModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--primary), var(--primary-mid));">
+                <h5 class="modal-title"><i class="fas fa-money-check-alt me-2"></i>Add Receipt (Montant reçu)</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('add_client_receipt', project_id=project.id) }}" method="POST">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><i class="fas fa-calendar me-1 text-muted"></i>Date</label>
+                            <input type="date" class="form-control" name="date" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><i class="fas fa-coins me-1 text-muted"></i>Montant (TND)</label>
+                            <input type="number" step="0.01" class="form-control" name="amount" required placeholder="0.00">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-comment me-1 text-muted"></i>Commentaire</label>
+                        <input type="text" class="form-control" name="comment" placeholder="Ex: Acompte, Facture #123...">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-success"><i class="fas fa-check me-1"></i>Ajouter reçu</button>
                 </div>
             </form>
         </div>
@@ -439,30 +503,28 @@
 
 <!-- Edit Expense Modal -->
 <div class="modal fade" id="editExpenseModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header" style="background-color: #ffc107;">
-                <h5 class="modal-title">Edit Expense</h5>
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Edit Expense</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form id="editExpenseForm" method="POST">
                 <div class="modal-body">
                     <input type="hidden" id="edit_expense_id" name="expense_id">
-                    <div class="mb-3">
-                        <label class="form-label">Date</label>
-                        <input type="date" class="form-control" id="edit_date" name="date" required>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Date</label>
+                            <input type="date" class="form-control" id="edit_date" name="date" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Montant (TND)</label>
+                            <input type="number" step="0.01" class="form-control" id="edit_amount" name="amount" required>
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Nature</label>
                         <input type="text" class="form-control" id="edit_nature" name="nature" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Montant (TND)</label>
-                        <input type="number" step="0.01" class="form-control" id="edit_amount" name="amount" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Commentaire</label>
-                        <textarea class="form-control" id="edit_comment" name="comment" rows="2"></textarea>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Catégorie</label>
@@ -472,10 +534,14 @@
                             <option value="Divers">Divers</option>
                         </select>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label">Commentaire</label>
+                        <textarea class="form-control" id="edit_comment" name="comment" rows="2"></textarea>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-warning">Save Changes</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>Enregistrer</button>
                 </div>
             </form>
         </div>
@@ -484,20 +550,20 @@
 
 <!-- Delete Expense Modal -->
 <div class="modal fade" id="deleteExpenseModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title">Delete Expense</h5>
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i>Confirm Delete</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p>Are you sure you want to delete <strong id="deleteExpenseNature"></strong>?</p>
-                <p class="text-danger"><small>This action cannot be undone.</small></p>
+                <p>Supprimer <strong id="deleteExpenseNature"></strong> ?</p>
+                <p class="text-danger small mb-0"><i class="fas fa-info-circle me-1"></i>Cette action est irréversible.</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
                 <form id="deleteExpenseForm" method="POST" style="display: inline;">
-                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="submit" class="btn btn-danger"><i class="fas fa-trash me-1"></i>Supprimer</button>
                 </form>
             </div>
         </div>
@@ -506,21 +572,21 @@
 
 <!-- Delete All Data Modal -->
 <div class="modal fade" id="deleteAllDataModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title">Delete All Financial Data</h5>
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i>Delete All Financial Data</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p class="fw-bold">⚠️ Warning: This action cannot be undone!</p>
-                <p>You are about to delete <strong>{{ expenses|length }}</strong> expense entries.</p>
-                <p class="text-danger">All financial data for this project will be permanently removed.</p>
+                <p class="fw-bold">⚠️ Attention : action irréversible !</p>
+                <p>Vous allez supprimer <strong>{{ expenses|length }}</strong> dépenses et tous les reçus.</p>
+                <p class="text-danger">Toutes les données financières du projet seront effacées.</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
                 <form action="{{ url_for('delete_all_project_financial', project_id=project.id) }}" method="POST">
-                    <button type="submit" class="btn btn-danger">Delete Everything</button>
+                    <button type="submit" class="btn btn-danger"><i class="fas fa-trash me-1"></i>Supprimer tout</button>
                 </form>
             </div>
         </div>
@@ -529,37 +595,29 @@
 
 <!-- Import Excel Modal -->
 <div class="modal fade" id="importExcelModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title">Import from Excel</h5>
+            <div class="modal-header" style="background: linear-gradient(135deg, #28a745, #20c997);">
+                <h5 class="modal-title"><i class="fas fa-file-import me-2"></i>Import from Excel</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form action="{{ url_for('import_project_financial', project_id=project.id) }}" method="POST" enctype="multipart/form-data">
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">Choose Excel File</label>
+                        <label class="form-label">Choisir le fichier</label>
                         <input type="file" class="form-control" name="file" accept=".xlsx,.xls,.csv" required>
                     </div>
-                    <div class="alert alert-info">
+                    <div class="alert alert-info small">
                         <i class="fas fa-info-circle me-2"></i>
-                        <strong>Format required:</strong> Columns should be:
-                        <ul class="mb-0 mt-2">
-                            <li><strong>Date</strong> (DD/MM/YYYY)</li>
-                            <li><strong>Nature</strong> (description)</li>
-                            <li><strong>Montant</strong> (number)</li>
-                            <li><strong>Commentaire</strong> (optional)</li>
-                            <li><strong>Catégorie</strong> (Ouvrier, Matériau, Divers)</li>
-                        </ul>
+                        <strong>Colonnes attendues :</strong> Date, Nature, Montant, Commentaire, Catégorie
                     </div>
                     <p class="text-muted small mb-0">
-                        <i class="fas fa-download me-1"></i>
-                        <a href="{{ url_for('download_financial_template') }}">Download template</a> for correct format
+                        <a href="{{ url_for('download_financial_template') }}"><i class="fas fa-download me-1"></i>Télécharger le modèle</a>
                     </p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-success">Import</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-success"><i class="fas fa-upload me-1"></i>Importer</button>
                 </div>
             </form>
         </div>
@@ -567,95 +625,80 @@
 </div>
 
 <script>
-// ========== EDITABLE FINANCIAL SUMMARY ==========
 function enableSummaryEdit() {
-    document.querySelectorAll('.view-mode').forEach(el => el.style.display = 'none');
-    document.querySelectorAll('.edit-mode').forEach(el => el.style.display = 'block');
-    
+    document.querySelectorAll('.summary-value.view-mode').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.edit-mode').forEach(el => {
+        if (el.querySelector('input')) el.style.display = 'block';
+    });
     document.getElementById('editSummaryBtn').style.display = 'none';
     document.getElementById('saveSummaryBtn').style.display = 'inline-block';
     document.getElementById('cancelSummaryBtn').style.display = 'inline-block';
 }
 
 function cancelSummaryEdit() {
-    document.querySelectorAll('.view-mode').forEach(el => el.style.display = 'block');
+    document.querySelectorAll('.view-mode').forEach(el => el.style.display = '');
     document.querySelectorAll('.edit-mode').forEach(el => el.style.display = 'none');
-    
-    // Reset input values to original
-    document.getElementById('edit-client-received').value = {{ financial.client_received or 0 }};
-    document.getElementById('edit-current-cash').value = {{ financial.current_cash or 0 }};
     document.getElementById('edit-sale-price').value = {{ financial.sale_price or 0 }};
     document.getElementById('edit-estimated-budget').value = {{ financial.estimated_budget or 0 }};
-    document.getElementById('edit-estimated-margin').value = {{ financial.estimated_margin or 0 }};
-    document.getElementById('edit-total-expenses').value = {{ financial.total_expenses or 0 }};
-    document.getElementById('edit-current-result').value = {{ financial.current_result or 0 }};
+    document.getElementById('edit-client-received').value = {{ financial.client_received or 0 }};
     document.getElementById('edit-devis-ref').value = {{ financial.devis_ref or 0 }};
-    
     document.getElementById('editSummaryBtn').style.display = 'inline-block';
     document.getElementById('saveSummaryBtn').style.display = 'none';
     document.getElementById('cancelSummaryBtn').style.display = 'none';
 }
 
 function saveSummaryEdit() {
-    const data = {
-        client_received: document.getElementById('edit-client-received').value,
-        current_cash: document.getElementById('edit-current-cash').value,
-        sale_price: document.getElementById('edit-sale-price').value,
-        estimated_budget: document.getElementById('edit-estimated-budget').value,
-        estimated_margin: document.getElementById('edit-estimated-margin').value,
-        total_expenses: document.getElementById('edit-total-expenses').value,
-        current_result: document.getElementById('edit-current-result').value,
-        devis_ref: document.getElementById('edit-devis-ref').value
-    };
-    
+    const salePrice = parseFloat(document.getElementById('edit-sale-price').value) || 0;
+    const estimatedBudget = parseFloat(document.getElementById('edit-estimated-budget').value) || 0;
+    const clientReceived = parseFloat(document.getElementById('edit-client-received').value) || 0;
+    const devisRef = parseFloat(document.getElementById('edit-devis-ref').value) || 0;
+    const totalExpenses = {{ financial.total_expenses or 0 }};
     fetch(`/project/{{ project.id }}/financial/update-summary`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+        body: JSON.stringify({ sale_price: salePrice, estimated_budget: estimatedBudget, client_received: clientReceived, devis_ref: devisRef })
     })
-    .then(response => response.json())
+    .then(r => r.json())
     .then(result => {
         if (result.success) {
-            document.getElementById('view-client-received').innerHTML = parseFloat(data.client_received).toFixed(2) + ' TND';
-            document.getElementById('view-current-cash').innerHTML = parseFloat(data.current_cash).toFixed(2) + ' TND';
-            document.getElementById('view-sale-price').innerHTML = parseFloat(data.sale_price).toFixed(2) + ' TND';
-            document.getElementById('view-estimated-budget').innerHTML = parseFloat(data.estimated_budget).toFixed(2) + ' TND';
-            document.getElementById('view-estimated-margin').innerHTML = parseFloat(data.estimated_margin).toFixed(2) + ' TND';
-            document.getElementById('view-total-expenses').innerHTML = parseFloat(data.total_expenses).toFixed(2) + ' TND';
-            document.getElementById('view-current-result').innerHTML = parseFloat(data.current_result).toFixed(2) + ' TND';
-            document.getElementById('view-devis-ref').innerHTML = parseFloat(data.devis_ref).toFixed(2) + ' TND';
-            
+            document.getElementById('view-sale-price').textContent = salePrice.toFixed(2) + ' TND';
+            document.getElementById('view-estimated-budget').textContent = estimatedBudget.toFixed(2) + ' TND';
+            document.getElementById('view-client-received').textContent = clientReceived.toFixed(2) + ' TND';
+            document.getElementById('view-devis-ref').textContent = devisRef.toFixed(2) + ' TND';
+            document.getElementById('view-estimated-margin').textContent = (salePrice - estimatedBudget).toFixed(2) + ' TND';
+            document.getElementById('view-balance-remaining').textContent = (salePrice - clientReceived).toFixed(2) + ' TND';
+            document.getElementById('view-current-result').textContent = (salePrice - totalExpenses).toFixed(2) + ' TND';
+            document.getElementById('view-current-cash').textContent = (clientReceived - totalExpenses).toFixed(2) + ' TND';
             cancelSummaryEdit();
-            alert('Financial summary updated successfully!');
-        } else {
-            alert('Error updating financial summary');
+            if (typeof bootstrap !== 'undefined') {
+                const toast = document.createElement('div');
+                toast.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3';
+                toast.style.zIndex = '9999';
+                toast.innerHTML = '<i class="fas fa-check me-2"></i>Résumé mis à jour !<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 3000);
+            } else { alert('Résumé mis à jour !'); }
         }
     })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error updating financial summary');
-    });
+    .catch(() => alert('Erreur lors de la mise à jour'));
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    // ========== DELETE SINGLE EXPENSE ==========
+    var today = new Date().toISOString().split('T')[0];
+    document.querySelector('#addExpenseModal input[name="date"]')?.setAttribute('value', today);
+    document.querySelector('#addReceiptModal input[name="date"]')?.setAttribute('value', today);
+
     const deleteModal = new bootstrap.Modal(document.getElementById('deleteExpenseModal'));
     const deleteForm = document.getElementById('deleteExpenseForm');
-
     document.querySelectorAll('.delete-expense').forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
-            const expenseId = this.dataset.id;
-            const expenseNature = this.dataset.nature;
-            
-            document.getElementById('deleteExpenseNature').textContent = expenseNature;
-            deleteForm.action = `/project/{{ project.id }}/expense/${expenseId}/delete`;
-            
+            document.getElementById('deleteExpenseNature').textContent = this.dataset.nature;
+            deleteForm.action = `/project/{{ project.id }}/expense/${this.dataset.id}/delete`;
             deleteModal.show();
         });
     });
 
-    // ========== EDIT EXPENSE ==========
     document.querySelectorAll('.edit-expense').forEach(btn => {
         btn.addEventListener('click', function() {
             document.getElementById('edit_expense_id').value = this.dataset.id;
@@ -664,21 +707,10 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('edit_amount').value = this.dataset.amount;
             document.getElementById('edit_comment').value = this.dataset.comment;
             document.getElementById('edit_category').value = this.dataset.category;
-            
             document.getElementById('editExpenseForm').action = `/project/{{ project.id }}/expense/${this.dataset.id}/edit`;
         });
     });
 
-    // ========== AUTO-HIDE ALERTS ==========
-    setTimeout(() => {
-        document.querySelectorAll('.alert').forEach(alert => {
-            alert.style.transition = 'opacity 0.5s';
-            alert.style.opacity = '0';
-            setTimeout(() => alert.remove(), 500);
-        });
-    }, 5000);
-    
-    // ========== SEARCH, FILTER AND SORT FUNCTIONALITY ==========
     const searchInput = document.getElementById('searchInput');
     const categoryFilter = document.getElementById('categoryFilter');
     const dateFilter = document.getElementById('dateFilter');
@@ -690,249 +722,138 @@ document.addEventListener('DOMContentLoaded', function() {
     const tableRows = document.querySelectorAll('.expense-row');
     const noResultsRow = document.getElementById('noResultsRow');
     const totalAmountSpan = document.getElementById('totalAmount');
-
     let currentSort = { column: 'date', direction: 'desc' };
     let customDateActive = false;
 
-    if (dateFilter) {
-        dateFilter.addEventListener('change', function() {
-            if (this.value === 'custom') {
-                customDateRange.style.display = 'flex';
-            } else {
-                customDateRange.style.display = 'none';
-                customDateActive = false;
-                filterTable();
-            }
-        });
-    }
-
-    if (applyDateRangeBtn) {
-        applyDateRangeBtn.addEventListener('click', function() {
-            if (dateFrom.value && dateTo.value) {
-                customDateActive = true;
-                filterTable();
-            } else {
-                alert('Please select both dates');
-            }
-        });
-    }
+    if (dateFilter) dateFilter.addEventListener('change', function() {
+        customDateRange.style.display = this.value === 'custom' ? 'flex' : 'none';
+        if (this.value !== 'custom') { customDateActive = false; filterTable(); }
+    });
+    if (applyDateRangeBtn) applyDateRangeBtn.addEventListener('click', function() {
+        if (dateFrom.value && dateTo.value) { customDateActive = true; filterTable(); }
+        else alert('Sélectionnez les deux dates');
+    });
 
     function filterTable() {
-        const searchTerm = searchInput?.value.toLowerCase() || '';
+        const searchTerm = (searchInput?.value || '').toLowerCase();
         const categoryValue = categoryFilter?.value || 'all';
         const dateFilterValue = dateFilter?.value || 'all';
-        let visibleCount = 0;
-        let totalVisibleAmount = 0;
-        
+        let visibleCount = 0, totalVisibleAmount = 0;
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        
+
         tableRows.forEach(row => {
             const rowDate = new Date(row.dataset.date);
             rowDate.setHours(0, 0, 0, 0);
-            const rowNature = row.dataset.nature || '';
-            const rowComment = row.dataset.comment || '';
-            const rowCategory = row.dataset.category || '';
-            const rowAmount = parseFloat(row.dataset.amount) || 0;
-            
-            let matchesSearch = true;
-            if (searchTerm) {
-                const searchableText = `${rowNature} ${rowComment} ${rowCategory}`;
-                matchesSearch = searchableText.includes(searchTerm);
-            }
-            
-            let matchesCategory = true;
-            if (categoryValue !== 'all') {
-                matchesCategory = rowCategory === categoryValue.toLowerCase();
-            }
-            
+            let matchesSearch = !searchTerm || `${row.dataset.nature || ''} ${row.dataset.comment || ''} ${row.dataset.category || ''}`.includes(searchTerm);
+            let matchesCategory = categoryValue === 'all' || row.dataset.category === categoryValue.toLowerCase();
             let matchesDate = true;
             if (dateFilterValue !== 'all' && !customDateActive) {
+                const weekAgo = new Date(today); weekAgo.setDate(weekAgo.getDate() - 7);
+                const monthAgo = new Date(today); monthAgo.setMonth(monthAgo.getMonth() - 1);
+                const yearAgo = new Date(today); yearAgo.setFullYear(yearAgo.getFullYear() - 1);
                 switch(dateFilterValue) {
-                    case 'today':
-                        matchesDate = rowDate.getTime() === today.getTime();
-                        break;
-                    case 'week':
-                        const weekAgo = new Date(today);
-                        weekAgo.setDate(weekAgo.getDate() - 7);
-                        matchesDate = rowDate >= weekAgo && rowDate <= today;
-                        break;
-                    case 'month':
-                        const monthAgo = new Date(today);
-                        monthAgo.setMonth(monthAgo.getMonth() - 1);
-                        matchesDate = rowDate >= monthAgo && rowDate <= today;
-                        break;
-                    case 'year':
-                        const yearAgo = new Date(today);
-                        yearAgo.setFullYear(yearAgo.getFullYear() - 1);
-                        matchesDate = rowDate >= yearAgo && rowDate <= today;
-                        break;
+                    case 'today': matchesDate = rowDate.getTime() === today.getTime(); break;
+                    case 'week': matchesDate = rowDate >= weekAgo && rowDate <= today; break;
+                    case 'month': matchesDate = rowDate >= monthAgo && rowDate <= today; break;
+                    case 'year': matchesDate = rowDate >= yearAgo && rowDate <= today; break;
                 }
-            } else if (customDateActive && dateFrom.value && dateTo.value) {
-                const fromDate = new Date(dateFrom.value);
-                const toDate = new Date(dateTo.value);
-                toDate.setHours(23, 59, 59, 999);
-                matchesDate = rowDate >= fromDate && rowDate <= toDate;
+            } else if (customDateActive && dateFrom?.value && dateTo?.value) {
+                const from = new Date(dateFrom.value), to = new Date(dateTo.value);
+                to.setHours(23, 59, 59, 999);
+                matchesDate = rowDate >= from && rowDate <= to;
             }
-            
             if (matchesSearch && matchesCategory && matchesDate) {
                 row.style.display = '';
                 visibleCount++;
-                totalVisibleAmount += rowAmount;
-            } else {
-                row.style.display = 'none';
-            }
+                totalVisibleAmount += parseFloat(row.dataset.amount) || 0;
+            } else row.style.display = 'none';
         });
-        
-        if (totalAmountSpan) {
-            totalAmountSpan.textContent = totalVisibleAmount.toFixed(2) + ' TND';
-        }
-        
-        if (noResultsRow) {
-            if (visibleCount === 0) {
-                noResultsRow.style.display = '';
-            } else {
-                noResultsRow.style.display = 'none';
-            }
-        }
+
+        if (totalAmountSpan) totalAmountSpan.textContent = totalVisibleAmount.toFixed(2) + ' TND';
+        if (noResultsRow) noResultsRow.style.display = visibleCount === 0 ? '' : 'none';
     }
 
-    if (clearFiltersBtn) {
-        clearFiltersBtn.addEventListener('click', function() {
-            if (searchInput) searchInput.value = '';
-            if (categoryFilter) categoryFilter.value = 'all';
-            if (dateFilter) dateFilter.value = 'all';
-            if (customDateRange) customDateRange.style.display = 'none';
-            customDateActive = false;
-            if (dateFrom) dateFrom.value = '';
-            if (dateTo) dateTo.value = '';
-            filterTable();
-            
-            document.querySelectorAll('.sortable i').forEach(icon => {
-                icon.className = 'fas fa-sort ms-1';
-            });
-        });
-    }
+    if (clearFiltersBtn) clearFiltersBtn.addEventListener('click', function() {
+        if (searchInput) searchInput.value = '';
+        if (categoryFilter) categoryFilter.value = 'all';
+        if (dateFilter) dateFilter.value = 'all';
+        if (customDateRange) customDateRange.style.display = 'none';
+        customDateActive = false;
+        if (dateFrom) dateFrom.value = '';
+        if (dateTo) dateTo.value = '';
+        filterTable();
+        document.querySelectorAll('.sortable i').forEach(icon => icon.className = 'fas fa-sort ms-1');
+    });
 
     document.querySelectorAll('.sortable').forEach(header => {
         header.addEventListener('click', function() {
             const column = this.dataset.sort;
             const direction = currentSort.column === column && currentSort.direction === 'asc' ? 'desc' : 'asc';
             currentSort = { column, direction };
-            
-            document.querySelectorAll('.sortable i').forEach(icon => {
-                icon.className = 'fas fa-sort ms-1';
-            });
+            document.querySelectorAll('.sortable i').forEach(icon => icon.className = 'fas fa-sort ms-1');
             this.querySelector('i').className = `fas fa-sort-${direction === 'asc' ? 'up' : 'down'} ms-1`;
-            
-            const tbody = document.getElementById('expenses-table-body');
             const rows = Array.from(document.querySelectorAll('.expense-row:not([style*="display: none"])'));
-            
             rows.sort((a, b) => {
                 let aVal, bVal;
-                
                 switch(column) {
-                    case 'date':
-                        aVal = new Date(a.dataset.date);
-                        bVal = new Date(b.dataset.date);
-                        break;
-                    case 'nature':
-                        aVal = a.dataset.nature;
-                        bVal = b.dataset.nature;
-                        break;
-                    case 'amount':
-                        aVal = parseFloat(a.dataset.amount);
-                        bVal = parseFloat(b.dataset.amount);
-                        break;
-                    case 'comment':
-                        aVal = a.dataset.comment;
-                        bVal = b.dataset.comment;
-                        break;
-                    case 'category':
-                        aVal = a.dataset.category;
-                        bVal = b.dataset.category;
-                        break;
-                    default:
-                        return 0;
+                    case 'date': aVal = new Date(a.dataset.date); bVal = new Date(b.dataset.date); break;
+                    case 'nature': aVal = a.dataset.nature; bVal = b.dataset.nature; break;
+                    case 'amount': aVal = parseFloat(a.dataset.amount); bVal = parseFloat(b.dataset.amount); break;
+                    case 'comment': aVal = a.dataset.comment; bVal = b.dataset.comment; break;
+                    case 'category': aVal = a.dataset.category; bVal = b.dataset.category; break;
+                    default: return 0;
                 }
-                
                 if (aVal < bVal) return direction === 'asc' ? -1 : 1;
                 if (aVal > bVal) return direction === 'asc' ? 1 : -1;
                 return 0;
             });
-            
-            rows.forEach(row => tbody.appendChild(row));
+            rows.forEach(row => document.getElementById('expenses-table-body').appendChild(row));
         });
     });
 
     if (searchInput) searchInput.addEventListener('keyup', filterTable);
     if (categoryFilter) categoryFilter.addEventListener('change', filterTable);
     if (dateFilter) dateFilter.addEventListener('change', filterTable);
+
+    document.querySelectorAll('.alert').forEach(a => {
+        setTimeout(() => { a.style.transition = 'opacity 0.5s'; a.style.opacity = '0'; setTimeout(() => a.remove(), 500); }, 5000);
+    });
 });
 </script>
 
 <style>
-.summary-card {
-    background: white;
-    border-radius: 10px;
-    padding: 15px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    height: 100%;
-}
-
-.summary-label {
-    font-size: 0.9rem;
-    color: #6c757d;
-    margin-bottom: 5px;
-}
-
-.summary-value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--primary);
-}
-
-.table th {
-    background-color: var(--primary);
-    color: white;
-}
-
-.badge-category {
-    background-color: #e9ecef;
-    color: #495057;
-    padding: 0.4rem 0.8rem;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    display: inline-block;
-}
-
-.card {
-    border: none;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+.financial-card {
     border-radius: 12px;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    height: 100%;
+    min-height: 90px;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
-
-.btn-group {
-    flex-wrap: wrap;
-    gap: 5px;
-}
-
-.btn-group .btn {
-    border-radius: 5px !important;
-    margin-bottom: 5px;
-}
-
-.sortable {
-    cursor: pointer;
-    user-select: none;
-}
-
-.sortable:hover {
-    background-color: rgba(255,255,255,0.2);
-}
-
-#searchFilterCollapse {
-    transition: all 0.3s ease;
-}
+.financial-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+.financial-card-primary { background: linear-gradient(135deg, rgba(30,58,95,0.08), rgba(44,82,130,0.05)); border-left: 4px solid var(--primary); }
+.financial-card-accent { background: linear-gradient(135deg, rgba(255,102,0,0.08), rgba(255,102,0,0.05)); border-left: 4px solid var(--accent); }
+.financial-card-success { background: linear-gradient(135deg, rgba(40,167,69,0.1), rgba(40,167,69,0.05)); border-left: 4px solid #28a745; }
+.financial-card-danger { background: linear-gradient(135deg, rgba(220,53,69,0.08), rgba(220,53,69,0.05)); border-left: 4px solid #dc3545; }
+.financial-card-info { background: linear-gradient(135deg, rgba(77,168,218,0.1), rgba(77,168,218,0.05)); border-left: 4px solid var(--accent-glow); }
+.financial-card-muted { background: var(--light-bg); border-left: 4px solid #6c757d; }
+.financial-card-icon { width: 48px; height: 48px; border-radius: 12px; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0; }
+.financial-card-content { flex: 1; min-width: 0; }
+.financial-card-label { display: block; font-size: 0.85rem; color: #6c757d; margin-bottom: 0.25rem; }
+.summary-value { font-size: 1.4rem; font-weight: 700; color: var(--primary); }
+.badge-category { padding: 0.35rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 500; display: inline-block; }
+.cat-ouvrier { background-color: #4DA8DA; color: white; }
+.cat-materiau { background-color: #28a745; color: white; }
+.cat-divers { background-color: #FF6600; color: white; }
+.cat-other { background-color: #6c757d; color: white; }
+.table th { background: var(--primary); color: white; }
+.sortable { cursor: pointer; user-select: none; }
+.sortable:hover { background-color: rgba(255,255,255,0.15); }
+.btn-group { flex-wrap: wrap; gap: 5px; }
+.btn-group .btn { border-radius: 5px !important; }
+#searchFilterCollapse { transition: all 0.3s ease; }
 </style>
 {% endblock %}

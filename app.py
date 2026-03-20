@@ -42,6 +42,15 @@ class Contact(db.Model):
     notes = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+    @property
+    def relation(self):
+        """Parse relation from notes (relation:good|average|bad)"""
+        import re
+        if not self.notes:
+            return None
+        m = re.search(r'relation:(good|average|bad)', self.notes)
+        return m.group(1) if m else None
+
 class Provider(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -113,8 +122,9 @@ def load_user(user_id):
 @app.route('/project/<int:project_id>/financial/update-summary', methods=['POST'])
 @login_required
 def update_financial_summary(project_id):
-    """Update all financial summary values"""
+    """Update financial summary - syncs with Project (selling_price, client_receipts) and ProjectFinancialParams"""
     try:
+        project = Project.query.get_or_404(project_id)
         financial = ProjectFinancialParams.query.filter_by(project_id=project_id).first()
         if not financial:
             financial = ProjectFinancialParams(project_id=project_id)
@@ -122,13 +132,16 @@ def update_financial_summary(project_id):
         
         data = request.get_json()
         
-        # Update financial params
-        financial.sale_price = float(data.get('sale_price', 0))
-        financial.estimated_budget = float(data.get('estimated_budget', 0))
-        financial.devis_ref = float(data.get('devis_ref', 0))
+        # Update Project (same fields as project detail page)
+        if 'sale_price' in data:
+            project.selling_price = float(data.get('sale_price', 0))
+        if 'client_received' in data:
+            project.client_receipts = float(data.get('client_received', 0))
         
-        # Update receipts total (you may want to create receipts instead)
-        # This is simplified - you might want to create actual receipt entries
+        # Update ProjectFinancialParams
+        financial.sale_price = float(data.get('sale_price', project.selling_price or 0))
+        financial.estimated_budget = float(data.get('estimated_budget', financial.estimated_budget or 0))
+        financial.devis_ref = float(data.get('devis_ref', financial.devis_ref or 0))
         
         db.session.commit()
         
@@ -360,12 +373,17 @@ def update_project(id):
     project.client_name = request.form.get('client_name')
     project.status = request.form.get('status')
     
-    # Handle financial fields
+    # Handle financial fields (synced with project financial page)
     selling_price = request.form.get('selling_price', '0')
     project.selling_price = float(selling_price) if selling_price else 0.0
     
     client_receipts = request.form.get('client_receipts', '0')
     project.client_receipts = float(client_receipts) if client_receipts else 0.0
+    
+    # Sync ProjectFinancialParams.sale_price
+    financial = ProjectFinancialParams.query.filter_by(project_id=id).first()
+    if financial:
+        financial.sale_price = project.selling_price
     
     db.session.commit()
     flash('Project updated successfully')
@@ -778,19 +796,20 @@ def project_financial(project_id):
     total_expenses = sum(e.amount for e in expenses)
     
     receipts = ProjectReceipt.query.filter_by(project_id=project_id).all()
-    total_receipts = sum(r.amount for r in receipts)
-    
-    client_received = total_receipts
+    # Use project.selling_price and project.client_receipts (same as project detail page)
+    sale_price = project.selling_price or financial.sale_price or 0
+    client_received = project.client_receipts if project.client_receipts is not None else 0
     current_cash = client_received - total_expenses
-    estimated_margin = financial.sale_price - financial.estimated_budget
-    current_result = financial.sale_price - total_expenses
+    estimated_margin = sale_price - financial.estimated_budget
+    current_result = sale_price - total_expenses
+    balance_remaining = sale_price - client_received  # Solde Restant (amount client still owes)
     
     categories = {}
     for expense in expenses:
         categories[expense.category] = categories.get(expense.category, 0) + expense.amount
     
     category_totals = []
-    colors = {'Ouvrier': '#17a2b8', 'Matériau': '#28a745', 'Divers': '#ffc107'}
+    colors = {'Ouvrier': '#4DA8DA', 'Matériau': '#28a745', 'Divers': '#FF6600'}  # accent-glow, success, accent
     for cat, amount in categories.items():
         category_totals.append({
             'category': cat,
@@ -804,14 +823,18 @@ def project_financial(project_id):
                          financial={
                              'client_received': client_received,
                              'current_cash': current_cash,
-                             'sale_price': financial.sale_price,
+                             'sale_price': sale_price,
                              'estimated_budget': financial.estimated_budget,
                              'estimated_margin': estimated_margin,
                              'total_expenses': total_expenses,
                              'current_result': current_result,
-                             'devis_ref': financial.devis_ref
+                             'depenses_reelles': total_expenses, # données projet #5: sum of expenses
+                             'gain_actuel': current_result,      # données projet #6: Prix de Vente - Dépenses Réelles
+                             'devis_ref': financial.devis_ref,
+                             'balance_remaining': balance_remaining
                          },
                          expenses=expenses,
+                         receipts=receipts,
                          total_expenses=total_expenses,
                          category_totals=category_totals)
 
@@ -859,6 +882,21 @@ def update_project_financial_params(project_id):
     
     db.session.commit()
     flash('Project parameters updated')
+    return redirect(url_for('project_financial', project_id=project_id))
+
+@app.route('/project/<int:project_id>/expense/<int:expense_id>/edit', methods=['POST'])
+@login_required
+def edit_expense(project_id, expense_id):
+    expense = ProjectExpense.query.get_or_404(expense_id)
+    if expense.project_id != project_id:
+        return redirect(url_for('project_financial', project_id=project_id))
+    expense.date = datetime.strptime(request.form.get('date'), '%Y-%m-%d')
+    expense.nature = request.form.get('nature')
+    expense.amount = float(request.form.get('amount'))
+    expense.comment = request.form.get('comment') or None
+    expense.category = request.form.get('category', 'Divers')
+    db.session.commit()
+    flash('Expense updated successfully')
     return redirect(url_for('project_financial', project_id=project_id))
 
 @app.route('/project/<int:project_id>/expense/<int:expense_id>/delete', methods=['POST'])
