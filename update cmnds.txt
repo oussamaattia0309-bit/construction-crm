@@ -1,18 +1,12 @@
-==============================# on local
+QUICK ONE-LINE COMMANDS
+============================================
 
+# LOCAL to GITHUB (one line)
+cd "C:\Users\USER\Desktop\stuff\web\CRM CAE"; git add .; git commit -m "Update"; git push origin main
 
-cd C:\Users\USER\Desktop\stuff\web\CRM CAE
-git add .
-git commit -m "Describe your changes"
-git push
+# PYTHONANYWHERE from GITHUB (one line)
+cd ~/mysite && git pull origin main && source venv/bin/activate && pip install -r requirements.txt && python -c "from app import app, db; app.app_context().push(); db.create_all()" && touch /var/www/oussamaattia1994_pythonanywhere_com_wsgi.py
 
-==============================#On PythonAnywhere
-
-https://www.pythonanywhere.com/user/Oussamaattia1994/consoles/45814647/
-
-cd ~/mysite
-git pull
-touch /var/www/oussamaattia1994_pythonanywhere_com_wsgi.py
 
 
 ==============================#acess :

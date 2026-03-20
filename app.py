@@ -908,21 +908,31 @@ def delete_expense(project_id, expense_id):
     flash('Expense deleted successfully')
     return redirect(url_for('project_financial', project_id=project_id))
 
-# ===== NEW ROUTE ADDED HERE =====
 @app.route('/project/<int:project_id>/financial/delete-all', methods=['POST'])
 @login_required
 def delete_all_project_financial(project_id):
-    """Delete all financial data for a project"""
+    """Delete all financial data for a project (expenses + receipts)"""
     try:
-        # Delete all expenses
         ProjectExpense.query.filter_by(project_id=project_id).delete()
-        # Delete all receipts
         ProjectReceipt.query.filter_by(project_id=project_id).delete()
         db.session.commit()
         flash('✅ All financial data deleted successfully')
     except Exception as e:
         db.session.rollback()
         flash(f'❌ Error deleting data: {str(e)}')
+    return redirect(url_for('project_financial', project_id=project_id))
+
+@app.route('/project/<int:project_id>/expenses/delete-all', methods=['POST'])
+@login_required
+def delete_all_expenses(project_id):
+    """Delete all expenses for a project (expenses table only, not receipts)"""
+    try:
+        deleted = ProjectExpense.query.filter_by(project_id=project_id).delete()
+        db.session.commit()
+        flash(f'✅ {deleted} dépenses supprimées')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'❌ Erreur: {str(e)}')
     return redirect(url_for('project_financial', project_id=project_id))
 
 # ==================== PROJECT FINANCIAL EXPORT/IMPORT ====================
@@ -969,7 +979,8 @@ def export_project_financial(project_id):
 @app.route('/project/<int:project_id>/financial/import', methods=['POST'])
 @login_required
 def import_project_financial(project_id):
-    """Import expenses from Excel"""
+    """Import expenses from Excel - follows financial_template.xlsx (sheet 'suivi chantier').
+    Imported rows are ADDED to expenses, not replaced."""
     if 'file' not in request.files:
         flash('No file selected')
         return redirect(url_for('project_financial', project_id=project_id))
@@ -980,11 +991,15 @@ def import_project_financial(project_id):
         return redirect(url_for('project_financial', project_id=project_id))
     
     try:
-        # Read the Excel file
+        # Read the Excel file - use sheet 'suivi chantier' if present (template format)
         if file.filename.endswith('.csv'):
             df = pd.read_csv(file)
         else:
-            df = pd.read_excel(file)
+            xlsx = pd.ExcelFile(file)
+            if 'suivi chantier' in xlsx.sheet_names:
+                df = pd.read_excel(xlsx, sheet_name='suivi chantier')
+            else:
+                df = pd.read_excel(xlsx, sheet_name=0)  # first sheet
         
         # Track success/failure
         success_count = 0
@@ -997,39 +1012,53 @@ def import_project_financial(project_id):
                 return ''
             return str(val).strip()
         
-        # Process each row
+        # Process each row - ADD to expenses (never replace)
         for index, row in df.iterrows():
             try:
-                # Parse date (handle different formats)
-                date_str = clean(row.get('Date', ''))
-                if date_str:
-                    try:
-                        # Try DD/MM/YYYY format
-                        date = datetime.strptime(date_str, '%d/%m/%Y').date()
-                    except:
-                        try:
-                            # Try YYYY-MM-DD format
-                            date = datetime.strptime(date_str, '%Y-%m-%d').date()
-                        except:
-                            date = datetime.now().date()
-                else:
+                # Parse date (Excel may return datetime, or string)
+                val = row.get('Date')
+                if pd.isna(val):
                     date = datetime.now().date()
+                elif hasattr(val, 'date'):
+                    date = val.date()
+                else:
+                    date_str = clean(val)
+                    if date_str:
+                        try:
+                            date = datetime.strptime(date_str, '%d/%m/%Y').date()
+                        except:
+                            try:
+                                date = datetime.strptime(date_str, '%Y-%m-%d').date()
+                            except:
+                                date = datetime.now().date()
+                    else:
+                        date = datetime.now().date()
                 
-                # Get amount
                 amount_str = clean(row.get('Montant', '0'))
                 try:
-                    amount = float(amount_str.replace(',', '.'))
+                    amount = float(str(amount_str).replace(',', '.'))
                 except:
                     amount = 0.0
                 
-                # Create expense
+                cat_val = 'Divers'
+                for c in df.columns:
+                    if 'cat' in c.lower():
+                        cv = clean(row.get(c, 'Divers'))
+                        if cv in ('Ouvrier', 'Matériau', 'Divers'):
+                            cat_val = cv
+                        elif 'ouvrier' in cv.lower():
+                            cat_val = 'Ouvrier'
+                        elif 'materiau' in cv.lower() or 'matériau' in cv.lower():
+                            cat_val = 'Matériau'
+                        break
+                
                 expense = ProjectExpense(
                     project_id=project_id,
                     date=date,
                     nature=clean(row.get('Nature', '')),
                     amount=amount,
                     comment=clean(row.get('Commentaire', '')),
-                    category=clean(row.get('Catégorie', 'Divers'))
+                    category=cat_val
                 )
                 
                 # Basic validation

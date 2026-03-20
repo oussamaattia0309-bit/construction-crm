@@ -228,6 +228,11 @@
                 <button class="btn btn-sm btn-light" type="button" data-bs-toggle="collapse" data-bs-target="#searchFilterCollapse" title="Search and filter expenses">
                     <i class="fas fa-search me-1"></i>Filtrer
                 </button>
+                {% if expenses %}
+                <button class="btn btn-sm btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#deleteAllExpensesModal" title="Supprimer toutes les dépenses">
+                    <i class="fas fa-trash-alt me-1"></i>Vider
+                </button>
+                {% endif %}
             </div>
         </div>
         
@@ -548,6 +553,28 @@
     </div>
 </div>
 
+<!-- Delete All Expenses Modal -->
+<div class="modal fade" id="deleteAllExpensesModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i>Vider les dépenses</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Supprimer <strong>{{ expenses|length }}</strong> dépense(s) ?</p>
+                <p class="text-danger small mb-0"><i class="fas fa-info-circle me-1"></i>Cette action est irréversible. Les reçus client ne sont pas affectés.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form action="{{ url_for('delete_all_expenses', project_id=project.id) }}" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger"><i class="fas fa-trash me-1"></i>Vider les dépenses</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Delete Expense Modal -->
 <div class="modal fade" id="deleteExpenseModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
@@ -609,7 +636,8 @@
                     </div>
                     <div class="alert alert-info small">
                         <i class="fas fa-info-circle me-2"></i>
-                        <strong>Colonnes attendues :</strong> Date, Nature, Montant, Commentaire, Catégorie
+                        Utilisez le modèle (onglet « suivi chantier »). Colonnes : Date, Nature, Montant, Commentaire, Catégorie.
+                        Les données sont <strong>ajoutées</strong>, pas remplacées.
                     </div>
                     <p class="text-muted small mb-0">
                         <a href="{{ url_for('download_financial_template') }}"><i class="fas fa-download me-1"></i>Télécharger le modèle</a>
