@@ -260,17 +260,22 @@ function loadDashboardData() {
 
 // Delete confirmation handling
 function attachDeleteListeners() {
-    const deleteModal = new bootstrap.Modal(document.getElementById('deleteProjectModal'));
+    console.log('Attaching delete listeners...');
+    const deleteButtons = document.querySelectorAll('.delete-project-btn');
+    console.log('Found delete buttons:', deleteButtons.length);
     
-    document.querySelectorAll('.delete-project-btn').forEach(btn => {
+    deleteButtons.forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
+            console.log('Delete button clicked for project:', this.dataset.projectId);
+            
             const projectId = this.dataset.projectId;
             const projectName = this.dataset.projectName;
             
             document.getElementById('deleteProjectName').textContent = projectName;
             document.getElementById('confirmDeleteBtn').href = `/projects/delete/${projectId}`;
             
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteProjectModal'));
             deleteModal.show();
         });
     });
@@ -281,6 +286,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const statsSection = document.getElementById('stats-section');
     if (statsSection) {
         observer.observe(statsSection);
+    }
+    
+    // Also observe the projects container for dynamic content changes
+    const projectsContainer = document.getElementById('recent-projects-container');
+    if (projectsContainer) {
+        const mutationObserver = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                    // Re-attach delete listeners when new content is added
+                    setTimeout(attachDeleteListeners, 100);
+                }
+            });
+        });
+        mutationObserver.observe(projectsContainer, { childList: true, subtree: true });
     }
 });
 </script>

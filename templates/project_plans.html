@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Project Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div>
+                    <h1 class="section-title mb-1">
+                        <i class="fas fa-hard-hat me-2" style="color: var(--accent);"></i>{{ project.name }}
+                    </h1>
+                    {% if project.client_name or project.address %}
+                    <div class="text-muted small mt-1">
+                        {% if project.client_name %}<i class="fas fa-user me-1"></i>{{ project.client_name }}{% endif %}
+                        {% if project.address %}<span class="ms-3"><i class="fas fa-map-marker-alt me-1"></i>{{ project.address }}</span>{% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <a href="{{ url_for('project_detail', id=project.id) }}" class="btn btn-outline-primary" title="Back to project details">
+                        <i class="fas fa-arrow-left me-2"></i>Project Details
+                    </a>
+                    <a href="{{ url_for('project_financial', project_id=project.id) }}" class="btn btn-success" title="Back to financial">
+                        <i class="fas fa-chart-line me-2"></i>Financial
+                    </a>
+                    <span class="badge fs-6 px-3 py-2" style="background-color: var(--primary); color: white;">
+                        <i class="fas fa-drafting-compass me-1"></i>Plans
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Plans Section -->
+    <div class="card dashboard-card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="fas fa-drafting-compass me-2" style="color: var(--accent);"></i>Plans du projet
+                <small class="d-block fw-normal fs-6 opacity-90 mt-1">{{ plans|length }} plan(s)</small>
+            </h5>
+            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addPlanModal">
+                <i class="fas fa-upload me-1"></i>Uploader un plan
+            </button>
+        </div>
+        <div class="card-body">
+            {% if plans %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Titre</th>
+                            <th>Description</th>
+                            <th>Fichier</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for plan in plans %}
+                        <tr>
+                            <td>{{ plan.date.strftime('%d/%m/%Y') }}</td>
+                            <td><strong>{{ plan.title }}</strong></td>
+                            <td>{{ plan.description or '—' }}</td>
+                            <td>
+                                {% if plan.file_path %}
+                                <a href="{{ url_for('static', filename=plan.file_path) }}" class="btn btn-outline-primary btn-sm" target="_blank" title="Télécharger">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                                {% else %}
+                                <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary btn-sm" onclick="editPlan({{ plan.id }})" title="Modifier">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <form method="POST" action="{{ url_for('delete_project_plan', project_id=project.id, plan_id=plan.id) }}" style="display: inline;">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Supprimer">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-drafting-compass fa-4x mb-3" style="color: var(--light-bg);"></i>
+                <h4 class="text-muted">Aucun plan</h4>
+                <p class="text-muted">Commencez par uploader votre premier plan pour ce projet.</p>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPlanModal">
+                    <i class="fas fa-upload me-2"></i>Uploader un plan
+                </button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Add Plan Modal -->
+<div class="modal fade" id="addPlanModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--primary), var(--primary-mid)); color: white;">
+                <h5 class="modal-title"><i class="fas fa-drafting-compass me-2"></i>Uploader un plan</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('add_project_plan', project_id=project.id) }}" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-heading me-1 text-white"></i>Titre</label>
+                        <input type="text" class="form-control" name="title" required placeholder="Entrez le titre du plan">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-file-alt me-1 text-white"></i>Description</label>
+                        <textarea class="form-control" name="description" rows="3" placeholder="Description détaillée du plan"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-calendar me-1 text-white"></i>Date</label>
+                        <input type="date" class="form-control" name="date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-paperclip me-1 text-white"></i>Fichier</label>
+                        <input type="file" class="form-control" name="file" accept=".pdf,.dwg,.dxf,.jpg,.jpeg,.png" required>
+                        <small class="text-white">Formats acceptés: PDF, DWG, DXF, JPG, PNG (max 10MB)</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-upload me-1"></i>Uploader</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function editPlan(planId) {
+    // Placeholder for edit functionality
+    alert(`Fonctionnalité de modification du plan #${planId} à implémenter`);
+}
+</script>
+{% endblock %}

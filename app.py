@@ -118,6 +118,49 @@ class ProjectFinancialParams(db.Model):
     
     project = db.relationship('Project', backref=db.backref('financial_params', uselist=False))
 
+class ProjectMemo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    title = db.Column(db.String(200), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    project = db.relationship('Project', backref=db.backref('memos', lazy=True))
+
+class ProjectPlan(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    title = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text)
+    date = db.Column(db.Date, nullable=False)
+    file_path = db.Column(db.String(500))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    project = db.relationship('Project', backref=db.backref('plans', lazy=True))
+
+class ProjectContract(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    title = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text)
+    date = db.Column(db.Date, nullable=False)
+    file_path = db.Column(db.String(500))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    project = db.relationship('Project', backref=db.backref('contracts', lazy=True))
+
+class ProjectInvoice(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    title = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text)
+    date = db.Column(db.Date, nullable=False)
+    file_path = db.Column(db.String(500))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    project = db.relationship('Project', backref=db.backref('invoices', lazy=True))
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -399,7 +442,13 @@ def update_project(id):
 def delete_project(id):
     project = Project.query.get_or_404(id)
     try:
-        Budget.query.filter_by(project_id=id).delete()
+        # Delete associated project expenses
+        ProjectExpense.query.filter_by(project_id=id).delete()
+        # Delete associated project receipts
+        ProjectReceipt.query.filter_by(project_id=id).delete()
+        # Delete associated financial params
+        ProjectFinancialParams.query.filter_by(project_id=id).delete()
+        # Delete the project
         db.session.delete(project)
         db.session.commit()
         flash(f'✅ Project "{project.name}" deleted successfully')
@@ -1101,6 +1150,159 @@ def import_project_financial(project_id):
         flash(f'Error reading file: {str(e)}')
     
     return redirect(url_for('project_financial', project_id=project_id))
+
+# ==================== DOCUMENT MANAGEMENT ROUTES ====================
+@app.route('/project/<int:project_id>/memos')
+@login_required
+def project_memos(project_id):
+    """View all memos for a project"""
+    project = Project.query.get_or_404(project_id)
+    memos = ProjectMemo.query.filter_by(project_id=project_id).order_by(ProjectMemo.date.desc()).all()
+    return render_template('project_memos.html', project=project, memos=memos)
+
+@app.route('/project/<int:project_id>/memos/add', methods=['POST'])
+@login_required
+def add_project_memo(project_id):
+    """Add a new memo to a project"""
+    project = Project.query.get_or_404(project_id)
+    
+    memo = ProjectMemo(
+        project_id=project_id,
+        title=request.form.get('memo_title'),
+        content=request.form.get('memo_content'),
+        date=datetime.strptime(request.form.get('memo_date'), '%Y-%m-%d').date(),
+        created_at=datetime.utcnow()
+    )
+    
+    db.session.add(memo)
+    db.session.commit()
+    flash('✅ Mémo ajouté avec succès!')
+    return redirect(url_for('project_memos', project_id=project_id))
+
+@app.route('/project/<int:project_id>/memos/<int:memo_id>/delete', methods=['POST'])
+@login_required
+def delete_project_memo(project_id, memo_id):
+    """Delete a memo"""
+    memo = ProjectMemo.query.get_or_404(memo_id)
+    if memo.project_id != project_id:
+        flash('❌ Accès non autorisé')
+        return redirect(url_for('index'))
+    
+    db.session.delete(memo)
+    db.session.commit()
+    flash('✅ Mémo supprimé avec succès!')
+    return redirect(url_for('project_memos', project_id=project_id))
+
+@app.route('/project/<int:project_id>/plans')
+@login_required
+def project_plans(project_id):
+    """View all plans for a project"""
+    project = Project.query.get_or_404(project_id)
+    plans = ProjectPlan.query.filter_by(project_id=project_id).order_by(ProjectPlan.date.desc()).all()
+    return render_template('project_plans.html', project=project, plans=plans)
+
+@app.route('/project/<int:project_id>/plans/add', methods=['POST'])
+@login_required
+def add_project_plan(project_id):
+    """Add a new plan to a project"""
+    project = Project.query.get_or_404(project_id)
+    
+    plan = ProjectPlan(
+        project_id=project_id,
+        title=request.form.get('title'),
+        description=request.form.get('description'),
+        date=datetime.strptime(request.form.get('date'), '%Y-%m-%d').date(),
+        created_at=datetime.utcnow()
+    )
+    
+    # Handle file upload
+    if 'file' in request.files:
+        file = request.files['file']
+        if file and file.filename:
+            filename = secure_filename(file.filename)
+            file_path = os.path.join('uploads', 'plans', filename)
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
+            file.save(file_path)
+            plan.file_path = file_path
+    
+    db.session.add(plan)
+    db.session.commit()
+    flash('✅ Plan ajouté avec succès!')
+    return redirect(url_for('project_plans', project_id=project_id))
+
+@app.route('/project/<int:project_id>/contracts')
+@login_required
+def project_contracts(project_id):
+    """View all contracts for a project"""
+    project = Project.query.get_or_404(project_id)
+    contracts = ProjectContract.query.filter_by(project_id=project_id).order_by(ProjectContract.date.desc()).all()
+    return render_template('project_contracts.html', project=project, contracts=contracts)
+
+@app.route('/project/<int:project_id>/contracts/add', methods=['POST'])
+@login_required
+def add_project_contract(project_id):
+    """Add a new contract to a project"""
+    project = Project.query.get_or_404(project_id)
+    
+    contract = ProjectContract(
+        project_id=project_id,
+        title=request.form.get('title'),
+        description=request.form.get('description'),
+        date=datetime.strptime(request.form.get('date'), '%Y-%m-%d').date(),
+        created_at=datetime.utcnow()
+    )
+    
+    # Handle file upload
+    if 'file' in request.files:
+        file = request.files['file']
+        if file and file.filename:
+            filename = secure_filename(file.filename)
+            file_path = os.path.join('uploads', 'contracts', filename)
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
+            file.save(file_path)
+            contract.file_path = file_path
+    
+    db.session.add(contract)
+    db.session.commit()
+    flash('✅ Contrat ajouté avec succès!')
+    return redirect(url_for('project_contracts', project_id=project_id))
+
+@app.route('/project/<int:project_id>/invoices')
+@login_required
+def project_invoices(project_id):
+    """View all invoices for a project"""
+    project = Project.query.get_or_404(project_id)
+    invoices = ProjectInvoice.query.filter_by(project_id=project_id).order_by(ProjectInvoice.date.desc()).all()
+    return render_template('project_invoices.html', project=project, invoices=invoices)
+
+@app.route('/project/<int:project_id>/invoices/add', methods=['POST'])
+@login_required
+def add_project_invoice(project_id):
+    """Add a new invoice to a project"""
+    project = Project.query.get_or_404(project_id)
+    
+    invoice = ProjectInvoice(
+        project_id=project_id,
+        title=request.form.get('title'),
+        description=request.form.get('description'),
+        date=datetime.strptime(request.form.get('date'), '%Y-%m-%d').date(),
+        created_at=datetime.utcnow()
+    )
+    
+    # Handle file upload
+    if 'file' in request.files:
+        file = request.files['file']
+        if file and file.filename:
+            filename = secure_filename(file.filename)
+            file_path = os.path.join('uploads', 'invoices', filename)
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
+            file.save(file_path)
+            invoice.file_path = file_path
+    
+    db.session.add(invoice)
+    db.session.commit()
+    flash('✅ Facture ajoutée avec succès!')
+    return redirect(url_for('project_invoices', project_id=project_id))
 
 # ==================== MAIN ====================
 if __name__ == '__main__':

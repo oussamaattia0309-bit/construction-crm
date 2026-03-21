@@ -32,6 +32,174 @@
         </div>
     </div>
 
+    <!-- Project Documents Section -->
+    <div class="card dashboard-card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="fas fa-folder-open me-2" style="color: var(--accent);"></i>Documents du projet
+                <small class="d-block fw-normal fs-6 opacity-90 mt-1">Mémos, plans, contrats et factures</small>
+            </h5>
+            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addDocumentModal">
+                <i class="fas fa-plus me-1"></i>Ajouter un document
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Memos Section -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="document-card-compact">
+                        <div class="card-compact-header">
+                            <div class="card-compact-icon">
+                                <i class="fas fa-sticky-note"></i>
+                            </div>
+                            <div class="card-compact-info">
+                                <h6 class="card-compact-title">Mémos</h6>
+                                <span class="card-compact-count">{{ project.memos|length if project.memos else 0 }}</span>
+                            </div>
+                        </div>
+                        <div class="card-compact-preview">
+                            {% if project.memos and project.memos|length > 0 %}
+                                {% for memo in project.memos[:2] %}
+                                <div class="compact-preview-item">
+                                    <strong>{{ memo.title }}</strong>
+                                    <small class="text-muted d-block">{{ memo.date.strftime('%d/%m/%Y') }}</small>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="compact-empty">
+                                    <i class="fas fa-sticky-note opacity-50"></i>
+                                    <small>Aucun mémo</small>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="card-compact-actions">
+                            <button class="btn btn-primary btn-sm w-100" data-bs-toggle="modal" data-bs-target="#addMemoModal">
+                                <i class="fas fa-plus me-1"></i>Ajouter
+                            </button>
+                            <a href="{{ url_for('project_memos', project_id=project.id) }}" class="btn btn-outline-secondary btn-sm w-100 mt-2">
+                                <i class="fas fa-list me-1"></i>Voir tout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Plans Section -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="document-card-compact">
+                        <div class="card-compact-header">
+                            <div class="card-compact-icon">
+                                <i class="fas fa-drafting-compass"></i>
+                            </div>
+                            <div class="card-compact-info">
+                                <h6 class="card-compact-title">Plans</h6>
+                                <span class="card-compact-count">{{ project.plans|length if project.plans else 0 }}</span>
+                            </div>
+                        </div>
+                        <div class="card-compact-preview">
+                            {% if project.plans and project.plans|length > 0 %}
+                                {% for plan in project.plans[:2] %}
+                                <div class="compact-preview-item">
+                                    <strong>{{ plan.title }}</strong>
+                                    <small class="text-muted d-block">{{ plan.date.strftime('%d/%m/%Y') }}</small>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="compact-empty">
+                                    <i class="fas fa-drafting-compass opacity-50"></i>
+                                    <small>Aucun plan</small>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="card-compact-actions">
+                            <button class="btn btn-primary btn-sm w-100" data-bs-toggle="modal" data-bs-target="#addPlanModal">
+                                <i class="fas fa-upload me-1"></i>Upload
+                            </button>
+                            <a href="{{ url_for('project_plans', project_id=project.id) }}" class="btn btn-outline-secondary btn-sm w-100 mt-2">
+                                <i class="fas fa-list me-1"></i>Voir tout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Contracts Section -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="document-card-compact">
+                        <div class="card-compact-header">
+                            <div class="card-compact-icon">
+                                <i class="fas fa-file-contract"></i>
+                            </div>
+                            <div class="card-compact-info">
+                                <h6 class="card-compact-title">Contrats</h6>
+                                <span class="card-compact-count">{{ project.contracts|length if project.contracts else 0 }}</span>
+                            </div>
+                        </div>
+                        <div class="card-compact-preview">
+                            {% if project.contracts and project.contracts|length > 0 %}
+                                {% for contract in project.contracts[:2] %}
+                                <div class="compact-preview-item">
+                                    <strong>{{ contract.title }}</strong>
+                                    <small class="text-muted d-block">{{ contract.date.strftime('%d/%m/%Y') }}</small>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="compact-empty">
+                                    <i class="fas fa-file-contract opacity-50"></i>
+                                    <small>Aucun contrat</small>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="card-compact-actions">
+                            <button class="btn btn-primary btn-sm w-100" data-bs-toggle="modal" data-bs-target="#addContractModal">
+                                <i class="fas fa-plus me-1"></i>Ajouter
+                            </button>
+                            <a href="{{ url_for('project_contracts', project_id=project.id) }}" class="btn btn-outline-secondary btn-sm w-100 mt-2">
+                                <i class="fas fa-list me-1"></i>Voir tout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Invoices Section -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="document-card-compact">
+                        <div class="card-compact-header">
+                            <div class="card-compact-icon">
+                                <i class="fas fa-file-invoice-dollar"></i>
+                            </div>
+                            <div class="card-compact-info">
+                                <h6 class="card-compact-title">Factures</h6>
+                                <span class="card-compact-count">{{ project.invoices|length if project.invoices else 0 }}</span>
+                            </div>
+                        </div>
+                        <div class="card-compact-preview">
+                            {% if project.invoices and project.invoices|length > 0 %}
+                                {% for invoice in project.invoices[:2] %}
+                                <div class="compact-preview-item">
+                                    <strong>{{ invoice.title }}</strong>
+                                    <small class="text-muted d-block">{{ invoice.date.strftime('%d/%m/%Y') }}</small>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="compact-empty">
+                                    <i class="fas fa-file-invoice-dollar opacity-50"></i>
+                                    <small>Aucune facture</small>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="card-compact-actions">
+                            <button class="btn btn-primary btn-sm w-100" data-bs-toggle="modal" data-bs-target="#addInvoiceModal">
+                                <i class="fas fa-plus me-1"></i>Ajouter
+                            </button>
+                            <a href="{{ url_for('project_invoices', project_id=project.id) }}" class="btn btn-outline-secondary btn-sm w-100 mt-2">
+                                <i class="fas fa-list me-1"></i>Voir tout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- FIXED AMOUNTS (Input once) - per données projet -->
     <div class="card dashboard-card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
@@ -506,6 +674,216 @@
     </div>
 </div>
 
+<!-- Add Document Modal -->
+<div class="modal fade" id="addDocumentModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--primary), var(--primary-mid)); color: white;">
+                <h5 class="modal-title"><i class="fas fa-folder-plus me-2"></i>Ajouter un document</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addDocumentForm" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-tag me-1 text-muted"></i>Type de document</label>
+                        <select class="form-select" id="documentType" name="document_type" required>
+                            <option value="">Sélectionner un type</option>
+                            <option value="memo">Mémo</option>
+                            <option value="plan">Plan</option>
+                            <option value="contract">Contrat</option>
+                            <option value="invoice">Facture</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Memo-specific fields (shown when memo is selected) -->
+                    <div id="memoFields" style="display: none;">
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-heading me-1 text-muted"></i>Titre du mémo</label>
+                            <input type="text" class="form-control" id="memoTitle" name="memo_title" placeholder="Entrez le titre du mémo">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-sticky-note me-1 text-muted"></i>Contenu du mémo</label>
+                            <textarea class="form-control" id="memoContent" name="memo_content" rows="5" placeholder="Écrivez votre mémo ici..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-calendar me-1 text-muted"></i>Date</label>
+                            <input type="date" class="form-control" id="memoDate" name="memo_date" required>
+                        </div>
+                    </div>
+                    
+                    <!-- Document-specific fields (shown for plan, contract, invoice) -->
+                    <div id="documentFields" style="display: none;">
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-heading me-1 text-muted"></i>Titre</label>
+                            <input type="text" class="form-control" id="documentTitle" name="title" placeholder="Entrez le titre du document">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-file-alt me-1 text-muted"></i>Description</label>
+                            <textarea class="form-control" id="documentDescription" name="description" rows="3" placeholder="Description détaillée du document"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-calendar me-1 text-muted"></i>Date</label>
+                            <input type="date" class="form-control" id="documentDate" name="date" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-paperclip me-1 text-muted"></i>Fichier</label>
+                            <input type="file" class="form-control" id="documentFile" name="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                            <small class="text-muted">Formats acceptés: PDF, DOC, DOCX, JPG, PNG (max 5MB)</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-plus me-1"></i>Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Memo Modal -->
+<div class="modal fade" id="addMemoModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--primary), var(--primary-mid)); color: white;">
+                <h5 class="modal-title"><i class="fas fa-sticky-note me-2"></i>Ajouter un mémo</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('add_project_memo', project_id=project.id) }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-heading me-1 text-white"></i>Titre</label>
+                        <input type="text" class="form-control" name="memo_title" required placeholder="Entrez le titre du mémo">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-sticky-note me-1 text-white"></i>Contenu</label>
+                        <textarea class="form-control" name="memo_content" rows="5" required placeholder="Écrivez votre mémo ici..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-calendar me-1 text-white"></i>Date</label>
+                        <input type="date" class="form-control" name="memo_date" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-check me-1"></i>Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Plan Modal -->
+<div class="modal fade" id="addPlanModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--primary), var(--primary-mid)); color: white;">
+                <h5 class="modal-title"><i class="fas fa-drafting-compass me-2"></i>Uploader un plan</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('add_project_plan', project_id=project.id) }}" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-heading me-1 text-white"></i>Titre</label>
+                        <input type="text" class="form-control" name="title" required placeholder="Entrez le titre du plan">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-file-alt me-1 text-white"></i>Description</label>
+                        <textarea class="form-control" name="description" rows="3" placeholder="Description détaillée du plan"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-calendar me-1 text-white"></i>Date</label>
+                        <input type="date" class="form-control" name="date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-paperclip me-1 text-white"></i>Fichier</label>
+                        <input type="file" class="form-control" name="file" accept=".pdf,.dwg,.dxf,.jpg,.jpeg,.png" required>
+                        <small class="text-white">Formats acceptés: PDF, DWG, DXF, JPG, PNG (max 10MB)</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-upload me-1"></i>Uploader</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Contract Modal -->
+<div class="modal fade" id="addContractModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--primary), var(--primary-mid)); color: white;">
+                <h5 class="modal-title"><i class="fas fa-file-contract me-2"></i>Ajouter un contrat</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('add_project_contract', project_id=project.id) }}" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-heading me-1 text-white"></i>Titre</label>
+                        <input type="text" class="form-control" name="title" required placeholder="Entrez le titre du contrat">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-file-alt me-1 text-white"></i>Description</label>
+                        <textarea class="form-control" name="description" rows="3" placeholder="Description détaillée du contrat"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-calendar me-1 text-white"></i>Date</label>
+                        <input type="date" class="form-control" name="date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-paperclip me-1 text-white"></i>Fichier</label>
+                        <input type="file" class="form-control" name="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" required>
+                        <small class="text-white">Formats acceptés: PDF, DOC, DOCX, JPG, PNG (max 10MB)</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-plus me-1"></i>Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Invoice Modal -->
+<div class="modal fade" id="addInvoiceModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--primary), var(--primary-mid)); color: white;">
+                <h5 class="modal-title"><i class="fas fa-file-invoice-dollar me-2"></i>Ajouter une facture</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('add_project_invoice', project_id=project.id) }}" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-heading me-1 text-white"></i>Titre</label>
+                        <input type="text" class="form-control" name="title" required placeholder="Entrez le titre de la facture">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-file-alt me-1 text-white"></i>Description</label>
+                        <textarea class="form-control" name="description" rows="3" placeholder="Description détaillée de la facture"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-calendar me-1 text-white"></i>Date</label>
+                        <input type="date" class="form-control" name="date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-paperclip me-1 text-white"></i>Fichier</label>
+                        <input type="file" class="form-control" name="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" required>
+                        <small class="text-white">Formats acceptés: PDF, DOC, DOCX, JPG, PNG (max 10MB)</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-plus me-1"></i>Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- Edit Expense Modal -->
 <div class="modal fade" id="editExpenseModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
@@ -847,6 +1225,193 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.alert').forEach(a => {
         setTimeout(() => { a.style.transition = 'opacity 0.5s'; a.style.opacity = '0'; setTimeout(() => a.remove(), 500); }, 5000);
     });
+
+    // Document Management JavaScript
+    const addDocumentForm = document.getElementById('addDocumentForm');
+    const documentTypeSelect = document.getElementById('documentType');
+    
+    // Sample data for demonstration (replace with actual data from backend)
+    const sampleDocuments = {
+        memo: [
+            { id: 1, title: 'Réunion de chantier', date: '2024-01-15', description: 'Discussion des travaux à réaliser' },
+            { id: 2, title: 'Note de sécurité', date: '2024-01-20', description: 'Consignes de sécurité pour le site' }
+        ],
+        plan: [
+            { id: 3, title: 'Plan architectural', date: '2024-01-10', description: 'Plans détaillés du bâtiment' }
+        ],
+        contract: [
+            { id: 4, title: 'Contrat client', date: '2024-01-05', description: 'Contrat signé avec le client' }
+        ],
+        invoice: [
+            { id: 5, title: 'Facture #001', date: '2024-01-25', description: 'Première facture émise' }
+        ]
+    };
+
+    // Function to render documents in their respective sections
+    function renderDocuments() {
+        Object.keys(sampleDocuments).forEach(type => {
+            const documents = sampleDocuments[type];
+            const countElement = document.getElementById(`${type}s-count`);
+            const previewElement = document.getElementById(`${type}s-preview`);
+            
+            // Update count
+            countElement.textContent = documents.length;
+            
+            // Update preview
+            if (documents.length === 0) {
+                previewElement.innerHTML = `
+                    <div class="text-muted text-center py-3">
+                        <i class="fas fa-${getDocumentIcon(type)} fa-2x mb-2 opacity-50"></i>
+                        <p class="small mb-0">Aucun ${type === 'memo' ? 'mémo' : type === 'plan' ? 'plan' : type === 'contract' ? 'contrat' : 'facture'}</p>
+                    </div>
+                `;
+            } else {
+                // Show latest document
+                const latestDoc = documents[documents.length - 1];
+                previewElement.innerHTML = `
+                    <div class="latest-doc">
+                        <div class="latest-doc-title">${latestDoc.title}</div>
+                        <div class="latest-doc-date">${formatDate(latestDoc.date)}</div>
+                    </div>
+                `;
+            }
+        });
+    }
+
+    function getDocumentIcon(type) {
+        const icons = {
+            memo: 'sticky-note',
+            plan: 'drafting-compass',
+            contract: 'file-contract',
+            invoice: 'file-invoice-dollar'
+        };
+        return icons[type] || 'file';
+    }
+
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    function openAddDocumentModal(type) {
+        // Set the document type in the modal
+        document.getElementById('documentType').value = type;
+        
+        // Update modal title based on type
+        const modalTitle = document.querySelector('#addDocumentModal .modal-title');
+        const typeLabels = {
+            memo: 'Ajouter un mémo',
+            plan: 'Uploader un plan',
+            contract: 'Ajouter un contrat',
+            invoice: 'Ajouter une facture'
+        };
+        modalTitle.innerHTML = `<i class="fas fa-folder-plus me-2"></i>${typeLabels[type]}`;
+        
+        // Show/hide appropriate fields
+        const memoFields = document.getElementById('memoFields');
+        const documentFields = document.getElementById('documentFields');
+        
+        if (type === 'memo') {
+            memoFields.style.display = 'block';
+            documentFields.style.display = 'none';
+        } else {
+            memoFields.style.display = 'none';
+            documentFields.style.display = 'block';
+        }
+        
+        // Show the modal
+        const modal = new bootstrap.Modal(document.getElementById('addDocumentModal'));
+        modal.show();
+    }
+
+    function viewAllDocuments(type) {
+        // Placeholder for viewing all documents
+        alert(`Fonctionnalité pour voir tous les ${type === 'memo' ? 'mémos' : type === 'plan' ? 'plans' : type === 'contract' ? 'contrats' : 'factures'} à implémenter`);
+    }
+
+    function viewDocument(id) {
+        // Placeholder for document viewing functionality
+        alert(`Fonctionnalité de visualisation du document #${id} à implémenter`);
+    }
+
+    function deleteDocument(id, type) {
+        if (confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) {
+            sampleDocuments[type] = sampleDocuments[type].filter(doc => doc.id !== id);
+            renderDocuments();
+        }
+    }
+
+    // Handle form submission
+    if (addDocumentForm) {
+        addDocumentForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const type = formData.get('document_type');
+            
+            if (type === 'memo') {
+                // Handle memo submission
+                const title = formData.get('memo_title');
+                const content = formData.get('memo_content');
+                const date = formData.get('memo_date');
+                
+                // Add to sample data (replace with actual backend call)
+                const newMemo = {
+                    id: Date.now(),
+                    title: title,
+                    description: content,
+                    date: date
+                };
+                
+                if (!sampleDocuments.memo) {
+                    sampleDocuments.memo = [];
+                }
+                sampleDocuments.memo.push(newMemo);
+                
+            } else {
+                // Handle document submission (plan, contract, invoice)
+                const title = formData.get('title');
+                const description = formData.get('description');
+                const date = formData.get('date');
+                const file = formData.get('file');
+                
+                // Add to sample data (replace with actual backend call)
+                const newDoc = {
+                    id: Date.now(),
+                    title: title,
+                    description: description,
+                    date: date,
+                    file: file ? file.name : null
+                };
+                
+                if (!sampleDocuments[type]) {
+                    sampleDocuments[type] = [];
+                }
+                sampleDocuments[type].push(newDoc);
+            }
+            
+            // Reset form and close modal
+            this.reset();
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addDocumentModal'));
+            modal.hide();
+            
+            // Re-render documents
+            renderDocuments();
+            
+            // Show success message
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-success alert-dismissible fade show';
+            const successMessage = type === 'memo' ? 'Mémo ajouté avec succès!' : 'Document ajouté avec succès!';
+            alert.innerHTML = `
+                <i class="fas fa-check-circle me-2"></i>${successMessage}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.querySelector('.container-fluid').insertBefore(alert, document.querySelector('.container-fluid').firstChild);
+        });
+    }
+
+    // Initialize document display
+    renderDocuments();
 });
 </script>
 
@@ -883,5 +1448,156 @@ document.addEventListener('DOMContentLoaded', function() {
 .btn-group { flex-wrap: wrap; gap: 5px; }
 .btn-group .btn { border-radius: 5px !important; }
 #searchFilterCollapse { transition: all 0.3s ease; }
+
+/* Document Card Compact Styles */
+.document-card-compact {
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    background: white;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.document-card-compact:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.card-compact-header {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.card-compact-icon {
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.card-compact-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.card-compact-title {
+    margin: 0;
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+.card-compact-count {
+    background: var(--primary);
+    color: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    min-width: 20px;
+    text-align: center;
+}
+
+.card-compact-preview {
+    padding: 0.75rem 1rem;
+    flex: 1;
+    min-height: 80px;
+    max-height: 120px;
+    overflow-y: auto;
+}
+
+.compact-preview-item {
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    border-left: 3px solid var(--primary);
+    transition: background-color 0.2s;
+}
+
+.compact-preview-item:last-child {
+    margin-bottom: 0;
+}
+
+.compact-preview-item:hover {
+    background: #e9ecef;
+}
+
+.compact-preview-item strong {
+    font-size: 0.8rem;
+    color: #495057;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.compact-preview-item small {
+    font-size: 0.7rem;
+    color: #6c757d;
+}
+
+.compact-empty {
+    text-align: center;
+    padding: 1rem 0;
+    color: #6c757d;
+}
+
+.compact-empty i {
+    font-size: 1.5rem;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.card-compact-actions {
+    padding: 0.75rem 1rem;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.card-compact-actions .btn {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .card-compact-header {
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .card-compact-preview {
+        padding: 0.5rem 0.75rem;
+        min-height: 60px;
+        max-height: 100px;
+    }
+    
+    .card-compact-actions {
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .card-compact-icon {
+        width: 30px;
+        height: 30px;
+        font-size: 0.9rem;
+    }
+}
 </style>
 {% endblock %}

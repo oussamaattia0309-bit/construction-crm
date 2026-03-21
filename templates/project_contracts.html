@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Project Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div>
+                    <h1 class="section-title mb-1">
+                        <i class="fas fa-hard-hat me-2" style="color: var(--accent);"></i>{{ project.name }}
+                    </h1>
+                    {% if project.client_name or project.address %}
+                    <div class="text-muted small mt-1">
+                        {% if project.client_name %}<i class="fas fa-user me-1"></i>{{ project.client_name }}{% endif %}
+                        {% if project.address %}<span class="ms-3"><i class="fas fa-map-marker-alt me-1"></i>{{ project.address }}</span>{% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <a href="{{ url_for('project_detail', id=project.id) }}" class="btn btn-outline-primary" title="Back to project details">
+                        <i class="fas fa-arrow-left me-2"></i>Project Details
+                    </a>
+                    <a href="{{ url_for('project_financial', project_id=project.id) }}" class="btn btn-success" title="Back to financial">
+                        <i class="fas fa-chart-line me-2"></i>Financial
+                    </a>
+                    <span class="badge fs-6 px-3 py-2" style="background-color: var(--primary); color: white;">
+                        <i class="fas fa-file-contract me-1"></i>Contrats
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contracts Section -->
+    <div class="card dashboard-card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="fas fa-file-contract me-2" style="color: var(--accent);"></i>Contrats du projet
+                <small class="d-block fw-normal fs-6 opacity-90 mt-1">{{ contracts|length }} contrat(s)</small>
+            </h5>
+            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addContractModal">
+                <i class="fas fa-plus me-1"></i>Ajouter un contrat
+            </button>
+        </div>
+        <div class="card-body">
+            {% if contracts %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Titre</th>
+                            <th>Description</th>
+                            <th>Fichier</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for contract in contracts %}
+                        <tr>
+                            <td>{{ contract.date.strftime('%d/%m/%Y') }}</td>
+                            <td><strong>{{ contract.title }}</strong></td>
+                            <td>{{ contract.description or '—' }}</td>
+                            <td>
+                                {% if contract.file_path %}
+                                <a href="{{ url_for('static', filename=contract.file_path) }}" class="btn btn-outline-primary btn-sm" target="_blank" title="Télécharger">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                                {% else %}
+                                <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary btn-sm" onclick="editContract({{ contract.id }})" title="Modifier">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <form method="POST" action="{{ url_for('delete_project_contract', project_id=project.id, contract_id=contract.id) }}" style="display: inline;">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Supprimer">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-file-contract fa-4x mb-3" style="color: var(--light-bg);"></i>
+                <h4 class="text-muted">Aucun contrat</h4>
+                <p class="text-muted">Commencez par ajouter votre premier contrat pour ce projet.</p>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addContractModal">
+                    <i class="fas fa-plus me-2"></i>Ajouter un contrat
+                </button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Add Contract Modal -->
+<div class="modal fade" id="addContractModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--primary), var(--primary-mid)); color: white;">
+                <h5 class="modal-title"><i class="fas fa-file-contract me-2"></i>Ajouter un contrat</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('add_project_contract', project_id=project.id) }}" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-heading me-1 text-white"></i>Titre</label>
+                        <input type="text" class="form-control" name="title" required placeholder="Entrez le titre du contrat">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-file-alt me-1 text-white"></i>Description</label>
+                        <textarea class="form-control" name="description" rows="3" placeholder="Description détaillée du contrat"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-calendar me-1 text-white"></i>Date</label>
+                        <input type="date" class="form-control" name="date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-paperclip me-1 text-white"></i>Fichier</label>
+                        <input type="file" class="form-control" name="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" required>
+                        <small class="text-white">Formats acceptés: PDF, DOC, DOCX, JPG, PNG (max 10MB)</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-plus me-1"></i>Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function editContract(contractId) {
+    // Placeholder for edit functionality
+    alert(`Fonctionnalité de modification du contrat #${contractId} à implémenter`);
+}
+</script>
+{% endblock %}
