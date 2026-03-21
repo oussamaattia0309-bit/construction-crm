@@ -213,7 +213,7 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form.get('username')
+        username = request.form.get('username').lower().strip()
         password = request.form.get('password')
         user = User.query.filter_by(username=username).first()
         

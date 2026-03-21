@@ -443,6 +443,11 @@
             <h5 class="mb-0"><i class="fas fa-list me-2" style="color: var(--accent);"></i>Détail des dépenses</h5>
             <div class="d-flex align-items-center gap-2">
                 <span class="badge px-3 py-2" style="background-color: var(--primary-mid);">{{ expenses|length }} entrées</span>
+                {% if expenses|length > 5 %}
+                <button class="btn btn-sm btn-outline-secondary" id="toggleExpensesBtn" title="Afficher toutes les dépenses">
+                    <i class="fas fa-expand me-1"></i>Afficher tout
+                </button>
+                {% endif %}
                 <button class="btn btn-sm btn-light" type="button" data-bs-toggle="collapse" data-bs-target="#searchFilterCollapse" title="Search and filter expenses">
                     <i class="fas fa-search me-1"></i>Filtrer
                 </button>
@@ -504,7 +509,8 @@
         </div>
         
         <div class="card-body">
-            <div class="table-responsive">
+                    <div class="table-responsive">
+                <div class="expense-table-wrapper" id="expenseTableWrapper">
                 <table class="table table-hover mb-0" id="expensesTable">
                     <thead>
                         <tr>
@@ -588,6 +594,7 @@
                         </tr>
                     </tfoot>
                 </table>
+                </div>
             </div>
         </div>
     </div>
@@ -1220,10 +1227,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 matchesDate = rowDate >= from && rowDate <= to;
             }
             if (matchesSearch && matchesCategory && matchesDate) {
-                row.style.display = '';
+                row.style.display = 'table-row';
                 visibleCount++;
                 totalVisibleAmount += parseFloat(row.dataset.amount) || 0;
-            } else row.style.display = 'none';
+            } else {
+                row.style.display = 'none';
+            }
         });
 
         if (totalAmountSpan) totalAmountSpan.textContent = totalVisibleAmount.toFixed(2) + ' TND';
@@ -1271,6 +1280,19 @@ document.addEventListener('DOMContentLoaded', function() {
     if (searchInput) searchInput.addEventListener('keyup', filterTable);
     if (categoryFilter) categoryFilter.addEventListener('change', filterTable);
     if (dateFilter) dateFilter.addEventListener('change', filterTable);
+
+    // Toggle expand/collapse table wrapper (scroll vs full)
+    const toggleExpensesBtn = document.getElementById('toggleExpensesBtn');
+    const expenseWrapper = document.getElementById('expenseTableWrapper');
+    if (toggleExpensesBtn && expenseWrapper) {
+        toggleExpensesBtn.addEventListener('click', function() {
+            const expanded = expenseWrapper.classList.toggle('expanded');
+            this.innerHTML = expanded ? '<i class="fas fa-compress me-1"></i>Réduire' : '<i class="fas fa-expand me-1"></i>Afficher tout';
+            this.title = expanded ? 'Afficher seulement les 5 dernières' : 'Afficher toutes les dépenses';
+            if (!expanded) expenseWrapper.scrollTop = 0;
+            filterTable(); // update totals based on visible rows
+        });
+    }
 
     document.querySelectorAll('.alert').forEach(a => {
         setTimeout(() => { a.style.transition = 'opacity 0.5s'; a.style.opacity = '0'; setTimeout(() => a.remove(), 500); }, 5000);
@@ -1498,6 +1520,9 @@ document.addEventListener('DOMContentLoaded', function() {
 .btn-group { flex-wrap: wrap; gap: 5px; }
 .btn-group .btn { border-radius: 5px !important; }
 #searchFilterCollapse { transition: all 0.3s ease; }
+/* expense-row extra hiding removed; use wrapper scroll instead */
+.expense-table-wrapper { max-height: 320px; overflow-y: auto; }
+.expense-table-wrapper.expanded { max-height: none; }
 
 /* Utility Classes for Enhanced UX */
 .bg-soft-primary { background-color: rgba(13, 110, 253, 0.1); }
