@@ -21,6 +21,11 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 # Database Models
+project_contacts = db.Table('project_contacts',
+    db.Column('project_id', db.Integer, db.ForeignKey('project.id'), primary_key=True),
+    db.Column('contact_id', db.Integer, db.ForeignKey('contact.id'), primary_key=True)
+)
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -73,6 +78,9 @@ class Project(db.Model):
     budget_total = db.Column(db.Float, default=0.0)
     selling_price = db.Column(db.Float, default=0.0)
     client_receipts = db.Column(db.Float, default=0.0)
+    
+    # Relationships
+    contacts = db.relationship('Contact', secondary=project_contacts, backref=db.backref('projects', lazy='dynamic'))
 
 class Tool(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -404,11 +412,54 @@ def add_project():
     flash('Project added successfully')
     return redirect(url_for('projects'))
 
+@app.route('/project/<int:project_id>/contacts/add_new', methods=['POST'])
+@login_required
+def project_add_new_contact(project_id):
+    project = Project.query.get_or_404(project_id)
+    name = request.form.get('name')
+    phone = request.form.get('phone')
+    email = request.form.get('email')
+    
+    if name:
+        # Create new contact
+        contact = Contact(name=name, phone=phone, email=email, type='Client')
+        db.session.add(contact)
+        # Link to project
+        project.contacts.append(contact)
+        db.session.commit()
+        flash('✅ Nouveau contact ajouté et lié au projet')
+    return redirect(url_for('project_detail', id=project_id))
+
+@app.route('/project/<int:project_id>/contacts/link_existing', methods=['POST'])
+@login_required
+def project_link_existing_contact(project_id):
+    project = Project.query.get_or_404(project_id)
+    contact_id = request.form.get('contact_id')
+    if contact_id:
+        contact = Contact.query.get(contact_id)
+        if contact and contact not in project.contacts:
+            project.contacts.append(contact)
+            db.session.commit()
+            flash('✅ Contact lié au projet')
+    return redirect(url_for('project_detail', id=project_id))
+
+@app.route('/project/<int:project_id>/contacts/<int:contact_id>/unlink', methods=['POST'])
+@login_required
+def project_unlink_contact(project_id, contact_id):
+    project = Project.query.get_or_404(project_id)
+    contact = Contact.query.get_or_404(contact_id)
+    if contact in project.contacts:
+        project.contacts.remove(contact)
+        db.session.commit()
+        flash('✅ Contact dissocié du projet')
+    return redirect(url_for('project_detail', id=project_id))
+
 @app.route('/projects/<int:id>')
 @login_required
 def project_detail(id):
     project = Project.query.get_or_404(id)
-    return render_template('project_detail.html', project=project)
+    all_contacts = Contact.query.all()
+    return render_template('project_detail.html', project=project, all_contacts=all_contacts)
 
 @app.route('/projects/<int:id>', methods=['POST'])
 @login_required

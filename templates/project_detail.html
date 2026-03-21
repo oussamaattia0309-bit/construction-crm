@@ -1,44 +1,216 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1>Project Details</h1>
-    
-    <form method="POST" action="/projects/{{ project.id }}">
-        <div class="mb-3">
-            <label class="form-label">Project Name</label>
-            <input type="text" name="name" class="form-control" value="{{ project.name }}">
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Main Project Details (Left) -->
+        <div class="col-lg-8">
+            <div class="card dashboard-card mb-4 border-0 shadow-sm">
+                <div class="card-header bg-white py-3 border-0">
+                    <h4 class="mb-0 fw-bold text-dark">
+                        <i class="fas fa-edit me-2 text-primary"></i>Détails du projet
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="/projects/{{ project.id }}">
+                        <div class="row g-3">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Nom du Projet</label>
+                                <input type="text" name="name" class="form-control rounded-pill" value="{{ project.name }}" required>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Nom du Client</label>
+                                <input type="text" name="client_name" class="form-control rounded-pill" value="{{ project.client_name or '' }}">
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Statut</label>
+                                <select name="status" class="form-select rounded-pill">
+                                    <option value="planned" {{ 'selected' if project.status == 'planned' }}>Planifié</option>
+                                    <option value="in_progress" {{ 'selected' if project.status == 'in_progress' }}>En cours</option>
+                                    <option value="completed" {{ 'selected' if project.status == 'completed' }}>Terminé</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Adresse</label>
+                                <input type="text" name="address" class="form-control rounded-pill" value="{{ project.address or '' }}">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Prix de Vente (TND)</label>
+                                <div class="input-group">
+                                    <input type="number" name="selling_price" class="form-control rounded-start-pill" value="{{ project.selling_price or 0 }}" step="0.01">
+                                    <span class="input-group-text rounded-end-pill">TND</span>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Acompte / Reçu (TND)</label>
+                                <div class="input-group">
+                                    <input type="number" name="client_receipts" class="form-control rounded-start-pill" value="{{ project.client_receipts or 0 }}" step="0.01">
+                                    <span class="input-group-text rounded-end-pill">TND</span>
+                                </div>
+                            </div>
+
+                            <div class="col-12 mb-3">
+                                <label class="form-label fw-bold">Description</label>
+                                <textarea name="description" class="form-control" rows="3">{{ project.description or '' }}</textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 d-flex gap-2">
+                            <button type="submit" class="btn btn-primary rounded-pill px-4">
+                                <i class="fas fa-save me-2"></i>Enregistrer
+                            </button>
+                            <a href="{{ url_for('projects') }}" class="btn btn-outline-secondary rounded-pill px-4">
+                                <i class="fas fa-arrow-left me-2"></i>Retour
+                            </a>
+                            <a href="{{ url_for('project_financial', project_id=project.id) }}" class="btn btn-success rounded-pill px-4">
+                                <i class="fas fa-chart-line me-2"></i>Financier
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        
-        <div class="mb-3">
-            <label class="form-label">Client Name</label>
-            <input type="text" name="client_name" class="form-control" value="{{ project.client_name or '' }}">
+
+        <!-- Important Contacts (Right) -->
+        <div class="col-lg-4">
+            <div class="card dashboard-card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold text-dark">
+                        <i class="fas fa-address-book me-2 text-primary"></i>Contacts Importants
+                    </h5>
+                    <div>
+                        <button class="btn btn-sm btn-soft-primary rounded-circle" type="button" data-bs-toggle="modal" data-bs-target="#addProjectContactModal">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% if project.contacts %}
+                            {% for contact in project.contacts %}
+                            <div class="list-group-item border-0 py-3 px-3 border-bottom">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-sm bg-soft-primary text-primary rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0 fw-bold">{{ contact.name }}</h6>
+                                            <small class="text-muted">{{ contact.phone or contact.email or 'Pas de coordonnées' }}</small>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex gap-1">
+                                        {% if contact.phone %}
+                                        <a href="tel:{{ contact.phone }}" class="btn btn-sm btn-soft-success rounded-circle">
+                                            <i class="fas fa-phone"></i>
+                                        </a>
+                                        {% endif %}
+                                        <form action="{{ url_for('project_unlink_contact', project_id=project.id, contact_id=contact.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir dissocier ce contact du projet ?');">
+                                            <button type="submit" class="btn btn-sm btn-soft-danger rounded-circle" title="Dissocier">
+                                                <i class="fas fa-unlink"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-user-plus fa-3x text-light mb-3"></i>
+                                <p class="text-muted">Aucun contact lié</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <div class="mb-3">
-            <label class="form-label">Status</label>
-            <select name="status" class="form-control">
-                <option value="planned" {{ 'selected' if project.status == 'planned' }}>Planned</option>
-                <option value="in_progress" {{ 'selected' if project.status == 'in_progress' }}>In Progress</option>
-                <option value="completed" {{ 'selected' if project.status == 'completed' }}>Completed</option>
-            </select>
-        </div>
-        
-        <div class="mb-3">
-            <label class="form-label">Prix de Vente (TND)</label>
-            <input type="number" name="selling_price" class="form-control" value="{{ project.selling_price or 0 }}" step="0.01">
-        </div>
-        
-        <div class="mb-3">
-            <label class="form-label">Acompte (TND)</label>
-            <input type="number" name="client_receipts" class="form-control" value="{{ project.client_receipts or 0 }}" step="0.01">
-        </div>
-        
-        <button type="submit" class="btn btn-primary">Save Changes</button>
-        <a href="{{ url_for('projects') }}" class="btn btn-secondary">Back to Projects</a>
-        <a href="{{ url_for('project_financial', project_id=project.id) }}" class="btn btn-success">
-            <i class="fas fa-chart-line me-2"></i>View Financial Details
-        </a>
-    </form>
+    </div>
 </div>
+
+<!-- Add Project Contact Modal -->
+<div class="modal fade" id="addProjectContactModal" tabindex="-1" aria-labelledby="addProjectContactModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="addProjectContactModalLabel">Ajouter un contact au projet</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <!-- Link Existing Contact -->
+                <div class="mb-4">
+                    <label class="form-label fw-bold small text-muted text-uppercase mb-3">Lier un contact existant</label>
+                    <form action="{{ url_for('project_link_existing_contact', project_id=project.id) }}" method="POST">
+                        <div class="input-group">
+                            <select name="contact_id" class="form-select rounded-start-pill">
+                                <option value="">Sélectionner un contact...</option>
+                                {% for c in all_contacts %}
+                                    {% if c not in project.contacts %}
+                                    <option value="{{ c.id }}">{{ c.name }} ({{ c.company or 'Sans entreprise' }})</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="btn btn-primary rounded-end-pill px-4">Lier</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="hr-text my-4">OU</div>
+
+                <!-- Create New Contact -->
+                <div>
+                    <label class="form-label fw-bold small text-muted text-uppercase mb-3">Créer un nouveau contact</label>
+                    <form action="{{ url_for('project_add_new_contact', project_id=project.id) }}" method="POST">
+                        <div class="mb-3">
+                            <input type="text" name="name" class="form-control rounded-pill" placeholder="Nom complet" required>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <input type="text" name="phone" class="form-control rounded-pill" placeholder="Téléphone">
+                            </div>
+                            <div class="col-6">
+                                <input type="email" name="email" class="form-control rounded-pill" placeholder="Email">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100 rounded-pill py-2 fw-bold text-white mt-2">
+                            Créer et lier au projet
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hr-text {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        color: #adb5bd;
+        font-weight: bold;
+        font-size: 0.75rem;
+    }
+    .hr-text::before, .hr-text::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid #e9ecef;
+    }
+    .hr-text:not(:empty)::before { margin-right: 1rem; }
+    .hr-text:not(:empty)::after { margin-left: 1rem; }
+    
+    .btn-soft-primary { background: rgba(13, 110, 253, 0.1); color: #0d6efd; border: none; }
+    .btn-soft-primary:hover { background: #0d6efd; color: white; }
+    .btn-soft-success { background: rgba(25, 135, 84, 0.1); color: #198754; border: none; }
+    .btn-soft-success:hover { background: #198754; color: white; }
+    .btn-soft-danger { background: rgba(220, 53, 69, 0.1); color: #dc3545; border: none; }
+    .btn-soft-danger:hover { background: #dc3545; color: white; }
+    .bg-soft-primary { background: rgba(13, 110, 253, 0.1); }
+    .rounded-pill { border-radius: 50rem !important; }
+    .dashboard-card { border-radius: 15px; }
+</style>
 {% endblock %}
