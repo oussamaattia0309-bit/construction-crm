@@ -25,26 +25,26 @@
                         <i class="fas fa-chart-line me-2"></i>Financial
                     </a>
                     <span class="badge fs-6 px-3 py-2" style="background-color: var(--primary); color: white;">
-                        <i class="fas fa-drafting-compass me-1"></i>Plans
+                        <i class="fas fa-file-invoice-dollar me-1"></i>Factures
                     </span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Plans Section -->
+    <!-- Invoices Section -->
     <div class="card dashboard-card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">
-                <i class="fas fa-drafting-compass me-2" style="color: var(--accent);"></i>Plans du projet
-                <small class="d-block fw-normal fs-6 opacity-90 mt-1">{{ plans|length }} plan(s)</small>
+                <i class="fas fa-file-invoice-dollar me-2" style="color: var(--accent);"></i>Factures du projet
+                <small class="d-block fw-normal fs-6 opacity-90 mt-1">{{ invoices|length }} facture(s)</small>
             </h5>
-            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addPlanModal">
-                <i class="fas fa-upload me-1"></i>Uploader un plan
+            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addInvoiceModal">
+                <i class="fas fa-plus me-1"></i>Ajouter une facture
             </button>
         </div>
         <div class="card-body">
-            {% if plans %}
+            {% if invoices %}
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
@@ -57,14 +57,14 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for plan in plans %}
+                        {% for invoice in invoices %}
                         <tr>
-                            <td>{{ plan.date.strftime('%d/%m/%Y') }}</td>
-                            <td><strong>{{ plan.title }}</strong></td>
-                            <td>{{ plan.description or '—' }}</td>
+                            <td>{{ invoice.date.strftime('%d/%m/%Y') }}</td>
+                            <td><strong>{{ invoice.title }}</strong></td>
+                            <td>{{ invoice.description or '—' }}</td>
                             <td>
-                                {% if plan.file_path %}
-                                <a href="{{ url_for('static', filename=plan.file_path) }}" class="btn btn-outline-primary btn-sm" target="_blank" title="Télécharger">
+                                {% if invoice.file_path %}
+                                <a href="{{ url_for('uploaded_file', filename=invoice.file_path.replace('uploads/', '')) }}" class="btn btn-outline-primary btn-sm" target="_blank" title="Télécharger">
                                     <i class="fas fa-download"></i>
                                 </a>
                                 {% else %}
@@ -73,10 +73,10 @@
                             </td>
                             <td>
                                 <div class="btn-group btn-group-sm">
-                                    <button class="btn btn-outline-primary btn-sm" onclick="editPlan({{ plan.id }})" title="Modifier">
+                                    <button class="btn btn-outline-primary btn-sm" onclick="editInvoice({{ invoice.id }})" title="Modifier">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <form method="POST" action="{{ url_for('delete_project_plan', project_id=project.id, plan_id=plan.id) }}" style="display: inline;">
+                                    <form method="POST" action="{{ url_for('delete_project_invoice', project_id=project.id, invoice_id=invoice.id) }}" style="display: inline;">
                                         <button type="submit" class="btn btn-outline-danger btn-sm" title="Supprimer">
                                             <i class="fas fa-trash"></i>
                                         </button>
@@ -90,11 +90,11 @@
             </div>
             {% else %}
             <div class="text-center py-5">
-                <i class="fas fa-drafting-compass fa-4x mb-3" style="color: var(--light-bg);"></i>
-                <h4 class="text-muted">Aucun plan</h4>
-                <p class="text-muted">Commencez par uploader votre premier plan pour ce projet.</p>
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPlanModal">
-                    <i class="fas fa-upload me-2"></i>Uploader un plan
+                <i class="fas fa-file-invoice-dollar fa-4x mb-3" style="color: var(--light-bg);"></i>
+                <h4 class="text-muted">Aucune facture</h4>
+                <p class="text-muted">Commencez par ajouter votre première facture pour ce projet.</p>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addInvoiceModal">
+                    <i class="fas fa-plus me-2"></i>Ajouter une facture
                 </button>
             </div>
             {% endif %}
@@ -102,23 +102,23 @@
     </div>
 </div>
 
-<!-- Add Plan Modal -->
-<div class="modal fade" id="addPlanModal" tabindex="-1">
+<!-- Add Invoice Modal -->
+<div class="modal fade" id="addInvoiceModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header" style="background: linear-gradient(135deg, var(--primary), var(--primary-mid)); color: white;">
-                <h5 class="modal-title"><i class="fas fa-drafting-compass me-2"></i>Uploader un plan</h5>
+                <h5 class="modal-title"><i class="fas fa-file-invoice-dollar me-2"></i>Ajouter une facture</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <form method="POST" action="{{ url_for('add_project_plan', project_id=project.id) }}" enctype="multipart/form-data">
+            <form method="POST" action="{{ url_for('add_project_invoice', project_id=project.id) }}" enctype="multipart/form-data">
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label"><i class="fas fa-heading me-1 text-white"></i>Titre</label>
-                        <input type="text" class="form-control" name="title" required placeholder="Entrez le titre du plan">
+                        <input type="text" class="form-control" name="title" required placeholder="Entrez le titre de la facture">
                     </div>
                     <div class="mb-3">
                         <label class="form-label"><i class="fas fa-file-alt me-1 text-white"></i>Description</label>
-                        <textarea class="form-control" name="description" rows="3" placeholder="Description détaillée du plan"></textarea>
+                        <textarea class="form-control" name="description" rows="3" placeholder="Description détaillée de la facture"></textarea>
                     </div>
                     <div class="mb-3">
                         <label class="form-label"><i class="fas fa-calendar me-1 text-white"></i>Date</label>
@@ -126,13 +126,13 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label"><i class="fas fa-paperclip me-1 text-white"></i>Fichier</label>
-                        <input type="file" class="form-control" name="file" accept=".pdf,.dwg,.dxf,.jpg,.jpeg,.png" required>
-                        <small class="text-white">Formats acceptés: PDF, DWG, DXF, JPG, PNG (max 10MB)</small>
+                        <input type="file" class="form-control" name="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" required>
+                        <small class="text-white">Formats acceptés: PDF, DOC, DOCX, JPG, PNG (max 10MB)</small>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="submit" class="btn btn-primary"><i class="fas fa-upload me-1"></i>Uploader</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-plus me-1"></i>Ajouter</button>
                 </div>
             </form>
         </div>
@@ -140,9 +140,9 @@
 </div>
 
 <script>
-function editPlan(planId) {
+function editInvoice(invoiceId) {
     // Placeholder for edit functionality
-    alert(`Fonctionnalité de modification du plan #${planId} à implémenter`);
+    alert(`Fonctionnalité de modification de la facture #${invoiceId} à implémenter`);
 }
 </script>
 {% endblock %}

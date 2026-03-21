@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request, flash, jsonify, send_file
+from flask import Flask, render_template, redirect, url_for, request, flash, jsonify, send_file, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -1158,7 +1158,7 @@ def project_memos(project_id):
     """View all memos for a project"""
     project = Project.query.get_or_404(project_id)
     memos = ProjectMemo.query.filter_by(project_id=project_id).order_by(ProjectMemo.date.desc()).all()
-    return render_template('project_memos.html', project=project, memos=memos)
+    return render_template('project_docs/memos.html', project=project, memos=memos)
 
 @app.route('/project/<int:project_id>/memos/add', methods=['POST'])
 @login_required
@@ -1199,7 +1199,7 @@ def project_plans(project_id):
     """View all plans for a project"""
     project = Project.query.get_or_404(project_id)
     plans = ProjectPlan.query.filter_by(project_id=project_id).order_by(ProjectPlan.date.desc()).all()
-    return render_template('project_plans.html', project=project, plans=plans)
+    return render_template('project_docs/plans.html', project=project, plans=plans)
 
 @app.route('/project/<int:project_id>/plans/add', methods=['POST'])
 @login_required
@@ -1230,13 +1230,34 @@ def add_project_plan(project_id):
     flash('✅ Plan ajouté avec succès!')
     return redirect(url_for('project_plans', project_id=project_id))
 
+@app.route('/project/<int:project_id>/plans/<int:plan_id>/delete', methods=['POST'])
+@login_required
+def delete_project_plan(project_id, plan_id):
+    """Delete a plan"""
+    plan = ProjectPlan.query.get_or_404(plan_id)
+    if plan.project_id != project_id:
+        flash('❌ Accès non autorisé')
+        return redirect(url_for('index'))
+    
+    # Optional: Delete physical file
+    if plan.file_path and os.path.exists(plan.file_path):
+        try:
+            os.remove(plan.file_path)
+        except Exception as e:
+            print(f"Error deleting file: {e}")
+            
+    db.session.delete(plan)
+    db.session.commit()
+    flash('✅ Plan supprimé avec succès!')
+    return redirect(url_for('project_plans', project_id=project_id))
+
 @app.route('/project/<int:project_id>/contracts')
 @login_required
 def project_contracts(project_id):
     """View all contracts for a project"""
     project = Project.query.get_or_404(project_id)
     contracts = ProjectContract.query.filter_by(project_id=project_id).order_by(ProjectContract.date.desc()).all()
-    return render_template('project_contracts.html', project=project, contracts=contracts)
+    return render_template('project_docs/contracts.html', project=project, contracts=contracts)
 
 @app.route('/project/<int:project_id>/contracts/add', methods=['POST'])
 @login_required
@@ -1267,13 +1288,33 @@ def add_project_contract(project_id):
     flash('✅ Contrat ajouté avec succès!')
     return redirect(url_for('project_contracts', project_id=project_id))
 
+@app.route('/project/<int:project_id>/contracts/<int:contract_id>/delete', methods=['POST'])
+@login_required
+def delete_project_contract(project_id, contract_id):
+    """Delete a contract"""
+    contract = ProjectContract.query.get_or_404(contract_id)
+    if contract.project_id != project_id:
+        flash('❌ Accès non autorisé')
+        return redirect(url_for('index'))
+    
+    if contract.file_path and os.path.exists(contract.file_path):
+        try:
+            os.remove(contract.file_path)
+        except Exception as e:
+            print(f"Error deleting file: {e}")
+            
+    db.session.delete(contract)
+    db.session.commit()
+    flash('✅ Contrat supprimé avec succès!')
+    return redirect(url_for('project_contracts', project_id=project_id))
+
 @app.route('/project/<int:project_id>/invoices')
 @login_required
 def project_invoices(project_id):
     """View all invoices for a project"""
     project = Project.query.get_or_404(project_id)
     invoices = ProjectInvoice.query.filter_by(project_id=project_id).order_by(ProjectInvoice.date.desc()).all()
-    return render_template('project_invoices.html', project=project, invoices=invoices)
+    return render_template('project_docs/invoices.html', project=project, invoices=invoices)
 
 @app.route('/project/<int:project_id>/invoices/add', methods=['POST'])
 @login_required
@@ -1303,6 +1344,31 @@ def add_project_invoice(project_id):
     db.session.commit()
     flash('✅ Facture ajoutée avec succès!')
     return redirect(url_for('project_invoices', project_id=project_id))
+
+@app.route('/project/<int:project_id>/invoices/<int:invoice_id>/delete', methods=['POST'])
+@login_required
+def delete_project_invoice(project_id, invoice_id):
+    """Delete an invoice"""
+    invoice = ProjectInvoice.query.get_or_404(invoice_id)
+    if invoice.project_id != project_id:
+        flash('❌ Accès non autorisé')
+        return redirect(url_for('index'))
+    
+    if invoice.file_path and os.path.exists(invoice.file_path):
+        try:
+            os.remove(invoice.file_path)
+        except Exception as e:
+            print(f"Error deleting file: {e}")
+            
+    db.session.delete(invoice)
+    db.session.commit()
+    flash('✅ Facture supprimée avec succès!')
+    return redirect(url_for('project_invoices', project_id=project_id))
+
+@app.route('/uploads/<path:filename>')
+@login_required
+def uploaded_file(filename):
+    return send_from_directory('uploads', filename)
 
 # ==================== MAIN ====================
 if __name__ == '__main__':
