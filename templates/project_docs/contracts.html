@@ -64,9 +64,15 @@
                             <td>{{ contract.description or '—' }}</td>
                             <td>
                                 {% if contract.file_path %}
-                                <a href="{{ url_for('uploaded_file', filename=contract.file_path.replace('uploads/', '')) }}" class="btn btn-outline-primary btn-sm" target="_blank" title="Télécharger">
-                                    <i class="fas fa-download"></i>
-                                </a>
+                                {% set file_rel = contract.file_path.replace('uploads\\', '').replace('uploads/', '') %}
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{{ url_for('uploaded_file', filename=file_rel) }}" class="btn btn-outline-info btn-sm" target="_blank" title="Voir le fichier">
+                                        <i class="fas fa-eye me-1"></i>Voir
+                                    </a>
+                                    <a href="{{ url_for('uploaded_file', filename=file_rel) }}?download=1" class="btn btn-outline-primary btn-sm" title="Télécharger">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                </div>
                                 {% else %}
                                 <span class="text-muted">—</span>
                                 {% endif %}

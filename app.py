@@ -1439,6 +1439,9 @@ def delete_project_invoice(project_id, invoice_id):
 @app.route('/uploads/<path:filename>')
 @login_required
 def uploaded_file(filename):
+    # Check if download parameter is in request
+    if request.args.get('download'):
+        return send_from_directory('uploads', filename, as_attachment=True)
     return send_from_directory('uploads', filename)
 
 # ==================== MAIN ====================
