@@ -108,8 +108,11 @@
 
     <!-- Projects Section -->
     <div class="row mb-5">
-        <div class="col-12">
-            <h2 class="section-title">Projects</h2>
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h2 class="section-title mb-0">Projects</h2>
+            <button type="button" class="btn btn-outline-secondary btn-sm" id="toggleCompletedBtn">
+                <i class="fas fa-eye me-2"></i>Show Completed
+            </button>
         </div>
     </div>
     <div class="row g-4" id="recent-projects-container">
@@ -172,6 +175,48 @@
     </div>
 </div>
 
+<!-- Edit Project Modal -->
+<div class="modal fade" id="editProjectModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Edit Project: <span id="editProjectTitle"></span></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editProjectForm">
+                    <div class="mb-3">
+                        <label for="editProjectName" class="form-label">Project Name</label>
+                        <input type="text" class="form-control" id="editProjectName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editProjectStatus" class="form-label">Project Status</label>
+                        <select class="form-select" id="editProjectStatus" required>
+                            <option value="planned">Planned</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editProjectClient" class="form-label">Client Name</label>
+                        <input type="text" class="form-control" id="editProjectClient">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editProjectAddress" class="form-label">Address</label>
+                        <input type="text" class="form-control" id="editProjectAddress">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveProjectBtn">
+                    <i class="fas fa-save me-2"></i>Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 // Counter animation from your website
 function animateCounter(element, target) {
@@ -189,37 +234,69 @@ function animateCounter(element, target) {
     updateCount();
 }
 
-// Observer for stats section
+// Website info function (define outside DOMContentLoaded for inline handlers)
+function showWebsiteInfo() {
+    alert('🏗️ CivilArchEngineering Website\n\nVisit our website to explore:\n\n• 📐 Innovative architectural designs\n• 🏗️ Expert civil engineering solutions\n• 📊 Professional project management\n• 🎯 Cutting-edge construction technology\n\n🌐 Click "Visit Our Website" to discover more!');
+}
+
+// Global toggle state for completed projects
+let showCompleted = false;
+let isLoadingData = false;
+
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-        if (entry.isIntersecting) {
+        if (entry.isIntersecting && !isLoadingData) {
+            isLoadingData = true;
             loadDashboardData();
         }
     });
 }, { threshold: 0.5 });
 
 function loadDashboardData() {
+    console.log('loadDashboardData called');
+    
     fetch('/api/dashboard')
         .then(response => response.json())
         .then(data => {
+            console.log('Dashboard data:', data);
             animateCounter(document.getElementById('contacts-count'), data.contacts);
             animateCounter(document.getElementById('providers-count'), data.providers);
             animateCounter(document.getElementById('projects-count'), data.active_projects);
             document.getElementById('budget-total').innerText = 'TND ' + data.total_budget.toLocaleString();
+        })
+        .catch(error => {
+            console.error('Dashboard fetch error:', error);
+            isLoadingData = false;
         });
     
     fetch('/api/projects/recent')
-        .then(response => response.json())
+        .then(response => {
+            console.log('Projects response status:', response.status);
+            return response.json();
+        })
         .then(projects => {
+            console.log('Projects data:', projects);
             const container = document.getElementById('recent-projects-container');
-            container.innerHTML = '';
             
-            if (projects.length === 0) {
-                container.innerHTML = '<div class="col-12 text-center"><p class="text-muted">No projects yet</p></div>';
+            if (!projects || !Array.isArray(projects)) {
+                console.error('Projects is not an array:', projects);
+                container.innerHTML = '<div class="col-12 text-center"><p class="text-muted">Error loading projects</p></div>';
+                isLoadingData = false;
                 return;
             }
             
-            projects.forEach(project => {
+            if (projects.length === 0) {
+                container.innerHTML = '<div class="col-12 text-center"><p class="text-muted">No projects yet</p></div>';
+                isLoadingData = false;
+                return;
+            }
+            
+            // Sort projects: in_progress first, then planned, then completed
+            const sortOrder = { 'in_progress': 0, 'planned': 1, 'completed': 2 };
+            projects.sort((a, b) => sortOrder[a.status] - sortOrder[b.status]);
+            
+            // Build all HTML at once, then insert once
+            const projectsHTML = projects.map(project => {
                 const statusClass = {
                     'planned': 'bg-warning',
                     'in_progress': 'bg-primary',
@@ -227,9 +304,10 @@ function loadDashboardData() {
                 }[project.status] || 'bg-secondary';
                 
                 const statusText = project.status.replace('_', ' ');
+                const isCompleted = project.status === 'completed';
                 
-                container.innerHTML += `
-                    <div class="col-md-4">
+                return `
+                    <div class="col-md-4 project-item ${isCompleted ? 'completed-project' : ''}">
                         <div class="project-card">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
@@ -246,29 +324,74 @@ function loadDashboardData() {
                                     <a href="/project/${project.id}/financial" class="btn btn-outline-info">
                                         <i class="fas fa-coins me-1"></i>Financial
                                     </a>
+                                    <button type="button" class="btn btn-outline-secondary edit-project-btn"
+                                            data-project-id="${project.id}"
+                                            data-project-name="${project.name}"
+                                            data-project-status="${project.status}"
+                                            data-project-client="${project.client_name || ''}"
+                                            data-project-address="${project.address || ''}">
+                                        <i class="fas fa-edit me-1"></i>Edit
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 `;
-            });
+            }).join('');
+            
+            console.log('Inserting projects HTML');
+            // Insert all HTML at once
+            container.innerHTML = projectsHTML;
             
             // Add delete event listeners after projects are loaded
             attachDeleteListeners();
+            attachEditListeners();
+            
+            // Hide completed projects by default (reset toggle state)
+            showCompleted = false;
+            updateToggleButton();
+            hideAllCompleted();
+            
+            isLoadingData = false;
+        })
+        .catch(error => {
+            console.error('Projects fetch error:', error);
+            isLoadingData = false;
+            const container = document.getElementById('recent-projects-container');
+            container.innerHTML = '<div class="col-12 text-center"><p class="text-danger">Failed to load projects</p></div>';
         });
+}
+
+// Helper functions for completed projects toggle
+function hideAllCompleted() {
+    const completedProjects = document.querySelectorAll('.completed-project');
+    completedProjects.forEach(project => {
+        project.style.display = 'none';
+    });
+}
+
+function updateToggleButton() {
+    const toggleBtn = document.getElementById('toggleCompletedBtn');
+    if (!toggleBtn) return;
+    
+    if (showCompleted) {
+        toggleBtn.innerHTML = '<i class="fas fa-eye-slash me-2"></i>Hide Completed';
+        toggleBtn.classList.remove('btn-outline-secondary');
+        toggleBtn.classList.add('btn-secondary');
+    } else {
+        toggleBtn.innerHTML = '<i class="fas fa-eye me-2"></i>Show Completed';
+        toggleBtn.classList.remove('btn-secondary');
+        toggleBtn.classList.add('btn-outline-secondary');
+    }
 }
 
 // Delete confirmation handling
 function attachDeleteListeners() {
-    console.log('Attaching delete listeners...');
     const deleteButtons = document.querySelectorAll('.delete-project-btn');
-    console.log('Found delete buttons:', deleteButtons.length);
     
     deleteButtons.forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
-            console.log('Delete button clicked for project:', this.dataset.projectId);
-            
             const projectId = this.dataset.projectId;
             const projectName = this.dataset.projectName;
             
@@ -281,43 +404,146 @@ function attachDeleteListeners() {
     });
 }
 
+// Edit project listeners
+function attachEditListeners() {
+    const editButtons = document.querySelectorAll('.edit-project-btn');
+    
+    editButtons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const projectId = this.dataset.projectId;
+            const projectName = this.dataset.projectName;
+            const projectStatus = this.dataset.projectStatus;
+            const projectClient = this.dataset.projectClient;
+            const projectAddress = this.dataset.projectAddress;
+            
+            // Populate modal
+            document.getElementById('editProjectTitle').textContent = projectName;
+            document.getElementById('editProjectName').value = projectName;
+            document.getElementById('editProjectStatus').value = projectStatus;
+            document.getElementById('editProjectClient').value = projectClient;
+            document.getElementById('editProjectAddress').value = projectAddress;
+            
+            // Store project ID for save
+            document.getElementById('editProjectForm').dataset.projectId = projectId;
+            
+            const editModal = new bootstrap.Modal(document.getElementById('editProjectModal'));
+            editModal.show();
+        });
+    });
+}
+
 // Start observing when page loads
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOMContentLoaded event fired');
+    
+    // Load data immediately instead of waiting for intersection
+    loadDashboardData();
+    
     const statsSection = document.getElementById('stats-section');
     if (statsSection) {
         observer.observe(statsSection);
     }
     
-    // Also observe the projects container for dynamic content changes
-    const projectsContainer = document.getElementById('recent-projects-container');
-    if (projectsContainer) {
-        const mutationObserver = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-                    // Re-attach delete listeners when new content is added
-                    setTimeout(attachDeleteListeners, 100);
+    // Toggle completed projects functionality
+    const toggleBtn = document.getElementById('toggleCompletedBtn');
+    
+    hideAllCompleted();
+    
+    toggleBtn.addEventListener('click', function() {
+        showCompleted = !showCompleted;
+        const completedProjects = document.querySelectorAll('.completed-project');
+        
+        completedProjects.forEach(project => {
+            if (showCompleted) {
+                project.style.display = '';
+            } else {
+                project.style.display = 'none';
+            }
+        });
+        
+        updateToggleButton();
+    });
+    
+    // Setup save button handler for edit modal
+    const editProjectModal = document.getElementById('editProjectModal');
+    const saveProjectBtn = document.getElementById('saveProjectBtn');
+    
+    // Handle modal cleanup when hidden
+    editProjectModal.addEventListener('hidden.bs.modal', function() {
+        // Remove backdrop if it exists
+        document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+            backdrop.remove();
+        });
+        // Remove modal-open class from body
+        document.body.classList.remove('modal-open');
+        // Remove inline styles from body
+        document.body.removeAttribute('style');
+    });
+    
+    if (saveProjectBtn) {
+        saveProjectBtn.addEventListener('click', function() {
+            const form = document.getElementById('editProjectForm');
+            const projectId = form.dataset.projectId;
+            const projectName = document.getElementById('editProjectName').value;
+            const projectStatus = document.getElementById('editProjectStatus').value;
+            const clientName = document.getElementById('editProjectClient').value;
+            const address = document.getElementById('editProjectAddress').value;
+            
+            // Send update to server
+            fetch(`/projects/${projectId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    name: projectName,
+                    status: projectStatus,
+                    client_name: clientName,
+                    address: address
+                })
+            })
+            .then(response => {
+                if (response.ok || response.status === 302) {
+                    // Close modal
+                    const modal = bootstrap.Modal.getInstance(editProjectModal);
+                    if (modal) {
+                        modal.hide();
+                    }
+                    // Reload projects
+                    loadDashboardData();
+                } else {
+                    alert('Failed to save project');
                 }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error saving project');
             });
         });
-        mutationObserver.observe(projectsContainer, { childList: true, subtree: true });
     }
 });
 </script>
 
 <style>
-/* Additional styles for project cards */
-.project-card {
+/* Project and Dashboard Cards */
+.project-card,
+.dashboard-card {
     border: none;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     transition: transform 0.2s, box-shadow 0.2s;
-    height: 100%;
     background: white;
 }
 
-.project-card:hover {
+.project-card,
+.dashboard-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+.project-card {
+    height: 100%;
 }
 
 .project-card .card-body {
@@ -345,14 +571,6 @@ document.addEventListener('DOMContentLoaded', function() {
     font-size: 0.875rem;
 }
 
-.dashboard-card {
-    border: none;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    transition: transform 0.2s;
-    background: white;
-}
-
 .dashboard-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 24px rgba(0,0,0,0.15);
@@ -363,38 +581,7 @@ document.addEventListener('DOMContentLoaded', function() {
     margin-bottom: 0.5rem;
 }
 
-.quick-action-orange {
-    background: white;
-    border: 2px solid #ff8c00;
-    color: #ff8c00;
-}
-
-.quick-action-orange i {
-    color: #ff8c00 !important;
-}
-
-.quick-action-orange h5 {
-    color: #ff8c00;
-    margin-bottom: 0;
-    font-weight: 600;
-}
-
-.quick-action-orange:hover {
-    background: #fff8f0;
-    border-color: #ff7700;
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(255, 140, 0, 0.2);
-}
-
-.quick-action-orange:hover i {
-    color: #ff7700 !important;
-}
-
-.quick-action-orange:hover h5 {
-    color: #ff7700;
-}
-
-/* Modal styles */
+/* Modal */
 .modal-content {
     border: none;
     border-radius: 16px;
@@ -408,17 +595,19 @@ document.addEventListener('DOMContentLoaded', function() {
     filter: brightness(0) invert(1);
 }
 
+/* Info Line Button */
 .info-line-btn {
     padding: 0.75rem 1.5rem;
     font-weight: 500;
 }
+
 .info-line-btn:hover {
     background: var(--primary);
     color: white;
     border-color: var(--primary);
 }
 
-/* Website Promo Card Styles */
+/* Website Promo Card */
 .website-promo-card {
     background: var(--primary);
     color: white;
@@ -490,7 +679,7 @@ document.addEventListener('DOMContentLoaded', function() {
     transform: translateY(-1px);
 }
 
-/* Responsive adjustments */
+/* Responsive */
 @media (max-width: 768px) {
     .project-card .card-body {
         padding: 1rem;
@@ -518,10 +707,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 }
 </style>
-
-<script>
-function showWebsiteInfo() {
-    alert('🏗️ CivilArchEngineering Website\n\nVisit our website to explore:\n\n• 📐 Innovative architectural designs\n• 🏗️ Expert civil engineering solutions\n• 📊 Professional project management\n• 🎯 Cutting-edge construction technology\n\n🌐 Click "Visit Our Website" to discover more!');
-}
-</script>
 {% endblock %}

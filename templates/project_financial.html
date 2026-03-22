@@ -37,9 +37,12 @@
         <div class="card-header bg-white border-bottom-0 py-3">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h5 class="mb-0 fw-bold text-dark">
-                        <i class="fas fa-folder-open me-2 text-primary"></i>Documents du projet
-                    </h5>
+                    <button type="button" class="btn btn-link text-start p-0 text-decoration-none text-dark documents-toggle" data-bs-toggle="collapse" data-bs-target="#documentsSection" aria-expanded="false">
+                        <h5 class="mb-0 fw-bold text-dark">
+                            <i class="fas fa-chevron-right me-2 text-primary documents-toggle-icon"></i>
+                            <i class="fas fa-folder-open me-2 text-primary"></i>Documents du projet
+                        </h5>
+                    </button>
                     <p class="text-muted small mb-0 mt-1">Gérez vos mémos, plans, contrats et factures en un seul endroit</p>
                 </div>
                 <div class="dropdown">
@@ -49,7 +52,7 @@
                 </div>
             </div>
         </div>
-        <div class="card-body pt-0">
+        <div class="collapse" id="documentsSection">
             <div class="row g-3">
                 <!-- Memos Section -->
                 <div class="col-md-6 col-lg-3">
@@ -247,6 +250,7 @@
                     </div>
                 </div>
             </div>
+        </div>
         </div>
     </div>
 
@@ -1151,6 +1155,19 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelector('#addExpenseModal input[name="date"]')?.setAttribute('value', today);
     document.querySelector('#addReceiptModal input[name="date"]')?.setAttribute('value', today);
 
+    // Documents section toggle
+    const documentsToggle = document.querySelector('.documents-toggle');
+    const documentsSection = document.getElementById('documentsSection');
+    if (documentsToggle && documentsSection) {
+        // Add Bootstrap collapse event listener for smooth animation
+        documentsSection.addEventListener('show.bs.collapse', function() {
+            documentsToggle.setAttribute('aria-expanded', 'true');
+        });
+        documentsSection.addEventListener('hide.bs.collapse', function() {
+            documentsToggle.setAttribute('aria-expanded', 'false');
+        });
+    }
+
     const deleteModal = new bootstrap.Modal(document.getElementById('deleteExpenseModal'));
     const deleteForm = document.getElementById('deleteExpenseForm');
     document.querySelectorAll('.delete-expense').forEach(btn => {
@@ -1320,11 +1337,23 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     // Function to render documents in their respective sections
+    // Document rendering function (disabled - elements are rendered via Jinja2 templates)
     function renderDocuments() {
+        // This function is no longer needed as document sections are rendered server-side via Jinja2
+        // Left for reference only
+        return;
+        
+        /*
         Object.keys(sampleDocuments).forEach(type => {
             const documents = sampleDocuments[type];
             const countElement = document.getElementById(`${type}s-count`);
             const previewElement = document.getElementById(`${type}s-preview`);
+            
+            // Check if elements exist before updating
+            if (!countElement || !previewElement) {
+                console.warn(`Document elements not found for type: ${type}`);
+                return;
+            }
             
             // Update count
             countElement.textContent = documents.length;
@@ -1348,6 +1377,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
             }
         });
+        */
     }
 
     function getDocumentIcon(type) {
@@ -1488,6 +1518,30 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <style>
+/* Documents Section Toggle */
+.documents-toggle {
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.documents-toggle:hover {
+    color: var(--primary) !important;
+}
+
+.documents-toggle-icon {
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+.documents-toggle[aria-expanded="true"] .documents-toggle-icon {
+    transform: rotate(90deg);
+}
+
+#documentsSection {
+    overflow: hidden;
+    padding: 1rem;
+}
+
 .financial-card {
     border-radius: 12px;
     padding: 1rem 1.25rem;

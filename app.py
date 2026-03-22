@@ -488,6 +488,24 @@ def update_project(id):
     
     return redirect(url_for('project_detail', id=id))
 
+@app.route('/projects/<int:id>/update-status', methods=['POST'])
+@login_required
+def update_project_status(id):
+    project = Project.query.get_or_404(id)
+    data = request.get_json()
+    
+    if not data or 'status' not in data:
+        return jsonify({'error': 'Status is required'}), 400
+    
+    new_status = data['status']
+    if new_status not in ['planned', 'in_progress', 'completed']:
+        return jsonify({'error': 'Invalid status'}), 400
+    
+    project.status = new_status
+    db.session.commit()
+    
+    return jsonify({'success': True, 'status': project.status}), 200
+
 @app.route('/projects/delete/<int:id>')
 @login_required
 def delete_project(id):
@@ -567,7 +585,9 @@ def recent_projects():
     return jsonify([{
         'id': p.id,
         'name': p.name,
-        'status': p.status
+        'status': p.status,
+        'client_name': p.client_name,
+        'address': p.address
     } for p in projects])
 
 @app.route('/api/projects/list')
