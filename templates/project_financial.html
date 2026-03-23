@@ -254,6 +254,24 @@
         </div>
     </div>
 
+    <!-- FINANCIAL SUMMARY SECTION -->
+    <div class="card dashboard-card mb-4 border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom-0 py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <button type="button" class="btn btn-link text-start p-0 text-decoration-none text-dark financial-toggle" data-bs-toggle="collapse" data-bs-target="#financialSection" aria-expanded="false">
+                        <h5 class="mb-0 fw-bold text-dark">
+                            <i class="fas fa-chevron-right me-2 text-primary financial-toggle-icon"></i>
+                            <i class="fas fa-calculator me-2 text-primary"></i>Synthèse financière
+                        </h5>
+                    </button>
+                    <p class="text-muted small mb-0 mt-1">Prix de vente, budget, montants calculés et soldes</p>
+                </div>
+            </div>
+        </div>
+        <div class="collapse" id="financialSection">
+            <div class="p-4">
+
     <!-- FIXED AMOUNTS (Input once) - per données projet -->
     <div class="card dashboard-card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
@@ -387,10 +405,96 @@
         </div>
     </div>
 
-    <!-- Action Buttons -->
-    <div class="row mb-3">
-        <div class="col-12">
-            <div class="btn-group flex-wrap" role="group">
+            </div>
+        </div>
+    </div>
+
+    <!-- PROJECT WORKERS SECTION -->
+    <div class="card dashboard-card mb-4 border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom-0 py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <button type="button" class="btn btn-link text-start p-0 text-decoration-none text-dark workers-toggle" data-bs-toggle="collapse" data-bs-target="#workersSection" aria-expanded="false">
+                        <h5 class="mb-0 fw-bold text-dark">
+                            <i class="fas fa-chevron-right me-2 text-primary workers-toggle-icon"></i>
+                            <i class="fas fa-users me-2 text-primary"></i>Main-d'œuvre du projet
+                        </h5>
+                    </button>
+                    <p class="text-muted small mb-0 mt-1">Sous-traitants et ouvriers journaliers affectés à ce projet</p>
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-primary rounded-pill px-3" type="button" data-bs-toggle="modal" data-bs-target="#addWorkerModal">
+                        <i class="fas fa-plus me-1"></i>Ajouter
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="collapse" id="workersSection">
+            <div class="p-4">
+
+                <!-- Subcontractors Section -->
+                <div class="card dashboard-card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-handshake me-2" style="color: var(--accent);"></i>Sous-traitants
+                            <small class="d-block fw-normal fs-6 opacity-90 mt-1">Prestataires externes travaillant sur ce projet</small>
+                        </h5>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge px-3 py-2" style="background-color: var(--primary-mid);">0 prestataires</span>
+                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addSubcontractorModal">
+                                <i class="fas fa-plus me-1"></i>Ajouter
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <!-- Placeholder for subcontractor cards -->
+                            <div class="col-12">
+                                <div class="text-center py-5">
+                                    <i class="fas fa-handshake fa-4x mb-3" style="color: var(--light-bg);"></i>
+                                    <p class="text-muted mb-2">Aucun sous-traitant assigné à ce projet</p>
+                                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addSubcontractorModal">
+                                        <i class="fas fa-plus me-1"></i>Ajouter un sous-traitant
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Daily Workers Section -->
+                <div class="card dashboard-card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-hard-hat me-2" style="color: var(--accent);"></i>Ouvriers journaliers
+                            <small class="d-block fw-normal fs-6 opacity-90 mt-1">Main-d'œuvre temporaire travaillant à la journée</small>
+                        </h5>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge px-3 py-2" style="background-color: var(--primary-mid);">0 ouvriers</span>
+                            <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#addDailyWorkerModal">
+                                <i class="fas fa-plus me-1"></i>Ajouter
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <!-- Placeholder for daily worker cards -->
+                            <div class="col-12">
+                                <div class="text-center py-5">
+                                    <i class="fas fa-hard-hat fa-4x mb-3" style="color: var(--light-bg);"></i>
+                                    <p class="text-muted mb-2">Aucun ouvrier journalier assigné à ce projet</p>
+                                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addDailyWorkerModal">
+                                        <i class="fas fa-plus me-1"></i>Ajouter un ouvrier
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addExpenseModal" title="Add expense">
                     <i class="fas fa-plus-circle me-2"></i>Add Expense
                 </button>
@@ -409,6 +513,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Spacer to separate buttons from the following section -->
+    <div class="mt-4"></div>
 
     <!-- Receipts Section (if any) -->
     {% if receipts %}
@@ -1105,10 +1212,10 @@ function enableSummaryEdit() {
 function cancelSummaryEdit() {
     document.querySelectorAll('.view-mode').forEach(el => el.style.display = '');
     document.querySelectorAll('.edit-mode').forEach(el => el.style.display = 'none');
-    document.getElementById('edit-sale-price').value = {{ financial.sale_price or 0 }};
-    document.getElementById('edit-estimated-budget').value = {{ financial.estimated_budget or 0 }};
-    document.getElementById('edit-client-received').value = {{ financial.client_received or 0 }};
-    document.getElementById('edit-devis-ref').value = {{ financial.devis_ref or 0 }};
+    document.getElementById('edit-sale-price').value = {{ (financial.sale_price or 0)|tojson }};
+    document.getElementById('edit-estimated-budget').value = {{ (financial.estimated_budget or 0)|tojson }};
+    document.getElementById('edit-client-received').value = {{ (financial.client_received or 0)|tojson }};
+    document.getElementById('edit-devis-ref').value = {{ (financial.devis_ref or 0)|tojson }};
     document.getElementById('editSummaryBtn').style.display = 'inline-block';
     document.getElementById('saveSummaryBtn').style.display = 'none';
     document.getElementById('cancelSummaryBtn').style.display = 'none';
