@@ -363,6 +363,19 @@ def update_contact_relation(contact_id):
     db.session.commit()
     return jsonify({'success': True})
 
+@app.route('/api/contacts')
+@login_required
+def api_contacts():
+    contacts = Contact.query.all()
+    return jsonify([{
+        'id': contact.id,
+        'name': contact.name,
+        'phone': contact.phone,
+        'email': contact.email,
+        'company': contact.company,
+        'type': contact.type
+    } for contact in contacts])
+
 # ==================== PROVIDER ROUTES ====================
 @app.route('/providers')
 @login_required
@@ -579,6 +592,307 @@ def delete_budget(id):
     db.session.commit()
     flash('Tool deleted')
     return redirect(url_for('budgets'))
+
+# ==================== STUFF MANAGEMENT ROUTES ====================
+@app.route('/stuff-management')
+@login_required
+def stuff_management():
+    # Sample data for demonstration - replace with actual database queries when ready
+    return render_template('stuff_management.html')
+
+@app.route('/stuff/add', methods=['POST'])
+@login_required
+def add_stuff():
+    try:
+        data = request.get_json()
+
+        if not data:
+            return jsonify({
+                'success': False,
+                'message': 'No data received'
+            }), 400
+
+        # Validate required fields
+        name = data.get('name')
+        category = data.get('category')
+
+        if not name or not category:
+            return jsonify({
+                'success': False,
+                'message': 'Name and category are required'
+            }), 400
+
+        # For now, we'll store stuff as contacts with specific types
+        # Later this should be moved to a proper Stuff model
+        contact = Contact(
+            name=name,
+            phone=data.get('phone', ''),
+            email=data.get('email', ''),
+            type=f'Stuff-{category}',
+            notes=f"""Category: {category}
+Brand/Model: {data.get('brand', '')}
+Serial: {data.get('serial', '')}
+Quantity: {data.get('quantity', 1)}
+Min Stock: {data.get('minStock', 1)}
+Rate: {data.get('rate', 0)} DT/day
+Price: {data.get('price', 0)} DT
+Location: {data.get('location', '')}
+Description: {data.get('description', '')}
+Added on {datetime.now().strftime('%Y-%m-%d')}"""
+        )
+
+        db.session.add(contact)
+        db.session.commit()
+
+        return jsonify({
+            'success': True,
+            'message': f'{category.title()} item added successfully',
+            'contact_id': contact.id
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            'success': False,
+            'message': f'Error adding stuff item: {str(e)}'
+        }), 500
+
+@app.route('/staff-management')
+@login_required
+def staff_management():
+    # Sample data for demonstration - replace with actual database queries
+    sample_staff = [
+        {
+            'id': 1,
+            'name': 'Ahmed Ben Ali',
+            'email': 'ahmed@company.com',
+            'phone': '+216 22 123 456',
+            'daily_rate': 80.0,
+            'status': 'active',
+            'hire_date': datetime(2024, 1, 15),
+            'days_worked_this_month': 18,
+            'current_projects': ['Villa Mahdia', 'Djerba Resort']
+        },
+        {
+            'id': 2,
+            'name': 'Mohamed Salem',
+            'email': 'mohamed@company.com',
+            'phone': '+216 98 765 432',
+            'daily_rate': 75.0,
+            'status': 'active',
+            'hire_date': datetime(2024, 2, 1),
+            'days_worked_this_month': 20,
+            'current_projects': ['Villa Mahdia', 'Sousse Tower']
+        },
+        {
+            'id': 3,
+            'name': 'Karim Tounsi',
+            'email': 'karim@company.com',
+            'phone': '+216 55 444 333',
+            'daily_rate': 70.0,
+            'status': 'inactive',
+            'hire_date': datetime(2024, 3, 10),
+            'days_worked_this_month': 8,
+            'current_projects': ['Djerba Resort']
+        }
+    ]
+    
+    return render_template('staff_management_demo.html', 
+                         staff=sample_staff,
+                         total_days_this_month=156,
+                         monthly_payroll=12480,
+                         current_month='March',
+                         today_attendance=7,
+                         pending_payments=3,
+                         active_projects_with_staff=4)
+
+@app.route('/workers/daily/create', methods=['POST'])
+@login_required
+def create_daily_worker():
+    try:
+        data = request.get_json()
+        print(f"Received data: {data}")  # Debug log
+        
+        if not data:
+            return jsonify({
+                'success': False,
+                'message': 'No data received'
+            }), 400
+        
+        # Validate required fields
+        name = data.get('name')
+        phone = data.get('phone')
+        
+        if not name or not phone:
+            return jsonify({
+                'success': False,
+                'message': 'Name and phone are required'
+            }), 400
+        
+        # Create contact first
+        contact = Contact(
+            name=name,
+            phone=phone,
+            email=data.get('email', ''),
+            type='Daily Worker',
+            notes=f"Rate: {data.get('rate', '')}/day\nCreated as daily worker on {datetime.now().strftime('%Y-%m-%d')}"
+        )
+        print(f"Created contact object: {contact}")  # Debug log
+        
+        db.session.add(contact)
+        db.session.flush()  # Get the ID without committing
+        print(f"Contact ID after flush: {contact.id}")  # Debug log
+        
+        # Here you would create the daily worker record
+        # For now, we'll just return success since we don't have the Worker model yet
+        db.session.commit()
+        print("Database commit successful")  # Debug log
+        
+        return jsonify({
+            'success': True,
+            'message': 'Daily worker created successfully',
+            'contact_id': contact.id
+        })
+        
+    except Exception as e:
+        print(f"Error in create_daily_worker: {str(e)}")  # Debug log
+        import traceback
+        traceback.print_exc()  # Print full traceback
+        db.session.rollback()
+        return jsonify({
+            'success': False,
+            'message': f'Error creating daily worker: {str(e)}'
+        }), 500
+
+@app.route('/workers/daily/create-from-contact', methods=['POST'])
+@login_required
+def create_daily_worker_from_contact():
+    try:
+        data = request.get_json()
+        contact_id = data.get('contact_id')
+        
+        if not contact_id:
+            return jsonify({
+                'success': False,
+                'message': 'Contact ID is required'
+            }), 400
+        
+        # Get the contact
+        contact = Contact.query.get(contact_id)
+        if not contact:
+            return jsonify({
+                'success': False,
+                'message': 'Contact not found'
+            }), 404
+        
+        # Update contact type to Daily Worker if not already set
+        if contact.type != 'Daily Worker':
+            contact.type = 'Daily Worker'
+            contact.notes = (contact.notes or '') + f"\nConverted to daily worker on {datetime.now().strftime('%Y-%m-%d')}"
+        
+        # Here you would create the daily worker record
+        # For now, we'll just update the contact
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Daily worker created from contact successfully',
+            'contact_id': contact.id
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
+@app.route('/workers/subcontractor/create', methods=['POST'])
+@login_required
+def create_subcontractor():
+    try:
+        data = request.get_json()
+        
+        # Create contact first
+        contact = Contact(
+            name=data.get('name'),
+            phone=data.get('phone'),
+            email=data.get('email'),
+            type='Subcontractor',
+            notes=f"Specialty: {data.get('specialty')}\nCreated as subcontractor on {datetime.now().strftime('%Y-%m-%d')}"
+        )
+        db.session.add(contact)
+        db.session.flush()  # Get the ID without committing
+        
+        # Here you would create the subcontractor record
+        # For now, we'll just return success since we don't have the Worker model yet
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Subcontractor created successfully',
+            'contact_id': contact.id
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
+@app.route('/workers/subcontractor/create-from-contact', methods=['POST'])
+@login_required
+def create_subcontractor_from_contact():
+    try:
+        data = request.get_json()
+        contact_id = data.get('contact_id')
+        specialty = data.get('specialty')
+        
+        if not contact_id:
+            return jsonify({
+                'success': False,
+                'message': 'Contact ID is required'
+            }), 400
+        
+        if not specialty:
+            return jsonify({
+                'success': False,
+                'message': 'Specialty is required'
+            }), 400
+        
+        # Get the contact
+        contact = Contact.query.get(contact_id)
+        if not contact:
+            return jsonify({
+                'success': False,
+                'message': 'Contact not found'
+            }), 404
+        
+        # Update contact type to Subcontractor if not already set
+        if contact.type != 'Subcontractor':
+            contact.type = 'Subcontractor'
+        
+        # Update notes with specialty
+        notes = (contact.notes or '') + f"\nSpecialty: {specialty}\nConverted to subcontractor on {datetime.now().strftime('%Y-%m-%d')}"
+        contact.notes = notes.strip()
+        
+        # Here you would create the subcontractor record
+        # For now, we'll just update the contact
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Subcontractor created from contact successfully',
+            'contact_id': contact.id
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
 
 # ==================== API ROUTES ====================
 @app.route('/api/dashboard')

@@ -1,0 +1,804 @@
+{% extends "base.html" %}
+
+{% block title %}Stuff Management - Construction CRM{% endblock %}
+
+{% block content %}
+<style>
+/* Stuff Management Styles */
+.stuff-card {
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+}
+
+.stuff-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.stuff-card.available {
+    border-left-color: var(--success);
+}
+
+.stuff-card.low-stock {
+    border-left-color: var(--warning);
+}
+
+.stuff-card.out-of-stock {
+    border-left-color: var(--danger);
+}
+
+.stuff-card.rented {
+    border-left-color: var(--primary);
+}
+
+.stuff-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.stuff-type-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.stuff-type-badge.equipment {
+    background: var(--primary);
+    color: white;
+}
+
+.stuff-type-badge.material {
+    background: var(--success);
+    color: white;
+}
+
+.stuff-type-badge.tool {
+    background: var(--warning);
+    color: white;
+}
+
+.stuff-type-badge.vehicle {
+    background: var(--danger);
+    color: white;
+}
+
+.stuff-type-badge.consumable {
+    background: #9b59b6;
+    color: white;
+}
+
+.stats-card {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: white;
+    padding: 1.5rem;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.stats-card .stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.stats-card .stat-label {
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+.stock-indicator {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: #e9ecef;
+    overflow: hidden;
+}
+
+.stock-bar {
+    height: 8px;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.stock-bar.available {
+    background: var(--success);
+}
+
+.stock-bar.low {
+    background: var(--warning);
+}
+
+.stock-bar.critical {
+    background: var(--danger);
+}
+
+.quick-action-btn {
+    background: white;
+    border: 2px solid var(--primary);
+    color: var(--primary);
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.quick-action-btn:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.filter-buttons .btn {
+    border-radius: 20px;
+    padding: 0.5rem 1.25rem;
+}
+
+.filter-buttons .btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+</style>
+
+<div class="container-fluid mt-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <h1 class="mb-2">
+                        <i class="fas fa-tools me-2 text-primary"></i>Stuff Management
+                    </h1>
+                    <p class="text-muted mb-0">Manage equipment, tools, materials and inventory</p>
+                </div>
+                <div class="d-flex gap-2 flex-wrap mt-2 mt-sm-0">
+                    <a href="#" class="quick-action-btn" data-bs-toggle="modal" data-bs-target="#addStuffModal">
+                        <i class="fas fa-plus"></i>
+                        Add Stuff
+                    </a>
+                    <a href="#" class="quick-action-btn">
+                        <i class="fas fa-truck-loading"></i>
+                        Inventory
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-6">
+            <div class="stats-card">
+                <div class="stat-number">145</div>
+                <div class="stat-label">Total Items</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stats-card" style="background: linear-gradient(135deg, var(--success), #2ecc71);">
+                <div class="stat-number">89</div>
+                <div class="stat-label">Available</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stats-card" style="background: linear-gradient(135deg, #f39c12, #e67e22);">
+                <div class="stat-number">23</div>
+                <div class="stat-label">Low Stock</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stats-card" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">
+                <div class="stat-number">12</div>
+                <div class="stat-label">Rented Out</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="filter-buttons d-flex gap-2 flex-wrap">
+                <button class="btn btn-outline-primary active" data-filter="all">All Items</button>
+                <button class="btn btn-outline-primary" data-filter="equipment">Equipment</button>
+                <button class="btn btn-outline-primary" data-filter="tools">Tools</button>
+                <button class="btn btn-outline-primary" data-filter="materials">Materials</button>
+                <button class="btn btn-outline-primary" data-filter="vehicles">Vehicles</button>
+                <button class="btn btn-outline-primary" data-filter="consumables">Consumables</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stuff Grid -->
+    <div class="row g-4" id="stuffGrid">
+        <!-- Equipment Section -->
+        <div class="col-lg-4 col-md-6 stuff-item" data-type="equipment" data-name="concrete mixer">
+            <div class="card stuff-card available h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="stuff-avatar bg-primary">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <div class="ms-3 flex-grow-1">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <h5 class="mb-0">Concrete Mixer</h5>
+                                <span class="stuff-type-badge equipment">Equipment</span>
+                            </div>
+                            <small class="text-muted">Model: CM-200 | Serial: 2024-001</small>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-eye me-2"></i>View Details</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-edit me-2"></i>Edit</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-truck me-2"></i>Assign to Project</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Status</small>
+                            <span class="badge bg-success">Available</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Daily Rate</small>
+                            <strong>150 DT / day</strong>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <small class="text-muted">Condition</small>
+                            <span class="badge bg-light text-dark">Excellent</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-2">
+                        <small class="text-muted d-block mb-2">Last Maintenance:</small>
+                        <div class="text-sm">15/03/2026 - Routine check</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 stuff-item" data-type="equipment" data-name="generator">
+            <div class="card stuff-card rented h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="stuff-avatar bg-primary">
+                            <i class="fas fa-plug"></i>
+                        </div>
+                        <div class="ms-3 flex-grow-1">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <h5 class="mb-0">Generator 10kW</h5>
+                                <span class="stuff-type-badge equipment">Equipment</span>
+                            </div>
+                            <small class="text-muted">Model: GEN-10K | Serial: 2023-045</small>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-eye me-2"></i>View Details</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-edit me-2"></i>Edit</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-truck me-2"></i>Return from Project</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Status</small>
+                            <span class="badge bg-primary">Rented Out</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Daily Rate</small>
+                            <strong>80 DT / day</strong>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <small class="text-muted">Current Project</small>
+                            <span class="badge bg-light text-dark">Villa Mahdia</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-2">
+                        <small class="text-muted d-block mb-2">Rental Period:</small>
+                        <div class="text-sm">10/03/2026 - 20/03/2026 (10 days)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tools Section -->
+        <div class="col-lg-4 col-md-6 stuff-item" data-type="tools" data-name="drill set">
+            <div class="card stuff-card low-stock h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="stuff-avatar" style="background: var(--warning);">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <div class="ms-3 flex-grow-1">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <h5 class="mb-0">Professional Drill Set</h5>
+                                <span class="stuff-type-badge tool">Tools</span>
+                            </div>
+                            <small class="text-muted">Bosch GSB 18V | 5 pieces</small>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-eye me-2"></i>View Details</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-edit me-2"></i>Edit</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-plus me-2"></i>Add Stock</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Stock Status</small>
+                            <span class="badge bg-warning">Low Stock</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Available</small>
+                            <strong>2 units</strong>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <small class="text-muted">Rental Rate</small>
+                            <strong>25 DT / day</strong>
+                        </div>
+                    </div>
+
+                    <div class="stock-indicator mb-2">
+                        <div class="stock-bar low" style="width: 20%"></div>
+                    </div>
+                    <small class="text-muted">Minimum stock: 5 units</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Materials Section -->
+        <div class="col-lg-4 col-md-6 stuff-item" data-type="materials" data-name="cement">
+            <div class="card stuff-card available h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="stuff-avatar" style="background: var(--success);">
+                            <i class="fas fa-cubes"></i>
+                        </div>
+                        <div class="ms-3 flex-grow-1">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <h5 class="mb-0">Cement 50kg Bags</h5>
+                                <span class="stuff-type-badge material">Materials</span>
+                            </div>
+                            <small class="text-muted">Tunisia Cement | Grade 42.5</small>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-eye me-2"></i>View Details</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-edit me-2"></i>Edit</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-shopping-cart me-2"></i>Order More</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Stock Status</small>
+                            <span class="badge bg-success">Available</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Available</small>
+                            <strong>150 bags</strong>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <small class="text-muted">Unit Price</small>
+                            <strong>12.5 DT / bag</strong>
+                        </div>
+                    </div>
+
+                    <div class="stock-indicator mb-2">
+                        <div class="stock-bar available" style="width: 75%"></div>
+                    </div>
+                    <small class="text-muted">Last restocked: 05/03/2026</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vehicles Section -->
+        <div class="col-lg-4 col-md-6 stuff-item" data-type="vehicles" data-name="pickup truck">
+            <div class="card stuff-card available h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="stuff-avatar" style="background: var(--danger);">
+                            <i class="fas fa-truck"></i>
+                        </div>
+                        <div class="ms-3 flex-grow-1">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <h5 class="mb-0">Pickup Truck</h5>
+                                <span class="stuff-type-badge vehicle">Vehicles</span>
+                            </div>
+                            <small class="text-muted">Toyota Hilux | Plate: 123 TUN 456</small>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-eye me-2"></i>View Details</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-edit me-2"></i>Edit</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-key me-2"></i>Assign Driver</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Status</small>
+                            <span class="badge bg-success">Available</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Daily Rate</small>
+                            <strong>200 DT / day</strong>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <small class="text-muted">Mileage</small>
+                            <strong>45,230 km</strong>
+                        </div>
+                    </div>
+
+                    <div class="mt-2">
+                        <small class="text-muted d-block mb-2">Last Service:</small>
+                        <div class="text-sm">28/02/2026 - Oil change & inspection</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Consumables Section -->
+        <div class="col-lg-4 col-md-6 stuff-item" data-type="consumables" data-name="safety gloves">
+            <div class="card stuff-card out-of-stock h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="stuff-avatar" style="background: #9b59b6;">
+                            <i class="fas fa-hand-paper"></i>
+                        </div>
+                        <div class="ms-3 flex-grow-1">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <h5 class="mb-0">Safety Gloves</h5>
+                                <span class="stuff-type-badge consumable">Consumables</span>
+                            </div>
+                            <small class="text-muted">Nitrile, Size L | Pack of 100</small>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-eye me-2"></i>View Details</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-edit me-2"></i>Edit</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-shopping-cart me-2"></i>Reorder</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Stock Status</small>
+                            <span class="badge bg-danger">Out of Stock</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Available</small>
+                            <strong class="text-danger">0 packs</strong>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <small class="text-muted">Unit Price</small>
+                            <strong>45 DT / pack</strong>
+                        </div>
+                    </div>
+
+                    <div class="stock-indicator mb-2">
+                        <div class="stock-bar critical" style="width: 0%"></div>
+                    </div>
+                    <small class="text-danger">Critical stock level - reorder immediately</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="text-center py-5" id="emptyState" style="display: none;">
+        <i class="fas fa-tools fa-3x text-muted mb-3"></i>
+        <h4 class="text-muted">No Stuff Items Yet</h4>
+        <p class="text-muted mb-4">Add equipment, tools, materials, and vehicles to start managing your inventory.</p>
+        <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStuffModal">
+            <i class="fas fa-plus me-2"></i>Add First Item
+        </a>
+    </div>
+</div>
+
+<!-- Add Stuff Modal -->
+<div class="modal fade" id="addStuffModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Add Stuff Item</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-4">
+                    <h6 class="fw-bold mb-3">Choose Item Type</h6>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="card h-100 border-primary cursor-pointer" onclick="selectStuffType('equipment')">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-cog fa-2x text-primary mb-2"></i>
+                                    <h6>Equipment</h6>
+                                    <small class="text-muted">Heavy machinery, generators, etc.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card h-100 border-success cursor-pointer" onclick="selectStuffType('tools')">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-tools fa-2x text-success mb-2"></i>
+                                    <h6>Tools</h6>
+                                    <small class="text-muted">Hand tools, power tools, etc.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card h-100 border-warning cursor-pointer" onclick="selectStuffType('materials')">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-cubes fa-2x text-warning mb-2"></i>
+                                    <h6>Materials</h6>
+                                    <small class="text-muted">Cement, sand, bricks, etc.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card h-100 border-danger cursor-pointer" onclick="selectStuffType('vehicles')">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-truck fa-2x text-danger mb-2"></i>
+                                    <h6>Vehicles</h6>
+                                    <small class="text-muted">Trucks, vans, cars, etc.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card h-100 cursor-pointer" onclick="selectStuffType('consumables')" style="border-color: #9b59b6;">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-box-open fa-2x mb-2" style="color: #9b59b6;"></i>
+                                    <h6>Consumables</h6>
+                                    <small class="text-muted">Gloves, masks, oils, etc.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stuff Form (Hidden by default) -->
+                <div id="stuffForm" style="display: none;">
+                    <form id="stuffItemForm">
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label class="form-label">Item Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="stuffName" required placeholder="e.g. Concrete Mixer, Safety Gloves">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Category</label>
+                                <select class="form-select" id="stuffCategory" disabled>
+                                    <option value="equipment">Equipment</option>
+                                    <option value="tools">Tools</option>
+                                    <option value="materials">Materials</option>
+                                    <option value="vehicles">Vehicles</option>
+                                    <option value="consumables">Consumables</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Brand/Model</label>
+                                <input type="text" class="form-control" id="stuffBrand" placeholder="e.g. Bosch, Toyota">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Serial Number</label>
+                                <input type="text" class="form-control" id="stuffSerial" placeholder="Serial number (if applicable)">
+                            </div>
+                        </div>
+
+                        <div class="row" id="quantityFields">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Quantity Available</label>
+                                <input type="number" class="form-control" id="stuffQuantity" min="0" value="1">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Minimum Stock Level</label>
+                                <input type="number" class="form-control" id="stuffMinStock" min="0" value="1" placeholder="Reorder when below this level">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Daily Rental Rate (DT)</label>
+                                <input type="number" class="form-control" id="stuffRate" min="0" step="0.5" placeholder="0 for non-rentable items">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Purchase Price (DT)</label>
+                                <input type="number" class="form-control" id="stuffPrice" min="0" step="0.01" placeholder="Original purchase price">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" id="stuffDescription" rows="3" placeholder="Additional details, specifications, etc."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Location</label>
+                            <input type="text" class="form-control" id="stuffLocation" placeholder="Where is this item stored?">
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveStuff()">
+                    <i class="fas fa-check me-1"></i>Add Item
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let selectedStuffType = null;
+
+    // Stuff type selection
+    window.selectStuffType = function(type) {
+        selectedStuffType = type;
+
+        // Show form
+        document.getElementById('stuffForm').style.display = 'block';
+
+        // Set category
+        document.getElementById('stuffCategory').value = type;
+
+        // Show/hide quantity fields based on type
+        const quantityFields = document.getElementById('quantityFields');
+        if (type === 'equipment' || type === 'vehicles') {
+            quantityFields.style.display = 'none';
+        } else {
+            quantityFields.style.display = 'block';
+        }
+    };
+
+    // Save stuff function
+    window.saveStuff = function() {
+        if (!selectedStuffType) {
+            alert('Please select an item type first');
+            return;
+        }
+
+        const formData = {
+            name: document.getElementById('stuffName').value,
+            category: selectedStuffType,
+            brand: document.getElementById('stuffBrand').value,
+            serial: document.getElementById('stuffSerial').value,
+            quantity: document.getElementById('stuffQuantity').value || 1,
+            minStock: document.getElementById('stuffMinStock').value || 1,
+            rate: document.getElementById('stuffRate').value || 0,
+            price: document.getElementById('stuffPrice').value || 0,
+            description: document.getElementById('stuffDescription').value,
+            location: document.getElementById('stuffLocation').value
+        };
+
+        if (!formData.name) {
+            alert('Please enter an item name');
+            return;
+        }
+
+        // Here you would send the data to your backend
+        console.log('Saving stuff item:', formData);
+
+        // Simulate API call
+        fetch('/stuff/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                bootstrap.Modal.getInstance(document.getElementById('addStuffModal')).hide();
+                alert('Stuff item added successfully');
+                location.reload();
+            } else {
+                alert('Error adding item: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error adding stuff item');
+        });
+    };
+
+    // Filter functionality
+    const filterButtons = document.querySelectorAll('[data-filter]');
+    const stuffItems = document.querySelectorAll('.stuff-item');
+
+    function filterStuff(type) {
+        stuffItems.forEach(item => {
+            if (type === 'all' || item.dataset.type === type) {
+                item.style.display = '';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+
+    filterButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Update active state
+            filterButtons.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+
+            // Filter stuff
+            const filterType = this.dataset.filter;
+            filterStuff(filterType);
+        });
+    });
+
+    // Search functionality
+    const searchInput = document.createElement('input');
+    searchInput.type = 'text';
+    searchInput.placeholder = 'Search items...';
+    searchInput.className = 'form-control';
+    searchInput.style.maxWidth = '250px';
+
+    const filterSection = document.querySelector('.filter-buttons');
+    if (filterSection) {
+        const searchContainer = document.createElement('div');
+        searchContainer.className = 'ms-auto';
+        searchContainer.appendChild(searchInput);
+        filterSection.parentElement.appendChild(searchContainer);
+
+        searchInput.addEventListener('keyup', function() {
+            const term = this.value.toLowerCase();
+            stuffItems.forEach(item => {
+                const name = item.dataset.name || '';
+                if (name.includes(term)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    // Reset form when modal is hidden
+    document.getElementById('addStuffModal').addEventListener('hidden.bs.modal', function() {
+        selectedStuffType = null;
+        document.getElementById('stuffForm').style.display = 'none';
+        document.getElementById('stuffItemForm').reset();
+    });
+});
+</script>
+{% endblock %}

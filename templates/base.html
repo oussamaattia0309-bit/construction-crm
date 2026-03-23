@@ -61,6 +61,16 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'staff_management' %}active{% endif %}" href="{{ url_for('staff_management') }}">
+                                <i class="fas fa-hard-hat me-1"></i>Workers
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'stuff_management' %}active{% endif %}" href="{{ url_for('stuff_management') }}">
+                                <i class="fas fa-tools me-1"></i>Stuff
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {% if request.endpoint == 'budgets' %}active{% endif %}" href="{{ url_for('budgets') }}">
                                 <i class="fas fa-tools me-1"></i>Magazin
                             </a>

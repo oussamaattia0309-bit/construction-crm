@@ -1,0 +1,1652 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+/* Workers Management Styles - Unified for Subcontractors & Daily Workers */
+.worker-card {
+    transition: all 0.25s ease;
+    border-left: 4px solid transparent;
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    background: white;
+    overflow: hidden;
+    min-height: 320px;
+}
+
+.worker-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+    border-color: #b9c0c7;
+}
+
+.worker-card.subcontractor {
+    border-left-color: var(--primary);
+}
+
+.worker-card.daily {
+    border-left-color: var(--success);
+}
+
+.worker-avatar {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    font-size: 1.25rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+}
+
+    .section-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #e9ecef;
+    margin-bottom: 1rem;
+}
+
+    .section-title {
+    font-size: 1.15rem;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #343a40;
+    }
+.worker-type-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.worker-type-badge.subcontractor {
+    background: var(--primary);
+    color: white;
+}
+
+.worker-type-badge.daily {
+    background: var(--success);
+    color: white;
+}
+
+.rate-badge {
+    background: var(--primary);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.stats-card {
+    background: var(--primary);
+    padding: 1.5rem;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.stats-card .stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.stats-card .stat-label {
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+.work-summary {
+    background: var(--light-bg);
+    padding: 0.75rem;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.work-summary .number {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: var(--primary);
+}
+
+.work-summary .label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.payment-progress {
+    height: 6px;
+    border-radius: 3px;
+    background: #e9ecef;
+}
+
+.payment-progress-bar {
+    height: 6px;
+    border-radius: 3px;
+    background: var(--success);
+}
+
+.project-badge {
+    background: var(--light-bg);
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    margin: 0.25rem;
+    display: inline-block;
+}
+
+.quick-action-btn {
+    background: white;
+    border: 2px solid var(--primary);
+    color: var(--primary);
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.quick-action-btn:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.filter-buttons .btn {
+    border-radius: 22px;
+    padding: 0.55rem 1.35rem;
+    border-width: 1.5px;
+    letter-spacing: 0.03em;
+    font-weight: 600;
+}
+
+.filter-buttons .btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+}
+
+.filter-buttons .btn:not(.active) {
+    background: #f8f9fa;
+    color: #495057;
+
+.stats-overview {
+    background: #ffffff;
+    color: #212529;
+    padding: 1.25rem;
+    border-radius: 12px;
+    border: 1px solid #dee2e6;
+    margin-bottom: 1.5rem;
+}
+
+.stats-overview .stat-item {
+    text-align: center;
+    padding: 0.75rem;
+    border-right: 1px solid #e9ecef;
+}
+
+.stats-overview .stat-item:last-child {
+    border-right: none;
+
+.stats-overview .stat-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.stats-overview .stat-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.payroll-summary {
+    background: var(--light-bg);
+    padding: 1rem;
+    border-radius: 10px;
+    margin-top: 0.5rem;
+}
+
+.payroll-summary .amount {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--success);
+}
+
+@media (max-width: 768px) {
+    .stats-overview {
+        padding: 1.5rem;
+    }
+    
+    .stats-overview .stat-number {
+        font-size: 2rem;
+    }
+    
+    .work-summary {
+        min-width: 120px;
+    }
+    
+    .quick-action-btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+    }
+}
+</style>
+
+<div class="container-fluid mt-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <h1 class="mb-2">
+                        <i class="fas fa-hard-hat me-2 text-primary"></i>Worker Management
+                    </h1>
+                    <p class="text-muted mb-0">Manage subcontractors and daily workers, track payments and attendance</p>
+                </div>
+                <div class="d-flex gap-2 flex-wrap mt-2 mt-sm-0">
+                    <a href="#" class="quick-action-btn" data-bs-toggle="modal" data-bs-target="#addWorkerModal">
+                        <i class="fas fa-handshake"></i>
+                        Add Subcontractor
+                    </a>
+                    <a href="#" class="quick-action-btn" data-bs-toggle="modal" data-bs-target="#addWorkerModal">
+                        <i class="fas fa-user-plus"></i>
+                        Add Daily Worker
+                    </a>
+                    <a href="#" class="quick-action-btn" data-bs-toggle="modal" data-bs-target="#recordPaymentModal">
+                        <i class="fas fa-money-check-alt"></i>
+                        Record Payment
+                    </a>
+                    <a href="#" class="quick-action-btn" style="background: #f0ad4e; color: #fff; border-color: #eea236;" data-bs-toggle="modal" data-bs-target="#importContactModal">
+                        <i class="fas fa-address-book"></i>
+                        Import Contact
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="section-header">
+        <h2 class="section-title">Overview</h2>
+    </div>
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-6">
+            <div class="stats-card">
+                <div class="stat-number">{{ subcontractors|length if subcontractors else 23 }}</div>
+                <div class="stat-label">Subcontractors</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stats-card" style="background: var(--success);">
+                <div class="stat-number">{{ daily_workers|length if daily_workers else 15 }}</div>
+                <div class="stat-label">Daily Workers</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stats-card" style="background: #f39c12;">
+                <div class="stat-number">{{ total_pending_payments|round|int if total_pending_payments else 26900 }}</div>
+                <div class="stat-label">Pending Payments</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stats-card" style="background: #9b59b6;">
+                <div class="stat-number">{{ days_worked_this_month if days_worked_this_month else 180 }}</div>
+                <div class="stat-label">Days Worked ({{ current_month if current_month else 'March' }})</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="section-header">
+        <h2 class="section-title">Worker Directory</h2>
+    </div>
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="filter-buttons d-flex gap-2">
+                    <button class="btn btn-outline-primary active" data-filter="all">All Workers</button>
+                    <button class="btn btn-outline-primary" data-filter="subcontractor">Subcontractors</button>
+                    <button class="btn btn-outline-primary" data-filter="daily">Daily Workers</button>
+                </div>
+                <div class="ms-auto">
+                    <input type="text" id="globalWorkerSearch" class="form-control" placeholder="Search workers..." style="max-width: 250px;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Workers List -->
+    <div class="row g-4" id="workerList">
+        <!-- SUBCONTRACTORS SECTION -->
+        {% if subcontractors %}
+        {% for worker in subcontractors %}
+        <div class="col-lg-4 col-md-6 worker-item" data-type="subcontractor" data-name="{{ worker.name|lower }}">
+            <div class="card worker-card subcontractor h-100">
+                <div class="card-body">
+                    <!-- Worker Header -->
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="worker-avatar bg-primary">
+                            {{ worker.name[:2].upper() }}
+                        </div>
+                        <div class="ms-3 flex-grow-1">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <h5 class="mb-0">{{ worker.name }}</h5>
+                                <span class="worker-type-badge subcontractor">Subcontractor</span>
+                            </div>
+                            <small class="text-muted">{{ worker.email }}</small>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-eye me-2"></i>View Details</a></li>
+                                <li><a class="dropdown-item edit-worker" href="#"><i class="fas fa-edit me-2"></i>Edit</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-money-bill me-2"></i>Record Payment</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger delete-worker" data-name="{{ worker.name }}"><i class="fas fa-trash me-2"></i>Delete</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Contact Info -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Phone</small>
+                            <span>{{ worker.phone or '—' }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Specialty</small>
+                            <span class="badge bg-light text-dark">{{ worker.specialty or 'General' }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Payment Summary -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Total Contract</small>
+                            <strong>{{ worker.total_contract_amount }} DT</strong>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <small class="text-muted">Paid</small>
+                            <span class="text-success">{{ worker.paid_amount }} DT</span>
+                        </div>
+                        <div class="progress payment-progress mb-2">
+                            <div class="payment-progress-bar" style="width: {{ (worker.paid_amount / worker.total_contract_amount * 100) if worker.total_contract_amount else 0 }}%"></div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">Remaining</small>
+                            <strong class="text-warning">{{ worker.total_contract_amount - worker.paid_amount }} DT</strong>
+                        </div>
+                    </div>
+
+                    <!-- Current Projects -->
+                    {% if worker.current_projects %}
+                    <div class="mt-2">
+                        <small class="text-muted d-block mb-2">Projects:</small>
+                        <div>
+                            {% for project in worker.current_projects %}
+                            <span class="project-badge">{{ project.name }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Past Projects Count -->
+                    {% if worker.past_projects_count %}
+                    <div class="mt-2 text-muted small">
+                        <i class="fas fa-history me-1"></i> {{ worker.past_projects_count }} past project(s)
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <!-- Sample Subcontractors for Demo -->
+        <div class="col-lg-4 col-md-6 worker-item subcontractor-item" data-type="subcontractor" data-name="mohamed electricien">
+            <div class="card worker-card subcontractor h-100">
+                <div class="card-body">
+                    <!-- Worker Header -->
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="worker-avatar bg-primary">
+                            ME
+                        </div>
+                        <div class="ms-3 flex-grow-1">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <h5 class="mb-0">Mohamed Electricien</h5>
+                                <span class="worker-type-badge subcontractor">Subcontractor</span>
+                            </div>
+                            <small class="text-muted">mohamed@example.com</small>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-eye me-2"></i>View Details</a></li>
+                                <li><a class="dropdown-item edit-worker" href="#"><i class="fas fa-edit me-2"></i>Edit</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-money-bill me-2"></i>Record Payment</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger delete-worker" data-name="Mohamed Electricien"><i class="fas fa-trash me-2"></i>Delete</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Contact Info -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Phone</small>
+                            <span>+216 22 123 456</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Specialty</small>
+                            <span class="badge bg-light text-dark">Electrical</span>
+                        </div>
+                    </div>
+
+                    <!-- Payment Summary -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Total Contract</small>
+                            <strong>15000 DT</strong>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <small class="text-muted">Paid</small>
+                            <span class="text-success">11000 DT</span>
+                        </div>
+                        <div class="progress payment-progress mb-2">
+                            <div class="payment-progress-bar" style="width: 73%"></div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">Remaining</small>
+                            <strong class="text-warning">4000 DT</strong>
+                        </div>
+                    </div>
+
+                    <!-- Current Projects -->
+                    <div class="mt-2">
+                        <small class="text-muted d-block mb-2">Projects:</small>
+                        <div>
+                            <span class="project-badge">Villa Mahdia</span>
+                            <span class="project-badge">Immeuble Bardo</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 worker-item subcontractor-item" data-type="subcontractor" data-name="karim plombier">
+            <div class="card worker-card subcontractor h-100">
+                <div class="card-body">
+                    <!-- Worker Header -->
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="worker-avatar bg-primary">
+                            KP
+                        </div>
+                        <div class="ms-3 flex-grow-1">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <h5 class="mb-0">Karim Plombier</h5>
+                                <span class="worker-type-badge subcontractor">Subcontractor</span>
+                            </div>
+                            <small class="text-muted">karim@example.com</small>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-eye me-2"></i>View Details</a></li>
+                                <li><a class="dropdown-item edit-worker" href="#"><i class="fas fa-edit me-2"></i>Edit</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-money-bill me-2"></i>Record Payment</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger delete-worker" data-name="Karim Plombier"><i class="fas fa-trash me-2"></i>Delete</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Contact Info -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Phone</small>
+                            <span>+216 55 444 333</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Specialty</small>
+                            <span class="badge bg-light text-dark">Plumbing</span>
+                        </div>
+                    </div>
+
+                    <!-- Payment Summary -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Total Contract</small>
+                            <strong>8500 DT</strong>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <small class="text-muted">Paid</small>
+                            <span class="text-success">6500 DT</span>
+                        </div>
+                        <div class="progress payment-progress mb-2">
+                            <div class="payment-progress-bar" style="width: 76%"></div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">Remaining</small>
+                            <strong class="text-warning">2000 DT</strong>
+                        </div>
+                    </div>
+
+                    <!-- Current Projects -->
+                    <div class="mt-2">
+                        <small class="text-muted d-block mb-2">Projects:</small>
+                        <div>
+                            <span class="project-badge">Djerba Resort</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- DAILY WORKERS SECTION -->
+        {% if daily_workers %}
+        {% for worker in daily_workers %}
+        <div class="col-lg-4 col-md-6 worker-item" data-type="daily" data-name="{{ worker.name|lower }}">
+            <div class="card worker-card daily h-100">
+                <div class="card-body">
+                    <!-- Worker Header -->
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="worker-avatar" style="background: var(--success);">
+                            {{ worker.name[:2].upper() }}
+                        </div>
+                        <div class="ms-3 flex-grow-1">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <h5 class="mb-0">{{ worker.name }}</h5>
+                                <span class="worker-type-badge daily">Daily Worker</span>
+                            </div>
+                            <small class="text-muted">{{ worker.email }}</small>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-eye me-2"></i>View Details</a></li>
+                                <li><a class="dropdown-item edit-worker" href="#"><i class="fas fa-edit me-2"></i>Edit</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-calendar-check me-2"></i>Record Work Day</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger delete-worker" data-name="{{ worker.name }}"><i class="fas fa-trash me-2"></i>Delete</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Contact & Rate -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Daily Rate</small>
+                            <span class="rate-badge">{{ worker.daily_rate }} DT / day</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Phone</small>
+                            <span>{{ worker.phone or '—' }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Work Summary This Month -->
+                    <div class="work-summary mb-3">
+                        <div class="number">{{ worker.days_worked_this_month or 0 }}</div>
+                        <div class="label">Days worked this month</div>
+                        <div class="mt-1"><strong>{{ (worker.days_worked_this_month or 0) * worker.daily_rate }} DT</strong> earned</div>
+                    </div>
+
+                    <!-- Current Projects -->
+                    {% if worker.current_projects %}
+                    <div class="mt-2">
+                        <small class="text-muted d-block mb-2">Current Projects:</small>
+                        <div>
+                            {% for project in worker.current_projects %}
+                            <span class="project-badge">{{ project.name }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Payment Status -->
+                    <div class="mt-2 pt-2 border-top">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">Payment Status</small>
+                            {% if worker.payment_status == 'paid' %}
+                            <span class="badge bg-success">Paid for this month</span>
+                            {% elif worker.payment_status == 'partial' %}
+                            <span class="badge bg-warning">Partial Payment</span>
+                            {% else %}
+                            <span class="badge bg-danger">Unpaid</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <!-- Sample Daily Workers for Demo -->
+        <div class="col-lg-4 col-md-6 worker-item daily-worker-item" data-type="daily" data-name="ahmed ben ali">
+            <div class="card worker-card daily h-100">
+                <div class="card-body">
+                    <!-- Worker Header -->
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="worker-avatar" style="background: var(--success);">
+                            AB
+                        </div>
+                        <div class="ms-3 flex-grow-1">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <h5 class="mb-0">Ahmed Ben Ali</h5>
+                                <span class="worker-type-badge daily">Daily Worker</span>
+                            </div>
+                            <small class="text-muted">ahmed@example.com</small>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-eye me-2"></i>View Details</a></li>
+                                <li><a class="dropdown-item edit-worker" href="#"><i class="fas fa-edit me-2"></i>Edit</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-calendar-plus me-2"></i>Record Work Day</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger delete-worker" data-name="Ahmed Ben Ali"><i class="fas fa-trash me-2"></i>Delete</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Contact & Rate -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Daily Rate</small>
+                            <span class="rate-badge">80 DT / day</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Phone</small>
+                            <span>+216 98 765 432</span>
+                        </div>
+                    </div>
+
+                    <!-- Work Summary This Month -->
+                    <div class="work-summary mb-3">
+                        <div class="number">17</div>
+                        <div class="label">Days worked this month</div>
+                        <div class="mt-1"><strong>1360 DT</strong> earned</div>
+                    </div>
+
+                    <!-- Current Projects -->
+                    <div class="mt-2">
+                        <small class="text-muted d-block mb-2">Current Projects:</small>
+                        <div>
+                            <span class="project-badge">Villa Mahdia</span>
+                            <span class="project-badge">Sousse Tower</span>
+                        </div>
+                    </div>
+
+                    <!-- Payment Status -->
+                    <div class="mt-2 pt-2 border-top">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">Payment Status</small>
+                            <span class="badge bg-success">Paid for this month</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Empty State -->
+    {% if (not subcontractors or subcontractors|length == 0) and (not daily_workers or daily_workers|length == 0) %}
+    <div class="text-center py-5">
+        <i class="fas fa-hard-hat fa-3x text-muted mb-3"></i>
+        <h4 class="text-muted">No Workers Yet</h4>
+        <p class="text-muted mb-4">Add subcontractors or daily workers to start managing your team.</p>
+        <div class="d-flex gap-3 justify-content-center">
+            <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addWorkerModal">
+                <i class="fas fa-handshake me-2"></i>Add Subcontractor
+            </a>
+            <a href="#" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addWorkerModal">
+                <i class="fas fa-user-plus me-2"></i>Add Daily Worker
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Add Worker Modal -->
+<div class="modal fade" id="addWorkerModal" tabindex="-1" aria-labelledby="addWorkerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addWorkerModalLabel">Add Worker</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addWorkerForm">
+                    <input type="hidden" id="editingWorkerCardId" value="">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">Worker Type</label>
+                            <select id="workerType" class="form-select" required>
+                                <option value="subcontractor">Subcontractor</option>
+                                <option value="daily">Daily Worker</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">Name</label>
+                            <input type="text" id="workerName" class="form-control" placeholder="Worker name" required>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">Email</label>
+                            <input type="email" id="workerEmail" class="form-control" placeholder="email@example.com">
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">Phone</label>
+                            <input type="text" id="workerPhone" class="form-control" placeholder="Phone number" required>
+                        </div>
+                        <div class="col-12 col-md-4" id="specialtyField">
+                            <label class="form-label">Specialty</label>
+                            <input type="text" id="workerSpecialty" class="form-control" placeholder="Specialty, e.g., Electrical" required>
+                        </div>
+                        <div class="col-12 col-md-4" id="dailyRateField" style="display:none;">
+                            <label class="form-label">Daily Rate (DT)</label>
+                            <input type="number" min="0" step="0.1" id="workerRate" class="form-control" placeholder="80">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Assign Projects</label>
+                            <select id="workerProjects" class="form-select" multiple size="4" aria-label="Select worker projects"></select>
+                            <div class="form-text">Select one or more projects. Project list is loaded from existing projects page.</div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="submitAddWorker">Add Worker</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Import Contact Modal -->
+<div class="modal fade" id="importContactModal" tabindex="-1" aria-labelledby="importContactModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importContactModalLabel">Import Contact from Contacts</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="importContactLoading" class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
+                    <p class="mt-2 text-muted">Loading contacts...</p>
+                </div>
+                <div id="importContactContent" style="display:none;">
+                    <table class="table table-hover table-sm" id="importContactTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Company</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div id="importContactEmpty" class="text-center py-4" style="display:none;">
+                    <p class="text-muted">No contacts available to import.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Record Payment Modal -->
+<div class="modal fade" id="recordPaymentModal" tabindex="-1" aria-labelledby="recordPaymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="recordPaymentModalLabel">Record Payment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="recordPaymentForm">
+                    <div class="mb-3">
+                        <label for="paymentWorkerName" class="form-label">Worker Name</label>
+                        <input type="text" class="form-control" id="paymentWorkerName" placeholder="E.g., Mohamed Electricien" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="paymentAmount" class="form-label">Amount (DT)</label>
+                        <input type="number" min="0" step="0.01" class="form-control" id="paymentAmount" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="paymentDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="paymentDescription" rows="2" placeholder="Optional description"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="submitRecordPayment">Save Payment</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Worker Confirmation Modal -->
+<div class="modal fade" id="deleteWorkerModal" tabindex="-1" aria-labelledby="deleteWorkerModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteWorkerModalLabel">Confirm Delete</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to remove <strong id="deleteWorkerName">this worker</strong>?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Filter functionality
+    const filterButtons = document.querySelectorAll('[data-filter]');
+    const workerItems = document.querySelectorAll('.worker-item');
+    
+    function filterWorkers(type) {
+        const allWorkers = document.querySelectorAll('.worker-item');
+        allWorkers.forEach(item => {
+            if (type === 'all' || item.dataset.type === type) {
+                item.style.display = '';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+    
+    filterButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Update active state
+            filterButtons.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Filter workers
+            const filterType = this.dataset.filter;
+            filterWorkers(filterType);
+        });
+    });
+    
+    // Search functionality
+    const searchInput = document.getElementById('globalWorkerSearch');
+    if (searchInput) {
+        searchInput.addEventListener('keyup', function() {
+            const term = this.value.toLowerCase();
+            workerItems.forEach(item => {
+                const name = item.dataset.name || '';
+                if (name.includes(term)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    }
+    
+    // Delete confirmation functionality
+    const deleteWorkerModal = new bootstrap.Modal(document.getElementById('deleteWorkerModal'));
+
+    function bindDeleteHandlers(){
+        const deleteWorkerButtons = document.querySelectorAll('.delete-worker');
+        deleteWorkerButtons.forEach(btn => {
+            btn.removeEventListener('click', handleDeleteWorkerClick);
+            btn.addEventListener('click', handleDeleteWorkerClick);
+        });
+    }
+
+    function handleDeleteWorkerClick(e){
+        e.preventDefault();
+        const workerName = this.dataset.name;
+        document.getElementById('deleteWorkerName').textContent = workerName;
+        deleteWorkerModal.show();
+    }
+
+    bindDeleteHandlers();
+
+    function openWorkerModalForEdit(card) {
+        const workerType = card.dataset.type || (card.querySelector('.worker-type-badge.daily') ? 'daily' : 'subcontractor');
+        const name = card.dataset.name || card.querySelector('h5.mb-0')?.textContent.trim() || '';
+        const email = card.dataset.email || card.querySelector('.card-body small.text-muted')?.textContent.trim() || '';
+        const phoneContainer = Array.from(card.querySelectorAll('.mb-3 .d-flex')).find(el => el.querySelector('small')?.textContent.trim().toLowerCase() === 'phone');
+        const phone = card.dataset.phone || (phoneContainer ? phoneContainer.querySelector('span')?.textContent.trim() : '');
+        const specialty = card.dataset.specialty || (workerType === 'subcontractor' ? card.querySelector('.worker-card .badge')?.textContent.trim() : '');
+        const rate = card.dataset.rate || 0;
+
+        document.getElementById('editingWorkerCardId').value = card.dataset.name;
+        document.getElementById('workerType').value = workerType;
+        document.getElementById('workerName').value = name;
+        document.getElementById('workerEmail').value = email;
+        document.getElementById('workerPhone').value = phone;
+        document.getElementById('workerSpecialty').value = specialty;
+        document.getElementById('workerRate').value = rate;
+
+        const projectSelect = document.getElementById('workerProjects');
+        const projects = card.dataset.projects ? JSON.parse(card.dataset.projects) : [];
+        Array.from(projectSelect.options).forEach(option => {
+            option.selected = projects.includes(option.value);
+        });
+
+        if (workerType === 'daily') {
+            document.getElementById('specialtyField').style.display = 'none';
+            document.getElementById('dailyRateField').style.display = 'block';
+            document.getElementById('workerRate').required = true;
+            document.getElementById('workerSpecialty').required = false;
+        } else {
+            document.getElementById('specialtyField').style.display = 'block';
+            document.getElementById('dailyRateField').style.display = 'none';
+            document.getElementById('workerRate').required = false;
+            document.getElementById('workerSpecialty').required = true;
+        }
+
+        document.getElementById('addWorkerModalLabel').textContent = 'Edit Worker';
+        document.getElementById('submitAddWorker').textContent = 'Update Worker';
+        window.editingWorkerCard = card;
+        new bootstrap.Modal(document.getElementById('addWorkerModal')).show();
+    }
+
+    document.addEventListener('click', function (event) {
+        const editBtn = event.target.closest('.edit-worker');
+        if (!editBtn) return;
+
+        event.preventDefault();
+        const workerCard = editBtn.closest('.worker-item');
+        if (!workerCard) return;
+
+        openWorkerModalForEdit(workerCard);
+    });
+
+    function loadProjectsForWorker() {
+        const projectSelect = document.getElementById('workerProjects');
+        if (!projectSelect) return;
+
+        fetch('/projects')
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const projectRows = doc.querySelectorAll('main > div > div:nth-child(3) > div tr.project-row');
+
+                projectSelect.innerHTML = '';
+
+                if (projectRows.length === 0) {
+                    const emptyOption = document.createElement('option');
+                    emptyOption.value = '';
+                    emptyOption.textContent = 'No projects available';
+                    emptyOption.disabled = true;
+                    projectSelect.appendChild(emptyOption);
+                    return;
+                }
+
+                projectRows.forEach(row => {
+                    const projectNameElement = row.querySelector('td strong');
+                    if (!projectNameElement) return;
+                    const projectName = projectNameElement.textContent.trim();
+                    if (!projectName) return;
+
+                    const option = document.createElement('option');
+                    option.value = projectName;
+                    option.textContent = projectName;
+                    projectSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Unable to load projects from /projects:', error);
+                projectSelect.innerHTML = '<option value="" disabled>No projects found</option>';
+            });
+    }
+
+    loadProjectsForWorker();
+
+    function loadImportContactsFromPage() {
+        const contactList = [];
+        const loading = document.getElementById('importContactLoading');
+        const content = document.getElementById('importContactContent');
+        const empty = document.getElementById('importContactEmpty');
+
+        if (loading) loading.style.display = 'block';
+        if (content) content.style.display = 'none';
+        if (empty) empty.style.display = 'none';
+
+        fetch('/contacts')
+            .then(res => res.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const rows = doc.querySelectorAll('tr[data-contact-id]');
+
+                rows.forEach(row => {
+                    const id = row.dataset.contactId || '';
+                    const name = row.querySelector('td:nth-child(2) strong')?.textContent.trim() || '';
+                    const email = row.querySelector('td:nth-child(3)')?.textContent.trim() || '';
+                    const phone = row.querySelector('td:nth-child(4)')?.textContent.trim() || '';
+                    const company = row.querySelector('td:nth-child(5)')?.textContent.trim() || '';
+                    const type = row.dataset.type || '';
+
+                    if (id) contactList.push({id, name, email, phone, company, type});
+                });
+
+                populateContactDropdowns(contactList);
+            })
+            .catch(err => {
+                console.error('Unable to load contacts list from /contacts:', err);
+                populateContactDropdowns([]);
+            })
+            .finally(() => {
+                if (loading) loading.style.display = 'none';
+            });
+    }
+
+    document.getElementById('importContactModal').addEventListener('show.bs.modal', function() {
+        loadImportContactsFromPage();
+    });
+
+    document.getElementById('importContactModal').addEventListener('hidden.bs.modal', function(){
+        const importBody = document.querySelector('#importContactTable tbody');
+        if (importBody) importBody.innerHTML = '';
+    });
+
+    document.addEventListener('click', function(event) {
+        const button = event.target.closest('.import-contact-btn');
+        if (!button) return;
+        event.preventDefault();
+
+        const name = button.dataset.name || '';
+        const email = button.dataset.email || '';
+        const phone = button.dataset.phone || '';
+        const type = button.dataset.type || 'client';
+
+        // Set worker form values
+        document.getElementById('workerName').value = name;
+        document.getElementById('workerEmail').value = email;
+        document.getElementById('workerPhone').value = phone;
+        
+        if (['sous-traitant','fournisseur','client','architecte','ingenieur'].includes(type.toLowerCase())) {
+            document.getElementById('workerType').value = 'subcontractor';
+            document.getElementById('specialtyField').style.display = 'block';
+            document.getElementById('dailyRateField').style.display = 'none';
+            document.getElementById('workerSpecialty').required = true;
+            document.getElementById('workerRate').required = false;
+            document.getElementById('workerSpecialty').value = type;
+        } else {
+            document.getElementById('workerType').value = 'daily';
+            document.getElementById('specialtyField').style.display = 'none';
+            document.getElementById('dailyRateField').style.display = 'block';
+            document.getElementById('workerRate').required = true;
+            document.getElementById('workerSpecialty').required = false;
+            document.getElementById('workerRate').value = '80';
+        }
+
+        document.getElementById('addWorkerModalLabel').textContent = 'Add Worker (from contact)';
+        document.getElementById('submitAddWorker').textContent = 'Add Worker';
+
+        // close import modal and open add worker modal
+        bootstrap.Modal.getInstance(document.getElementById('importContactModal')).hide();
+        new bootstrap.Modal(document.getElementById('addWorkerModal')).show();
+    });
+
+    var addWorkerModalEl = document.getElementById('addWorkerModal');
+    if (addWorkerModalEl) {
+        addWorkerModalEl.addEventListener('show.bs.modal', function () {
+            loadProjectsForWorker();
+
+            if (!window.editingWorkerCard) {
+                document.getElementById('addWorkerModalLabel').textContent = 'Add Worker';
+                document.getElementById('submitAddWorker').textContent = 'Add Worker';
+            }
+        });
+
+        addWorkerModalEl.addEventListener('hidden.bs.modal', function () {
+            window.editingWorkerCard = null;
+            document.getElementById('addWorkerForm').reset();
+            document.getElementById('specialtyField').style.display = 'block';
+            document.getElementById('dailyRateField').style.display = 'none';
+            document.getElementById('addWorkerModalLabel').textContent = 'Add Worker';
+            document.getElementById('submitAddWorker').textContent = 'Add Worker';
+        });
+    }
+
+    // Confirm delete button
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        const nameToDelete = document.getElementById('deleteWorkerName').textContent;
+        const workerCards = document.querySelectorAll('.worker-item');
+        workerCards.forEach(card => {
+            if (card.dataset.name && card.dataset.name.toLowerCase() === nameToDelete.toLowerCase()) {
+                card.remove();
+            }
+        });
+
+        deleteWorkerModal.hide();
+        alert('Worker deleted successfully');
+    });
+    
+    // Record payment form submission
+    document.getElementById('submitRecordPayment').addEventListener('click', function() {
+        const name = document.getElementById('paymentWorkerName').value.trim();
+        const amount = parseFloat(document.getElementById('paymentAmount').value);
+        const description = document.getElementById('paymentDescription').value.trim();
+
+        if (!name) {
+            alert('Please enter the worker name.');
+            return;
+        }
+        if (!amount || amount <= 0) {
+            alert('Please enter a valid payment amount.');
+            return;
+        }
+
+        // Example: post to API endpoint
+        fetch('/api/workers/payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ worker_name: name, amount: amount, description: description })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert('Payment successfully recorded');
+                bootstrap.Modal.getInstance(document.getElementById('recordPaymentModal')).hide();
+                location.reload();
+            } else {
+                alert('Error recording payment: ' + (data.message || 'Unknown error'));
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Error recording payment');
+        });
+    });
+
+    // Add worker type toggle
+    const workerTypeSelect = document.getElementById('workerType');
+    const specialtyField = document.getElementById('specialtyField');
+    const dailyRateField = document.getElementById('dailyRateField');
+
+    if (workerTypeSelect) {
+        workerTypeSelect.addEventListener('change', function() {
+            if (this.value === 'daily') {
+                specialtyField.style.display = 'none';
+                dailyRateField.style.display = 'block';
+                document.getElementById('workerRate').required = true;
+                document.getElementById('workerSpecialty').required = false;
+            } else {
+                specialtyField.style.display = 'block';
+                dailyRateField.style.display = 'none';
+                document.getElementById('workerRate').required = false;
+                document.getElementById('workerSpecialty').required = true;
+            }
+        });
+    }
+
+    function createWorkerCard(data) {
+        const card = document.createElement('div');
+        card.className = `col-lg-4 col-md-6 worker-item`; 
+        card.dataset.type = data.type;
+        card.dataset.name = data.name.toLowerCase();
+        card.dataset.email = (data.email || '').toLowerCase();
+        card.dataset.phone = (data.phone || '').toLowerCase();
+        card.dataset.specialty = (data.specialty || '').toLowerCase();
+        card.dataset.rate = data.rate || 0;
+        card.dataset.projects = JSON.stringify(data.projects || []);
+
+        const statusBadge = data.type === 'subcontractor' ? 'subcontractor' : 'daily';
+        const workerType = data.type === 'subcontractor' ? 'Subcontractor' : 'Daily Worker';
+
+        const contactEmail = data.email || '—';
+        const contactPhone = data.phone || '—';
+
+        let extraInfo = '';
+        if (data.type === 'subcontractor') {
+            extraInfo = `<div class="d-flex justify-content-between align-items-center mb-2"><small class="text-muted">Specialty</small><span class="badge bg-light text-dark">${data.specialty || 'General'}</span></div>`;
+        } else {
+            extraInfo = `<div class="d-flex justify-content-between align-items-center mb-2"><small class="text-muted">Daily Rate</small><span class="rate-badge">${data.rate || 0} DT / day</span></div>`;
+        }
+
+        const projects = data.projects && data.projects.length ? data.projects.map(p => `<span class="project-badge">${p}</span>`).join(' ') : '<span class="text-muted small">No project</span>';
+
+        card.innerHTML = `
+            <div class="card worker-card ${statusBadge} h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="worker-avatar bg-primary">${data.name.slice(0,2).toUpperCase()}</div>
+                        <div class="ms-3 flex-grow-1">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <h5 class="mb-0">${data.name}</h5>
+                                <span class="worker-type-badge ${statusBadge}">${workerType}</span>
+                            </div>
+                            <small class="text-muted">${contactEmail}</small>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown"><i class="fas fa-ellipsis-v"></i></button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-eye me-2"></i>View Details</a></li>
+                                <li><a class="dropdown-item edit-worker" href="#"><i class="fas fa-edit me-2"></i>Edit</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-money-bill me-2"></i>Record Payment</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger delete-worker" data-name="${data.name}"><i class="fas fa-trash me-2"></i>Delete</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Phone</small>
+                            <span>${contactPhone}</span>
+                        </div>
+                        ${extraInfo}
+                    </div>
+
+                    <div class="mt-2">
+                        <small class="text-muted d-block mb-2">Current Projects:</small>
+                        <div>${projects}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+        return card;
+    }
+
+    document.getElementById('submitAddWorker').addEventListener('click', function() {
+        const type = document.getElementById('workerType').value;
+        const name = document.getElementById('workerName').value.trim();
+        const email = document.getElementById('workerEmail').value.trim();
+        const phone = document.getElementById('workerPhone').value.trim();
+        const specialty = document.getElementById('workerSpecialty').value.trim();
+        const rate = parseFloat(document.getElementById('workerRate').value) || 0;
+        const workerProjectSelect = document.getElementById('workerProjects');
+        const projects = Array.from(workerProjectSelect.selectedOptions).map(option => option.value);
+
+        if (!name || !phone) {
+            alert('Please enter required fields: name and phone.');
+            return;
+        }
+
+        const workerData = { type, name, email, phone, specialty, rate, projects };
+        const editingCard = window.editingWorkerCard || null;
+
+        if (editingCard) {
+            const updatedCard = createWorkerCard(workerData);
+            editingCard.replaceWith(updatedCard);
+            bindDeleteHandlers();
+            window.editingWorkerCard = null;
+            document.getElementById('addWorkerModalLabel').textContent = 'Add Worker';
+            document.getElementById('submitAddWorker').textContent = 'Add Worker';
+            bootstrap.Modal.getInstance(document.getElementById('addWorkerModal')).hide();
+            alert('Worker updated successfully');
+            return;
+        }
+
+        // Save worker to backend before adding to UI
+        const endpoint = type === 'daily' ? '/workers/daily/create' : '/workers/subcontractor/create';
+        const payloadData = {
+            name: name,
+            email: email,
+            phone: phone,
+            address: '',
+            specialty: specialty,
+            rate: rate
+        };
+
+        fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payloadData)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                // Only add to UI after backend confirms save
+                const newCard = createWorkerCard(workerData);
+                document.getElementById('workerList').prepend(newCard);
+                bindDeleteHandlers();
+
+                // Clear form
+                document.getElementById('addWorkerForm').reset();
+                document.getElementById('specialtyField').style.display = 'block';
+                document.getElementById('dailyRateField').style.display = 'none';
+
+                // Hide modal
+                bootstrap.Modal.getInstance(document.getElementById('addWorkerModal')).hide();
+
+                // Reset filters & counts
+                filterWorkers('all');
+
+                alert('Worker added and saved successfully');
+            } else {
+                alert('Error saving worker: ' + (data.message || 'Unknown error'));
+            }
+        })
+        .catch(err => {
+            console.error('Error:', err);
+            alert('Error saving worker to database');
+        });
+    });
+    
+    // Load contacts from database
+    loadContacts();
+    
+    function loadContacts() {
+        fetch('/api/contacts')
+            .then(response => response.json())
+            .then(contacts => {
+                populateContactDropdowns(contacts);
+            })
+            .catch(error => {
+                console.error('Error loading contacts:', error);
+                // Fallback to empty dropdowns if API fails
+                populateContactDropdowns([]);
+            });
+    }
+    
+    function populateContactDropdowns(contacts) {
+        const subcontractorSelect = document.getElementById('contactSelect');
+        const dailyWorkerSelect = document.getElementById('contactSelectDaily');
+
+        // Build contact import table if open.
+        const importRows = document.querySelector('#importContactTable tbody');
+        if (importRows) {
+            importRows.innerHTML = '';
+            if (contacts.length === 0) {
+                document.getElementById('importContactEmpty').style.display = 'block';
+                document.getElementById('importContactContent').style.display = 'none';
+            } else {
+                document.getElementById('importContactEmpty').style.display = 'none';
+                document.getElementById('importContactContent').style.display = 'block';
+                contacts.forEach(contact => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${contact.name || '—'}</td>
+                        <td>${contact.email || '—'}</td>
+                        <td>${contact.phone || '—'}</td>
+                        <td>${contact.company || '—'}</td>
+                        <td><button class="btn btn-sm btn-primary import-contact-btn" data-id="${contact.id}" data-name="${contact.name}" data-email="${contact.email}" data-phone="${contact.phone}" data-type="${contact.type}" data-company="${contact.company}">Import</button></td>
+                    `;
+                    importRows.appendChild(row);
+                });
+            }
+        }
+        
+        if (subcontractorSelect) {
+            subcontractorSelect.innerHTML = '<option value="">Choose a contact...</option>';
+            contacts.forEach(contact => {
+                const optionText = `${contact.name} - ${contact.phone || 'No phone'}`;
+                const optionValue = contact.id;
+                subcontractorSelect.innerHTML += `<option value="${optionValue}">${optionText}</option>`;
+            });
+        }
+        
+        if (dailyWorkerSelect) {
+            dailyWorkerSelect.innerHTML = '<option value="">Choose a contact...</option>';
+            contacts.forEach(contact => {
+                const optionText = `${contact.name} - ${contact.phone || 'No phone'}`;
+                const optionValue = contact.id;
+                dailyWorkerSelect.innerHTML += `<option value="${optionValue}">${optionText}</option>`;
+            });
+        }
+    }
+    
+    // Worker type selection for modal
+    window.selectWorkerType = function(type) {
+        // Hide both forms initially
+        document.getElementById('subcontractorForm').style.display = 'none';
+        document.getElementById('dailyWorkerForm').style.display = 'none';
+        
+        // Show selected form
+        if (type === 'subcontractor') {
+            document.getElementById('subcontractorForm').style.display = 'block';
+        } else if (type === 'daily') {
+            document.getElementById('dailyWorkerForm').style.display = 'block';
+        }
+    };
+    
+    // Handle radio button changes for subcontractor
+    const subcontractorRadios = document.querySelectorAll('input[name="subcontractorSource"]');
+    subcontractorRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            const contactSelection = document.getElementById('contactSelection');
+            const newSubcontractorForm = document.getElementById('newSubcontractorForm');
+            if (contactSelection && newSubcontractorForm) {
+                if (this.value === 'contact') {
+                    contactSelection.style.display = 'block';
+                    newSubcontractorForm.style.display = 'none';
+                } else {
+                    contactSelection.style.display = 'none';
+                    newSubcontractorForm.style.display = 'block';
+                }
+            }
+        });
+    });
+    
+    // Handle radio button changes for daily worker
+    const dailyWorkerRadios = document.querySelectorAll('input[name="dailyWorkerSource"]');
+    dailyWorkerRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            const contactSelectionDaily = document.getElementById('contactSelectionDaily');
+            const newDailyWorkerForm = document.getElementById('newDailyWorkerForm');
+            if (contactSelectionDaily && newDailyWorkerForm) {
+                if (this.value === 'contact') {
+                    contactSelectionDaily.style.display = 'block';
+                    newDailyWorkerForm.style.display = 'none';
+                } else {
+                    contactSelectionDaily.style.display = 'none';
+                    newDailyWorkerForm.style.display = 'block';
+                }
+            }
+        });
+    });
+    
+    // Save worker function
+    window.saveWorker = function() {
+        const subcontractorForm = document.getElementById('subcontractorForm');
+        const dailyWorkerForm = document.getElementById('dailyWorkerForm');
+        
+        if (subcontractorForm && subcontractorForm.style.display !== 'none') {
+            // Handle subcontractor creation
+            const fromContact = document.getElementById('fromContactSub').checked;
+            
+            if (fromContact) {
+                const contactId = document.getElementById('contactSelect').value;
+                const specialty = document.getElementById('subcontractorSpecialty').value;
+                
+                if (!contactId) {
+                    alert('Please select a contact');
+                    return;
+                }
+                if (!specialty) {
+                    alert('Please enter specialty');
+                    return;
+                }
+                
+                // Send request to create subcontractor from contact
+                fetch('/workers/subcontractor/create-from-contact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        contact_id: contactId,
+                        specialty: specialty
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        bootstrap.Modal.getInstance(document.getElementById('addWorkerModal')).hide();
+                        alert('Subcontractor created successfully from contact');
+                        location.reload();
+                    } else {
+                        alert('Error creating subcontractor: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error creating subcontractor');
+                });
+            } else {
+                const name = document.getElementById('newSubcontractorName').value;
+                const phone = document.getElementById('newSubcontractorPhone').value;
+                const email = document.getElementById('newSubcontractorEmail').value;
+                const address = document.getElementById('newSubcontractorAddress').value;
+                const specialty = document.getElementById('newSubcontractorSpecialty').value;
+                
+                if (!name || !phone) {
+                    alert('Please fill in required fields (name and phone)');
+                    return;
+                }
+                
+                // Send request to create new subcontractor and add to contacts
+                fetch('/workers/subcontractor/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        phone: phone,
+                        email: email,
+                        address: address,
+                        specialty: specialty
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        bootstrap.Modal.getInstance(document.getElementById('addWorkerModal')).hide();
+                        alert('Subcontractor and contact created successfully');
+                        location.reload();
+                    } else {
+                        alert('Error creating subcontractor: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error creating subcontractor');
+                });
+            }
+        } else if (dailyWorkerForm && dailyWorkerForm.style.display !== 'none') {
+            // Handle daily worker creation
+            const fromContact = document.getElementById('fromContactDaily').checked;
+            
+            if (fromContact) {
+                const contactId = document.getElementById('contactSelectDaily').value;
+                
+                if (!contactId) {
+                    alert('Please select a contact');
+                    return;
+                }
+                
+                // Send request to create daily worker from contact
+                fetch('/workers/daily/create-from-contact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        contact_id: contactId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        bootstrap.Modal.getInstance(document.getElementById('addWorkerModal')).hide();
+                        alert('Daily worker created successfully from contact');
+                        location.reload();
+                    } else {
+                        alert('Error creating daily worker: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error creating daily worker');
+                });
+            } else {
+                const name = document.getElementById('newDailyWorkerName').value;
+                const phone = document.getElementById('newDailyWorkerPhone').value;
+                const email = document.getElementById('newDailyWorkerEmail').value;
+                const address = document.getElementById('newDailyWorkerAddress').value;
+                
+                if (!name || !phone) {
+                    alert('Please fill in required fields (name and phone)');
+                    return;
+                }
+                
+                // Send request to create new daily worker and add to contacts
+                fetch('/workers/daily/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        phone: phone,
+                        email: email,
+                        address: address
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        bootstrap.Modal.getInstance(document.getElementById('addWorkerModal')).hide();
+                        alert('Daily worker and contact created successfully');
+                        location.reload();
+                    } else {
+                        alert('Error creating daily worker: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error creating daily worker');
+                });
+            }
+        }
+    };
+    
+    // Animate stats on load
+    const statNumbers = document.querySelectorAll('.stat-number');
+    statNumbers.forEach(stat => {
+        const textContent = stat.textContent;
+        const target = parseInt(textContent.replace(/[^0-9]/g, ''));
+        if (!isNaN(target)) {
+            let current = 0;
+            const increment = target / 50;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                stat.textContent = textContent.includes('DT') ? 
+                    'DT ' + Math.floor(current).toLocaleString() : 
+                    Math.floor(current).toLocaleString();
+            }, 20);
+        }
+    });
+});
+</script>
+{% endblock %}
