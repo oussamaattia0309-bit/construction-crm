@@ -478,18 +478,28 @@ def update_project(id):
     project.name = request.form.get('name')
     project.client_name = request.form.get('client_name')
     project.status = request.form.get('status')
+    project.address = request.form.get('address')
+    project.description = request.form.get('description')
     
-    # Handle financial fields (synced with project financial page)
+    # Handle dates
+    start_date_str = request.form.get('start_date')
+    if start_date_str:
+        project.start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+    else:
+        project.start_date = None
+        
+    end_date_str = request.form.get('end_date')
+    if end_date_str:
+        project.end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
+    else:
+        project.end_date = None
+    
+    # Handle financial fields
     selling_price = request.form.get('selling_price', '0')
     project.selling_price = float(selling_price) if selling_price else 0.0
     
     client_receipts = request.form.get('client_receipts', '0')
     project.client_receipts = float(client_receipts) if client_receipts else 0.0
-    
-    # Sync ProjectFinancialParams.sale_price
-    financial = ProjectFinancialParams.query.filter_by(project_id=id).first()
-    if financial:
-        financial.sale_price = project.selling_price
     
     db.session.commit()
     flash('Project updated successfully')

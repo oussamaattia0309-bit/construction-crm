@@ -37,6 +37,16 @@
                                 <label class="form-label fw-bold">Adresse</label>
                                 <input type="text" name="address" class="form-control rounded-pill" value="{{ project.address or '' }}">
                             </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Date de Début</label>
+                                <input type="date" name="start_date" class="form-control rounded-pill" value="{{ project.start_date.strftime('%Y-%m-%d') if project.start_date else '' }}">
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Date de Fin</label>
+                                <input type="date" name="end_date" class="form-control rounded-pill" value="{{ project.end_date.strftime('%Y-%m-%d') if project.end_date else '' }}">
+                            </div>
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold">Prix de Vente (TND)</label>

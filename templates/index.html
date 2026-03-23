@@ -786,7 +786,11 @@ function loadDashboardData() {
                                 <div class="project-meta mt-auto">
                                     <div class="project-date">
                                         <i class="fas fa-calendar me-1"></i>
-                                        ${project.created_at ? new Date(project.created_at).toLocaleDateString() : 'N/A'}
+                                        ${project.start_date ? new Date(project.start_date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : 'N/A'}
+                                    </div>
+                                    <div class="project-date">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        ${project.end_date ? new Date(project.end_date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : 'N/A'}
                                     </div>
                                     <div class="project-action">
                                         <i class="fas fa-arrow-right"></i>
