@@ -198,58 +198,7 @@
 </div>
 </div>
 
-<!-- Add Contact Modal -->
-<div class="modal fade" id="addContactModal" tabindex="-1" aria-labelledby="addContactModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addContactModalLabel"><i class="fas fa-user-plus me-2"></i>Add New Contact</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form action="{{ url_for('add_contact') }}" method="POST">
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="name" name="name" required placeholder="e.g. Ahmed Ben Ali" autocomplete="name">
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" placeholder="email@example.com" autocomplete="email">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="phone" class="form-label">Phone</label>
-                            <input type="text" class="form-control" id="phone" name="phone" placeholder="+216 00 000 000" inputmode="tel" autocomplete="tel">
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="company" class="form-label">Company</label>
-                        <input type="text" class="form-control" id="company" name="company" placeholder="Company name" autocomplete="organization">
-                    </div>
-                    <div class="mb-3">
-                        <label for="type" class="form-label">Type</label>
-                        <select class="form-select" id="type" name="type">
-                            <option value="client">Client</option>
-                            <option value="fournisseur">Fournisseur</option>
-                            <option value="ingenieur">Ingénieur</option>
-                            <option value="architecte">Architecte</option>
-                            <option value="sous-traitant">Sous-traitant</option>
-                            <option value="autre">Autre</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="notes" class="form-label">Notes</label>
-                        <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Additional notes..."></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary"><i class="fas fa-check me-1"></i>Add Contact</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+<!-- Modal is now included in base.html -->
 
 <!-- Edit Contact Modal -->
 <div class="modal fade" id="editContactModal" tabindex="-1" aria-labelledby="editContactModalLabel" aria-hidden="true">

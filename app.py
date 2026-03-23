@@ -207,7 +207,15 @@ def update_financial_summary(project_id):
 @app.route('/')
 def index():
     if current_user.is_authenticated:
-        return render_template('index.html')
+        # Get project statistics
+        active_projects = Project.query.filter_by(status='in_progress').count()
+        completed_projects = Project.query.filter_by(status='completed').count()
+        planned_projects = Project.query.filter_by(status='planned').count()
+        
+        return render_template('index.html', 
+                             active_projects=active_projects,
+                             completed_projects=completed_projects,
+                             planned_projects=planned_projects)
     return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])

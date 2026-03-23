@@ -79,7 +79,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Run when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    if (document.getElementById('contacts-count')) {
+    // Only run dashboard functions if this is not the enhanced dashboard (which has date filters)
+    if (document.getElementById('contacts-count') && !document.getElementById('startDate')) {
         updateDashboard();
         loadRecentProjects();
     }

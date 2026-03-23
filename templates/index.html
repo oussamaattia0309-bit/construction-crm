@@ -1,6 +1,401 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+    /* Enhanced Stats Cards Styling */
+    .stats-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    }
+    
+    .stats-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        transition: left 0.5s ease;
+    }
+    
+    .stats-card:hover::before {
+        left: 100%;
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+    }
+    
+    .stats-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .stats-card:hover .stats-icon {
+        transform: scale(1.1) rotateZ(5deg);
+    }
+    
+    .stats-counter {
+        font-size: 2.5rem;
+        font-weight: 700;
+        line-height: 1.2;
+        margin: 0.5rem 0;
+    }
+    
+    .stats-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        color: #6c757d;
+    }
+    
+    .stats-btn {
+        transition: all 0.3s ease;
+        margin-top: 1rem;
+    }
+    
+    .stats-btn:hover {
+        background-color: var(--primary);
+        color: white;
+        transform: translateX(4px);
+    }
+    
+    /* Project Status Card */
+    .project-status-card {
+        transition: all 0.3s ease;
+    }
+    
+    .status-item {
+        padding: 1.25rem;
+        border-radius: 10px;
+        background: #f8f9fa;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    
+    .status-item:hover {
+        background: #e7f2f8;
+        transform: translateY(-4px);
+    }
+    
+    .status-item i {
+        font-size: 1.75rem;
+        margin-bottom: 0.75rem;
+        transition: transform 0.3s ease;
+    }
+    
+    .status-item:hover i {
+        transform: scale(1.15);
+    }
+    
+    .status-number {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0.5rem 0;
+    }
+    
+    /* Quick Actions Card Enhancements */
+    .quick-action-btn {
+        position: relative;
+        overflow: hidden;
+        display: block;
+        width: 100%;
+        border: none;
+        background: none;
+        padding: 0;
+        text-decoration: none !important;
+    }
+    
+    .quick-action-card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid transparent;
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    
+    .quick-action-card::after {
+        content: '→';
+        position: absolute;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        opacity: 0;
+        font-size: 1.5rem;
+        transition: all 0.3s ease;
+        color: inherit;
+    }
+    
+    .quick-action-btn:hover .quick-action-card {
+        border-color: currentColor;
+        box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
+    }
+    
+    .quick-action-btn:hover .quick-action-card::after {
+        opacity: 1;
+        right: 1rem;
+    }
+    
+    .quick-action-icon {
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        animation: slideInDown 0.6s ease-out backwards;
+    }
+    
+    .quick-action-btn:hover .quick-action-icon {
+        transform: translateY(-8px) scale(1.15);
+        animation: bounce 0.6s ease-out infinite;
+    }
+    
+    .quick-action-title {
+        animation: slideInUp 0.6s ease-out 0.1s backwards;
+    }
+    
+    .quick-action-desc {
+        animation: slideInUp 0.6s ease-out 0.2s backwards;
+    }
+    
+    .quick-action-btn:hover .quick-action-title {
+        font-weight: 700;
+        transform: scale(1.05);
+    }
+    
+    .quick-action-btn:hover .quick-action-desc {
+        color: rgba(0, 0, 0, 0.7) !important;
+        font-weight: 500;
+    }
+    
+    @keyframes slideInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes bounce {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-8px);
+        }
+    }
+    
+    .quick-actions-section {
+        position: relative;
+    }
+    
+    .quick-actions-section .section-title {
+        position: relative;
+        display: inline-block;
+    }
+    
+    .quick-actions-section .section-title::before {
+        content: '✨';
+        display: inline-block;
+        margin-right: 0.5rem;
+        font-size: 1.3rem;
+        animation: sparkle 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes sparkle {
+        0%, 100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+        50% {
+            opacity: 0.6;
+            transform: scale(1.1);
+        }
+    }
+    
+    /* Projects Section Enhancements */
+    .projects-section {
+        position: relative;
+    }
+    
+    .projects-section .section-title {
+        position: relative;
+        display: inline-block;
+    }
+    
+    .projects-section .section-title::before {
+        content: '🚧';
+        display: inline-block;
+        margin-right: 0.5rem;
+        font-size: 1.3rem;
+        animation: bounce 1.5s ease-in-out infinite;
+    }
+    
+    .project-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    .project-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+        transition: left 0.6s ease;
+    }
+    
+    .project-card:hover::before {
+        left: 100%;
+    }
+    
+    .project-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+        border-color: rgba(0,0,0,0.1);
+    }
+    
+    .project-status {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .project-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .project-card:hover .project-icon {
+        transform: scale(1.1) rotateZ(5deg);
+    }
+    
+    .project-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--dark-text);
+        transition: color 0.3s ease;
+    }
+    
+    .project-card:hover .project-title {
+        color: var(--primary);
+    }
+    
+    .project-details {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+    }
+    
+    .project-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    .project-date {
+        font-size: 0.75rem;
+        color: #adb5bd;
+        font-weight: 500;
+    }
+    
+    .project-action {
+        opacity: 0;
+        transform: translateX(10px);
+        transition: all 0.3s ease;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--primary);
+    }
+    
+    .project-card:hover .project-action {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    
+    .projects-loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem;
+        color: #6c757d;
+    }
+    
+    .projects-loading .spinner-border {
+        width: 3rem;
+        height: 3rem;
+        margin-bottom: 1rem;
+    }
+    
+    .projects-empty {
+        text-align: center;
+        padding: 3rem;
+        color: #6c757d;
+    }
+    
+    .projects-empty i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    
+    .toggle-completed-btn {
+        transition: all 0.3s ease;
+        border-radius: 20px;
+        padding: 0.5rem 1rem;
+    }
+    
+    .toggle-completed-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+
+</style>
 <div class="container">
     <!-- Hero Section (simplified) -->
     <div class="row mb-5">
@@ -12,114 +407,144 @@
     </div>
 
     <!-- Stats Counters (like your website) -->
-    <div class="row text-center g-4 mb-5" id="stats-section">
-        <div class="col-md-3">
-            <div class="dashboard-card">
-                <div class="card-body">
-                    <div class="mb-3">
+    <div class="row g-4 mb-6 mt-4" id="stats-section">
+        <div class="col-lg-4">
+            <div class="dashboard-card stats-card h-100">
+                <div class="card-body text-center p-5">
+                    <div class="stats-icon bg-soft-primary">
                         <i class="fas fa-address-book fa-2x text-primary"></i>
                     </div>
-                    <h3 class="counter display-4 fw-bold" id="contacts-count">0</h3>
-                    <p class="text-muted">Total Contacts</p>
-                    <a href="{{ url_for('contacts') }}" class="btn btn-outline-primary btn-sm">View All</a>
+                    <h3 class="stats-counter text-primary" id="contacts-count">0</h3>
+                    <p class="stats-label">Total Contacts</p>
+                    <a href="{{ url_for('contacts') }}" class="btn btn-outline-primary btn-sm stats-btn">View All</a>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="dashboard-card">
-                <div class="card-body">
-                    <div class="mb-3">
+        
+        <div class="col-lg-4">
+            <div class="dashboard-card stats-card h-100">
+                <div class="card-body text-center p-5">
+                    <div class="stats-icon bg-soft-success">
                         <i class="fas fa-truck fa-2x text-success"></i>
                     </div>
-                    <h3 class="counter display-4 fw-bold" id="providers-count">0</h3>
-                    <p class="text-muted">Providers</p>
-                    <a href="{{ url_for('providers') }}" class="btn btn-outline-primary btn-sm">View All</a>
+                    <h3 class="stats-counter text-success" id="providers-count">0</h3>
+                    <p class="stats-label">Providers</p>
+                    <a href="{{ url_for('providers') }}" class="btn btn-outline-success btn-sm stats-btn">View All</a>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="dashboard-card">
-                <div class="card-body">
-                    <div class="mb-3">
-                        <i class="fas fa-hard-hat fa-2x text-warning"></i>
+        
+        <div class="col-lg-4">
+            <div class="dashboard-card stats-card project-status-card h-100">
+                <div class="card-body p-5">
+                    <h5 class="fw-bold mb-4 text-center">
+                        <i class="fas fa-chart-pie me-2" style="color: #ff8c00;"></i>Project Status
+                    </h5>
+                    <div class="row g-3">
+                        <div class="col-md-6 col-12">
+                            <div class="status-item">
+                                <i class="fas fa-hard-hat text-warning d-block"></i>
+                                <div class="status-number" style="color: #ff8c00;">{{ active_projects }}</div>
+                                <p class="stats-label">Active</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <div class="status-item">
+                                <i class="fas fa-check-circle text-success d-block"></i>
+                                <div class="status-number" style="color: #28a745;">{{ completed_projects }}</div>
+                                <p class="stats-label">Completed</p>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="status-item">
+                                <i class="fas fa-tasks text-info d-block"></i>
+                                <div class="status-number" style="color: #17a2b8;">{{ planned_projects }}</div>
+                                <p class="stats-label">Planned</p>
+                            </div>
+                        </div>
                     </div>
-                    <h3 class="counter display-4 fw-bold" id="projects-count">0</h3>
-                    <p class="text-muted">Active Projects</p>
-                    <a href="{{ url_for('projects') }}" class="btn btn-outline-primary btn-sm">View All</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="dashboard-card">
-                <div class="card-body">
-                    <div class="mb-3">
-                        <i class="fas fa-coins fa-2x text-info"></i>
-                    </div>
-                    <h3 class="counter display-4 fw-bold" id="budget-total">TND 0</h3>
-                    <p class="text-muted">Total Budget</p>
-                    <a href="{{ url_for('budgets') }}" class="btn btn-outline-primary btn-sm">Manage</a>
+                    <a href="{{ url_for('projects') }}" class="btn btn-outline-warning btn-sm w-100 mt-4 stats-btn">View All Projects</a>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Quick Actions -->
-    <div class="row mt-5">
-        <div class="col-12">
-            <h2 class="section-title">Quick Actions</h2>
+    <div class="quick-actions-section mt-6 mb-4">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="section-title fw-bold mb-4">Quick Actions</h2>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-lg-3 col-md-6">
+                <button type="button" class="quick-action-btn" data-bs-toggle="modal" data-bs-target="#addContactModal">
+                    <div class="dashboard-card quick-action-card h-100 p-5">
+                        <div class="quick-action-icon stats-icon bg-soft-primary m-auto mb-4">
+                            <i class="fas fa-user-plus fa-2x text-primary"></i>
+                        </div>
+                        <h5 class="fw-bold quick-action-title text-primary">Add Contact</h5>
+                        <p class="text-muted small mt-2 quick-action-desc">Create new contact</p>
+                    </div>
+                </button>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <button type="button" class="quick-action-btn" data-bs-toggle="modal" data-bs-target="#addProjectModal">
+                    <div class="dashboard-card quick-action-card h-100 p-5">
+                        <div class="quick-action-icon stats-icon bg-soft-warning m-auto mb-4">
+                            <i class="fas fa-hard-hat fa-2x text-warning"></i>
+                        </div>
+                        <h5 class="fw-bold quick-action-title" style="color: #ff8c00;">New Project</h5>
+                        <p class="text-muted small mt-2 quick-action-desc">Start new project</p>
+                    </div>
+                </button>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <a href="{{ url_for('providers') }}" class="quick-action-btn">
+                    <div class="dashboard-card quick-action-card h-100 p-5">
+                        <div class="quick-action-icon stats-icon bg-soft-success m-auto mb-4">
+                            <i class="fas fa-truck fa-2x text-success"></i>
+                        </div>
+                        <h5 class="fw-bold quick-action-title text-success">Add Provider</h5>
+                        <p class="text-muted small mt-2 quick-action-desc">Add new provider</p>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <a href="{{ url_for('budgets') }}" class="quick-action-btn">
+                    <div class="dashboard-card quick-action-card h-100 p-5">
+                        <div class="quick-action-icon stats-icon bg-soft-info m-auto mb-4">
+                            <i class="fas fa-tools fa-2x text-info"></i>
+                        </div>
+                        <h5 class="fw-bold quick-action-title text-info">Magazin</h5>
+                        <p class="text-muted small mt-2 quick-action-desc">Manage inventory</p>
+                    </div>
+                </a>
+            </div>
         </div>
     </div>
-
-    <div class="row g-4">
-        <div class="col-md-3 col-6">
-            <a href="{{ url_for('contacts') }}" class="text-decoration-none">
-                <div class="dashboard-card text-center p-4">
-                    <i class="fas fa-user-plus fa-2x mb-3"></i>
-                    <h5>Add Contact</h5>
-                </div>
-            </a>
-        </div>
-        <div class="col-md-3 col-6">
-            <a href="{{ url_for('projects') }}" class="text-decoration-none">
-                <div class="dashboard-card text-center p-4">
-                    <i class="fas fa-hard-hat fa-2x mb-3"></i>
-                    <h5>New Project</h5>
-                </div>
-            </a>
-        </div>
-        <div class="col-md-3 col-6">
-            <a href="{{ url_for('providers') }}" class="text-decoration-none">
-                <div class="dashboard-card text-center p-4">
-                    <i class="fas fa-truck fa-2x mb-3"></i>
-                    <h5>Add Provider</h5>
-                </div>
-            </a>
-        </div>
-        <div class="col-md-3 col-6">
-            <a href="{{ url_for('budgets') }}" class="text-decoration-none">
-                <div class="dashboard-card text-center p-4">
-                    <i class="fas fa-tools fa-2x mb-3"></i>
-                    <h5>Magazin</h5>
-                </div>
-            </a>
-        </div>
-    </div>
-
 
     <!-- Projects Section -->
-    <div class="row mb-5">
+    <div class="row mb-5 projects-section">
         <div class="col-12 d-flex justify-content-between align-items-center">
-            <h2 class="section-title mb-0">Projects</h2>
-            <button type="button" class="btn btn-outline-secondary btn-sm" id="toggleCompletedBtn">
+            <h2 class="section-title mb-0">Recent Projects</h2>
+            <button type="button" class="btn btn-outline-secondary btn-sm toggle-completed-btn" id="toggleCompletedBtn">
                 <i class="fas fa-eye me-2"></i>Show Completed
             </button>
         </div>
     </div>
     <div class="row g-4" id="recent-projects-container">
         <!-- Will be populated by JavaScript -->
-    <div class="col-12 text-center">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
+        <div class="col-12">
+            <div class="projects-loading">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading projects...</span>
+                </div>
+                <p class="mb-0">Loading recent projects...</p>
             </div>
         </div>
     </div>
@@ -280,13 +705,35 @@ function loadDashboardData() {
             
             if (!projects || !Array.isArray(projects)) {
                 console.error('Projects is not an array:', projects);
-                container.innerHTML = '<div class="col-12 text-center"><p class="text-muted">Error loading projects</p></div>';
+                container.innerHTML = `
+                    <div class="col-12">
+                        <div class="projects-empty">
+                            <i class="fas fa-exclamation-triangle text-warning"></i>
+                            <h4 class="text-warning">Data Error</h4>
+                            <p class="mb-3">Received invalid project data. Please contact support if this persists.</p>
+                            <button type="button" class="btn btn-outline-primary" onclick="loadRecentProjects()">
+                                <i class="fas fa-refresh me-2"></i>Retry
+                            </button>
+                        </div>
+                    </div>
+                `;
                 isLoadingData = false;
                 return;
             }
             
             if (projects.length === 0) {
-                container.innerHTML = '<div class="col-12 text-center"><p class="text-muted">No projects yet</p></div>';
+                container.innerHTML = `
+                    <div class="col-12">
+                        <div class="projects-empty">
+                            <i class="fas fa-folder-open text-muted"></i>
+                            <h4 class="text-muted">No Projects Yet</h4>
+                            <p class="mb-3">Start by creating your first project to see it here.</p>
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProjectModal">
+                                <i class="fas fa-plus me-2"></i>Create First Project
+                            </button>
+                        </div>
+                    </div>
+                `;
                 isLoadingData = false;
                 return;
             }
@@ -303,35 +750,71 @@ function loadDashboardData() {
                     'completed': 'bg-success'
                 }[project.status] || 'bg-secondary';
                 
-                const statusText = project.status.replace('_', ' ');
+                const statusText = project.status.replace('_', ' ').toUpperCase();
                 const isCompleted = project.status === 'completed';
                 
+                // Get project icon based on status
+                const projectIcon = {
+                    'planned': 'fas fa-calendar-plus',
+                    'in_progress': 'fas fa-tools',
+                    'completed': 'fas fa-check-circle'
+                }[project.status] || 'fas fa-project-diagram';
+                
+                const iconBgClass = {
+                    'planned': 'bg-soft-warning',
+                    'in_progress': 'bg-soft-primary',
+                    'completed': 'bg-soft-success'
+                }[project.status] || 'bg-soft-secondary';
+                
                 return `
-                    <div class="col-md-4 project-item ${isCompleted ? 'completed-project' : ''}">
-                        <div class="project-card">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <h5 class="card-title mb-0">${project.name}</h5>
-                                    <button class="btn btn-sm btn-outline-danger delete-project-btn" 
-                                            data-project-id="${project.id}"
-                                            data-project-name="${project.name}">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                    <div class="col-lg-4 col-md-6 project-item ${isCompleted ? 'completed-project' : ''}">
+                        <div class="project-card card h-100">
+                            <div class="card-body d-flex flex-column">
+                                <div class="project-status ${statusClass} text-white">${statusText}</div>
+                                
+                                <div class="project-icon ${iconBgClass} mx-auto">
+                                    <i class="${projectIcon} fa-lg text-${statusClass.split('-')[1]}"></i>
                                 </div>
-                                <span class="badge ${statusClass} text-white mb-3">${statusText}</span>
-                                <div class="d-grid gap-2">
-                                    <a href="/projects/${project.id}" class="btn btn-outline-primary">View Details</a>
-                                    <a href="/project/${project.id}/financial" class="btn btn-outline-info">
-                                        <i class="fas fa-coins me-1"></i>Financial
+                                
+                                <h5 class="project-title text-center">${project.name}</h5>
+                                
+                                <div class="project-details text-center">
+                                    ${project.client_name ? `<div><i class="fas fa-user me-1"></i>${project.client_name}</div>` : ''}
+                                    ${project.address ? `<div><i class="fas fa-map-marker-alt me-1"></i>${project.address}</div>` : ''}
+                                </div>
+                                
+                                <div class="project-meta mt-auto">
+                                    <div class="project-date">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        ${project.created_at ? new Date(project.created_at).toLocaleDateString() : 'N/A'}
+                                    </div>
+                                    <div class="project-action">
+                                        <i class="fas fa-arrow-right"></i>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-grid gap-2 mt-3">
+                                    <a href="/projects/${project.id}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-eye me-1"></i>View Details
                                     </a>
-                                    <button type="button" class="btn btn-outline-secondary edit-project-btn"
-                                            data-project-id="${project.id}"
-                                            data-project-name="${project.name}"
-                                            data-project-status="${project.status}"
-                                            data-project-client="${project.client_name || ''}"
-                                            data-project-address="${project.address || ''}">
-                                        <i class="fas fa-edit me-1"></i>Edit
-                                    </button>
+                                    <div class="btn-group w-100">
+                                        <a href="/project/${project.id}/financial" class="btn btn-outline-info btn-sm">
+                                            <i class="fas fa-coins me-1"></i>Financial
+                                        </a>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm edit-project-btn"
+                                                data-project-id="${project.id}"
+                                                data-project-name="${project.name}"
+                                                data-project-status="${project.status}"
+                                                data-project-client="${project.client_name || ''}"
+                                                data-project-address="${project.address || ''}">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-danger btn-sm delete-project-btn" 
+                                                data-project-id="${project.id}"
+                                                data-project-name="${project.name}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -358,7 +841,18 @@ function loadDashboardData() {
             console.error('Projects fetch error:', error);
             isLoadingData = false;
             const container = document.getElementById('recent-projects-container');
-            container.innerHTML = '<div class="col-12 text-center"><p class="text-danger">Failed to load projects</p></div>';
+            container.innerHTML = `
+                <div class="col-12">
+                    <div class="projects-empty">
+                        <i class="fas fa-exclamation-triangle text-warning"></i>
+                        <h4 class="text-warning">Failed to Load Projects</h4>
+                        <p class="mb-3">There was an error loading your projects. Please try refreshing the page.</p>
+                        <button type="button" class="btn btn-outline-primary" onclick="loadRecentProjects()">
+                            <i class="fas fa-refresh me-2"></i>Try Again
+                        </button>
+                    </div>
+                </div>
+            `;
         });
 }
 
