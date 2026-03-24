@@ -1,4 +1,5 @@
 from flask import Flask, render_template, redirect, url_for, request, flash, jsonify, send_file, send_from_directory
+from sqlalchemy import text
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -114,6 +115,7 @@ class ProjectWorker(db.Model):
     # Relationships
     contact = db.relationship('Contact', backref='project_assignments')
     project = db.relationship('Project', backref='workers')
+    attendances = db.relationship('Attendance', backref='project_worker', lazy=True)
     
     @property
     def remaining_balance(self):
@@ -130,6 +132,13 @@ class ProjectWorker(db.Model):
                 return 'partial'
             return 'pending'
         return 'active'
+
+    @property
+    def days_worked(self):
+        try:
+            return sum([a.days or 0 for a in self.attendances])
+        except Exception:
+            return 0
 
 class ProjectExpense(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -202,6 +211,31 @@ class ProjectInvoice(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     project = db.relationship('Project', backref=db.backref('invoices', lazy=True))
+
+
+class Attendance(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    project_worker_id = db.Column(db.Integer, db.ForeignKey('project_worker.id'), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    days = db.Column(db.Float, default=0.0)
+    notes = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<Attendance pw={self.project_worker_id} date={self.date} days={self.days}>'
+
+
+class Payment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    project_worker_id = db.Column(db.Integer, db.ForeignKey('project_worker.id'), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    amount = db.Column(db.Float, default=0.0)
+    method = db.Column(db.String(50))
+    notes = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<Payment pw={self.project_worker_id} date={self.date} amount={self.amount}>'
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -515,6 +549,17 @@ def project_detail(id):
     project = Project.query.get_or_404(id)
     all_contacts = Contact.query.all()
     return render_template('project_detail.html', project=project, all_contacts=all_contacts)
+
+
+@app.route('/project/<int:id>/workers')
+@login_required
+def project_workers(id):
+    """Render the standalone workers management page for a project."""
+    project = Project.query.get_or_404(id)
+    workers = ProjectWorker.query.filter_by(project_id=id).all()
+    subcontractors = [w for w in workers if w.worker_type == 'subcontractor']
+    daily_workers = [w for w in workers if w.worker_type == 'daily_worker']
+    return render_template('project_workers.html', project=project, subcontractors=subcontractors, daily_workers=daily_workers)
 
 @app.route('/projects/<int:id>', methods=['POST'])
 @login_required
@@ -1078,15 +1123,113 @@ def record_worker_payment(project_id, worker_id):
         
         data = request.get_json()
         amount = float(data.get('amount', 0))
-        
-        worker.amount_paid += amount
+        date_str = data.get('payment_date')
+        method = data.get('payment_method')
+        notes = data.get('notes')
+
+        if amount <= 0:
+            return jsonify({'success': False, 'error': 'Amount must be > 0'}), 400
+
+        # parse date if provided
+        if date_str:
+            try:
+                pay_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+            except Exception:
+                pay_date = datetime.utcnow().date()
+        else:
+            pay_date = datetime.utcnow().date()
+
+        payment = Payment(project_worker_id=worker.id, date=pay_date, amount=amount, method=method, notes=notes)
+        db.session.add(payment)
+
+        worker.amount_paid = (worker.amount_paid or 0) + amount
         db.session.commit()
-        
+
         return jsonify({
             'success': True,
             'amount_paid': worker.amount_paid,
             'remaining_balance': worker.remaining_balance
         })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/project/<int:project_id>/workers/<int:worker_id>/payments')
+@login_required
+def get_worker_payments(project_id, worker_id):
+    try:
+        worker = ProjectWorker.query.filter_by(id=worker_id, project_id=project_id).first()
+        if not worker:
+            return jsonify([]), 404
+        payments = Payment.query.filter_by(project_worker_id=worker.id).order_by(Payment.date.desc()).all()
+        return jsonify([{
+            'id': p.id,
+            'date': p.date.strftime('%Y-%m-%d') if p.date else None,
+            'amount': p.amount,
+            'method': p.method,
+            'notes': p.notes
+        } for p in payments])
+    except Exception as e:
+        print(f"Error getting payments: {e}")
+        return jsonify([]), 500
+
+
+@app.route('/api/project/<int:project_id>/workers/<int:worker_id>/attendance')
+@login_required
+def get_worker_attendance(project_id, worker_id):
+    try:
+        worker = ProjectWorker.query.filter_by(id=worker_id, project_id=project_id).first()
+        if not worker:
+            return jsonify([]), 404
+        records = Attendance.query.filter_by(project_worker_id=worker.id).order_by(Attendance.date.desc()).all()
+        result = []
+        for a in records:
+            amount = 0
+            try:
+                amount = (a.days or 0) * (worker.daily_rate or 0)
+            except Exception:
+                amount = 0
+            result.append({
+                'id': a.id,
+                'date': a.date.strftime('%Y-%m-%d') if a.date else None,
+                'days': a.days,
+                'amount': amount,
+                'notes': a.notes if hasattr(a, 'notes') else None
+            })
+        return jsonify(result)
+    except Exception as e:
+        print(f"Error getting attendance: {e}")
+        return jsonify([]), 500
+
+
+@app.route('/api/project/<int:project_id>/workers/<int:worker_id>/attendance', methods=['POST'])
+@login_required
+def record_worker_attendance(project_id, worker_id):
+    """Record attendance (number of days) for a project worker."""
+    try:
+        worker = ProjectWorker.query.filter_by(id=worker_id, project_id=project_id).first()
+        if not worker:
+            return jsonify({'success': False, 'error': 'Worker not found'}), 404
+
+        data = request.get_json() or {}
+        days = float(data.get('days', 0))
+        date_str = data.get('date')
+        if date_str:
+            attend_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        else:
+            attend_date = datetime.utcnow().date()
+
+        if days <= 0:
+            return jsonify({'success': False, 'error': 'Days must be > 0'}), 400
+
+        notes = data.get('notes') if data else None
+        attendance = Attendance(project_worker_id=worker.id, date=attend_date, days=days, notes=notes)
+        db.session.add(attendance)
+        db.session.commit()
+
+        total_days = worker.days_worked
+        return jsonify({'success': True, 'total_days': total_days})
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -1925,15 +2068,31 @@ def uploaded_file(filename):
         return send_from_directory('uploads', filename, as_attachment=True)
     return send_from_directory('uploads', filename)
 
-# ==================== MAIN ====================
+# ==================== MAIN (entry point is at bottom) ====================
+# Ensure runtime migrations run when using flask's server (flask run)
+def ensure_runtime_migrations():
+    try:
+        with app.app_context():
+            db.create_all()
+            res = db.session.execute(text("PRAGMA table_info('attendance')")).fetchall()
+            cols = [row[1] for row in res]
+            if 'notes' not in cols:
+                try:
+                    db.session.execute(text("ALTER TABLE attendance ADD COLUMN notes TEXT"))
+                    db.session.commit()
+                    print("Added 'notes' column to attendance table (before_first_request)")
+                except Exception as inner_e:
+                    db.session.rollback()
+                    print('Failed to add notes column to attendance (before_first_request):', inner_e)
+    except Exception as e:
+        print('ensure_runtime_migrations failed:', e)
+
+# Register migration handler if supported (some Flask runtimes expose before_first_request)
+if hasattr(app, 'before_first_request'):
+    app.before_first_request(ensure_runtime_migrations)
+
 if __name__ == '__main__':
+    # When running directly, run migrations and start server
     with app.app_context():
-        db.create_all()
-        if not User.query.filter_by(username='admin').first():
-            admin = User(username='admin')
-            admin.set_password('changeme')
-            db.session.add(admin)
-            db.session.commit()
-            print('Default user created: admin / changeme')
-    
+        ensure_runtime_migrations()
     app.run(debug=True, host='0.0.0.0', port=5000)

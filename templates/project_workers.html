@@ -1,0 +1,663 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <a href="{{ url_for('project_financial', project_id=project.id) }}" class="btn btn-link p-0 me-3 text-decoration-none">
+                        <i class="fas fa-arrow-left me-2"></i>Retour aux finances
+                    </a>
+                    <h2 class="d-inline-block mb-0">{{ project.name }}</h2>
+                    <p class="text-muted mt-1 mb-0">Gestion de la main-d'œuvre</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addSubcontractorModal">
+                        <i class="fas fa-user-tie me-2"></i>Ajouter Sous-traitant
+                    </button>
+                    <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#addDailyWorkerModal">
+                        <i class="fas fa-user-clock me-2"></i>Ajouter Ouvrier journalier
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUBCONTRACTORS SECTION -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-white py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-handshake me-2 text-primary"></i>Sous-traitants</h5>
+                <span class="badge bg-primary">{{ subcontractors|length }}</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nom</th>
+                            <th>Spécialité</th>
+                            <th>Contact</th>
+                            <th>Rôle</th>
+                            <th>Contrat</th>
+                            <th>Payé</th>
+                            <th>Solde</th>
+                            <th>Dernier paiement</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in subcontractors %}
+                        {% set remaining = (a.contract_amount or 0) - (a.amount_paid or 0) %}
+                        <tr>
+                            <td><strong>{{ a.contact.name }}</strong></td>
+                            <td>{{ a.contact.notes or '—' }}</td>
+                            <td>
+                                <small>{{ a.contact.phone or '—' }}<br>{{ a.contact.email or '—' }}</small>
+                            </td>
+                            <td>{{ a.role or '—' }}</td>
+                            <td class="fw-bold">{{ '%.2f'|format(a.contract_amount or 0) }} TND</td>
+                            <td class="text-success">{{ '%.2f'|format(a.amount_paid or 0) }} TND</td>
+                            <td class="{% if remaining > 0 %}text-warning{% else %}text-success{% endif %}">
+                                {{ '%.2f'|format(remaining) }} TND
+                            </td>
+                            <td>
+                                {% if a.last_payment_date %}
+                                {{ a.last_payment_date.strftime('%d/%m/%Y') }}
+                                {% else %}
+                                <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if a.amount_paid >= a.contract_amount and a.contract_amount > 0 %}
+                                    <span class="badge bg-success">Payé</span>
+                                {% elif a.amount_paid > 0 %}
+                                    <span class="badge bg-warning">Partiel</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Non payé</span>
+                                {% endif %}
+                                {% if a.is_overdue %}
+                                <span class="badge bg-danger ms-1">En retard</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary" onclick="openPaymentModal({{ a.id }}, 'subcontractor', '{{ a.contact.name }}')">
+                                        <i class="fas fa-money-bill"></i>
+                                    </button>
+                                    <button class="btn btn-outline-info" onclick="viewPaymentHistory({{ a.id }}, 'subcontractor')">
+                                        <i class="fas fa-history"></i>
+                                    </button>
+                                    {% if a.contract_file %}
+                                    <a href="{{ a.contract_file }}" class="btn btn-outline-secondary" target="_blank">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="10" class="text-center text-muted py-5">
+                                <i class="fas fa-handshake fa-3x mb-3 d-block text-muted"></i>
+                                Aucun sous-traitant assigné à ce projet
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    {% if subcontractors %}
+                    <tfoot class="table-light fw-bold">
+                        <tr>
+                            <td colspan="4">Totaux:</td>
+                            <td>{{ '%.2f'|format(subcontractors|sum(attribute='contract_amount')) }} TND</td>
+                            <td>{{ '%.2f'|format(subcontractors|sum(attribute='amount_paid')) }} TND</td>
+                            <td>{{ '%.2f'|format(subcontractors|sum(attribute='contract_amount') - subcontractors|sum(attribute='amount_paid')) }} TND</td>
+                            <td colspan="3"></td>
+                        </tr>
+                    </tfoot>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- DAILY WORKERS SECTION -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-white py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-hard-hat me-2 text-success"></i>Ouvriers journaliers</h5>
+                <span class="badge bg-success">{{ daily_workers|length }}</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nom</th>
+                            <th>Rôle</th>
+                            <th>Jours travaillés</th>
+                            <th>Ce mois</th>
+                            <th>Taux journalier</th>
+                            <th>Total gagné</th>
+                            <th>Payé</th>
+                            <th>Solde</th>
+                            <th>Dernière présence</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in daily_workers %}
+                        {% set total_earned = (a.days_worked or 0) * (a.daily_rate or 0) %}
+                        {% set remaining = total_earned - (a.amount_paid or 0) %}
+                        <tr>
+                            <td><strong>{{ a.contact.name }}</strong></td>
+                            <td>{{ a.role or '—' }}</td>
+                            <td>{{ a.days_worked or 0 }}</td>
+                            <td>{{ a.days_worked_this_month or 0 }}</td>
+                            <td>{{ '%.2f'|format(a.daily_rate or 0) }} TND</td>
+                            <td class="fw-bold">{{ '%.2f'|format(total_earned) }} TND</td>
+                            <td class="text-success">{{ '%.2f'|format(a.amount_paid or 0) }} TND</td>
+                            <td class="{% if remaining > 0 %}text-warning{% else %}text-success{% endif %}">
+                                {{ '%.2f'|format(remaining) }} TND
+                            </td>
+                            <td>
+                                {% if a.last_attendance %}
+                                {{ a.last_attendance.strftime('%d/%m/%Y') }}
+                                {% else %}
+                                <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-warning" onclick="openAttendanceModal({{ a.id }}, '{{ a.contact.name }}')">
+                                        <i class="fas fa-calendar-check"></i>
+                                    </button>
+                                    <button class="btn btn-outline-primary" onclick="openPaymentModal({{ a.id }}, 'daily_worker', '{{ a.contact.name }}')">
+                                        <i class="fas fa-money-bill"></i>
+                                    </button>
+                                    <button class="btn btn-outline-info" onclick="viewAttendanceHistory({{ a.id }})">
+                                        <i class="fas fa-history"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="10" class="text-center text-muted py-5">
+                                <i class="fas fa-hard-hat fa-3x mb-3 d-block text-muted"></i>
+                                Aucun ouvrier journalier assigné à ce projet
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    {% if daily_workers %}
+                    <tfoot class="table-light fw-bold">
+                        <tr>
+                            <td colspan="5">Totaux:</td>
+                            <td>{{ '%.2f'|format(daily_workers|sum(attribute='days_worked') * daily_workers|sum(attribute='daily_rate')) }} TND</td>
+                            <td>{{ '%.2f'|format(daily_workers|sum(attribute='amount_paid')) }} TND</td>
+                            <td colspan="3"></td>
+                        </tr>
+                    </tfoot>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== MODALS ==================== -->
+
+<!-- Add Subcontractor Modal -->
+<div class="modal fade" id="addSubcontractorModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="fas fa-user-tie me-2"></i>Ajouter sous-traitant</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addSubcontractorForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Sélectionner un contact existant</label>
+                        <select class="form-select" name="contact_id" id="subcontractorContactSelect" required>
+                            <option value="">Chargement des contacts...</option>
+                        </select>
+                        <small class="form-text text-muted">Ou ajoutez un contact depuis la page <a href="{{ url_for('contacts') }}" target="_blank">Contacts</a>.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Rôle / Tâche</label>
+                        <input type="text" class="form-control" name="role" placeholder="Ex: Installation électrique">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Montant du contrat (TND)</label>
+                        <input type="number" step="0.01" class="form-control" name="contract_amount" placeholder="0.00">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Date de début</label>
+                        <input type="date" class="form-control" name="start_date" id="subcontractorStartDate">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Daily Worker Modal -->
+<div class="modal fade" id="addDailyWorkerModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="fas fa-user-clock me-2"></i>Ajouter ouvrier journalier</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addDailyWorkerForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Sélectionner un contact existant</label>
+                        <select class="form-select" name="contact_id" id="dailyWorkerContactSelect" required>
+                            <option value="">Chargement des contacts...</option>
+                        </select>
+                        <small class="form-text text-muted">Ou ajoutez un contact depuis la page <a href="{{ url_for('contacts') }}" target="_blank">Contacts</a>.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Rôle / Tâche</label>
+                        <input type="text" class="form-control" name="role" placeholder="Ex: Maçonnerie">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Taux journalier (TND)</label>
+                        <input type="number" step="0.01" class="form-control" name="daily_rate" placeholder="0.00">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Date de début</label>
+                        <input type="date" class="form-control" name="start_date" id="dailyWorkerStartDate">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-success">Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="fas fa-money-bill me-2"></i>Enregistrer un paiement</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="paymentForm">
+                <div class="modal-body">
+                    <input type="hidden" id="paymentAssignmentId">
+                    <input type="hidden" id="paymentWorkerType">
+                    <div class="mb-3">
+                        <label class="form-label">Travailleur</label>
+                        <input type="text" class="form-control" id="paymentWorkerName" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Montant (TND) *</label>
+                        <input type="number" step="0.01" class="form-control" id="paymentAmount" required placeholder="0.00">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Date de paiement</label>
+                        <input type="date" class="form-control" id="paymentDate">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mode de paiement</label>
+                        <select class="form-select" id="paymentMethod">
+                            <option value="cash">Espèces</option>
+                            <option value="transfer">Virement bancaire</option>
+                            <option value="check">Chèque</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notes</label>
+                        <textarea class="form-control" id="paymentNotes" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Attendance Modal -->
+<div class="modal fade" id="attendanceModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title"><i class="fas fa-calendar-check me-2"></i>Enregistrer présence</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="attendanceForm">
+                <div class="modal-body">
+                    <input type="hidden" id="attendanceAssignmentId">
+                    <div class="mb-3">
+                        <label class="form-label">Ouvrier</label>
+                        <input type="text" class="form-control" id="attendanceWorkerName" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Date *</label>
+                        <input type="date" class="form-control" id="attendanceDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nombre de jours (1 = journée complète, 0.5 = demi-journée)</label>
+                        <input type="number" step="0.5" class="form-control" id="attendanceDays" value="1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notes</label>
+                        <textarea class="form-control" id="attendanceNotes" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-warning">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Payment History Modal -->
+<div class="modal fade" id="paymentHistoryModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title"><i class="fas fa-history me-2"></i>Historique des paiements</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="paymentHistoryContent">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary"></div>
+                        <p class="mt-2">Chargement...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Attendance History Modal -->
+<div class="modal fade" id="attendanceHistoryModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title"><i class="fas fa-calendar-alt me-2"></i>Historique des présences</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="attendanceHistoryContent">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary"></div>
+                        <p class="mt-2">Chargement...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Set today's date for date inputs
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    const dateInputs = ['subcontractorStartDate', 'dailyWorkerStartDate', 'paymentDate', 'attendanceDate'];
+    dateInputs.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = today;
+    });
+    
+    // Load contacts for selects
+    loadContacts();
+});
+
+// Load contacts from API
+function loadContacts() {
+    fetch('/api/contacts')
+        .then(r => r.json())
+        .then(list => {
+            const subSelect = document.getElementById('subcontractorContactSelect');
+            const dailySelect = document.getElementById('dailyWorkerContactSelect');
+            const options = list.map(c => `<option value="${c.id}">${c.name} ${c.phone ? '- ' + c.phone : ''}</option>`).join('');
+            if (subSelect) subSelect.innerHTML = '<option value="">Sélectionner un contact</option>' + options;
+            if (dailySelect) dailySelect.innerHTML = '<option value="">Sélectionner un contact</option>' + options;
+        })
+        .catch(() => {
+            const subSelect = document.getElementById('subcontractorContactSelect');
+            const dailySelect = document.getElementById('dailyWorkerContactSelect');
+            if (subSelect) subSelect.innerHTML = '<option value="">Erreur chargement</option>';
+            if (dailySelect) dailySelect.innerHTML = '<option value="">Erreur chargement</option>';
+        });
+}
+
+// Open payment modal
+function openPaymentModal(assignmentId, workerType, workerName) {
+    document.getElementById('paymentAssignmentId').value = assignmentId;
+    document.getElementById('paymentWorkerType').value = workerType;
+    document.getElementById('paymentWorkerName').value = workerName;
+    document.getElementById('paymentAmount').value = '';
+    document.getElementById('paymentNotes').value = '';
+    const modal = new bootstrap.Modal(document.getElementById('paymentModal'));
+    modal.show();
+}
+
+// Open attendance modal
+function openAttendanceModal(assignmentId, workerName) {
+    document.getElementById('attendanceAssignmentId').value = assignmentId;
+    document.getElementById('attendanceWorkerName').value = workerName;
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('attendanceDate').value = today;
+    document.getElementById('attendanceDays').value = 1;
+    document.getElementById('attendanceNotes').value = '';
+    const modal = new bootstrap.Modal(document.getElementById('attendanceModal'));
+    modal.show();
+}
+
+// View payment history
+function viewPaymentHistory(assignmentId, workerType) {
+    const modal = new bootstrap.Modal(document.getElementById('paymentHistoryModal'));
+    const content = document.getElementById('paymentHistoryContent');
+    content.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary"></div><p class="mt-2">Chargement...</p></div>';
+    modal.show();
+    
+    fetch(`/api/project/{{ project.id }}/workers/${assignmentId}/payments`)
+        .then(r => r.json())
+        .then(data => {
+            if (data.length === 0) {
+                content.innerHTML = '<div class="text-center py-4 text-muted">Aucun paiement enregistré</div>';
+                return;
+            }
+            content.innerHTML = `
+                <table class="table table-sm">
+                    <thead><tr><th>Date</th><th>Montant</th><th>Mode</th><th>Notes</th></tr></thead>
+                    <tbody>
+                        ${data.map(p => `
+                            <tr>
+                                <td>${p.date || '—'}</td>
+                                <td class="fw-bold text-success">${p.amount} TND</td>
+                                <td>${p.method || '—'}</td>
+                                <td>${p.notes || '—'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        })
+        .catch(() => {
+            content.innerHTML = '<div class="text-center py-4 text-danger">Erreur de chargement</div>';
+        });
+}
+
+// View attendance history
+function viewAttendanceHistory(assignmentId) {
+    const modal = new bootstrap.Modal(document.getElementById('attendanceHistoryModal'));
+    const content = document.getElementById('attendanceHistoryContent');
+    content.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary"></div><p class="mt-2">Chargement...</p></div>';
+    modal.show();
+    
+    fetch(`/api/project/{{ project.id }}/workers/${assignmentId}/attendance`)
+        .then(r => r.json())
+        .then(data => {
+            if (data.length === 0) {
+                content.innerHTML = '<div class="text-center py-4 text-muted">Aucune présence enregistrée</div>';
+                return;
+            }
+            content.innerHTML = `
+                <table class="table table-sm">
+                    <thead><tr><th>Date</th><th>Jours</th><th>Montant</th><th>Notes</th></tr></thead>
+                    <tbody>
+                        ${data.map(a => `
+                            <tr>
+                                <td>${a.date || '—'}</td>
+                                <td>${a.days} jour(s)</td>
+                                <td class="fw-bold">${a.amount} TND</td>
+                                <td>${a.notes || '—'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        })
+        .catch(() => {
+            content.innerHTML = '<div class="text-center py-4 text-danger">Erreur de chargement</div>';
+        });
+}
+
+// Add Subcontractor form submit
+document.getElementById('addSubcontractorForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const payload = {
+        contact_id: parseInt(formData.get('contact_id')),
+        worker_type: 'subcontractor',
+        role: formData.get('role'),
+        start_date: formData.get('start_date'),
+        contract_amount: parseFloat(formData.get('contract_amount')) || 0
+    };
+    if (!payload.contact_id) { alert('Veuillez sélectionner un contact'); return; }
+    
+    fetch(`/api/project/{{ project.id }}/workers`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(res => {
+        if (res.success) location.reload();
+        else alert(res.error || 'Erreur lors de l\'ajout');
+    })
+    .catch(() => alert('Erreur réseau'));
+});
+
+// Add Daily Worker form submit
+document.getElementById('addDailyWorkerForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const payload = {
+        contact_id: parseInt(formData.get('contact_id')),
+        worker_type: 'daily_worker',
+        role: formData.get('role'),
+        start_date: formData.get('start_date'),
+        daily_rate: parseFloat(formData.get('daily_rate')) || 0
+    };
+    if (!payload.contact_id) { alert('Veuillez sélectionner un contact'); return; }
+    
+    fetch(`/api/project/{{ project.id }}/workers`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(res => {
+        if (res.success) location.reload();
+        else alert(res.error || 'Erreur lors de l\'ajout');
+    })
+    .catch(() => alert('Erreur réseau'));
+});
+
+// Payment form submit
+document.getElementById('paymentForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const assignmentId = document.getElementById('paymentAssignmentId').value;
+    const payload = {
+        amount: parseFloat(document.getElementById('paymentAmount').value),
+        payment_date: document.getElementById('paymentDate').value,
+        payment_method: document.getElementById('paymentMethod').value,
+        notes: document.getElementById('paymentNotes').value
+    };
+    if (!payload.amount || payload.amount <= 0) { alert('Montant invalide'); return; }
+    
+    fetch(`/api/project/{{ project.id }}/workers/${assignmentId}/payment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(res => {
+        if (res.success) location.reload();
+        else alert(res.error || 'Erreur lors du paiement');
+    })
+    .catch(() => alert('Erreur réseau'));
+});
+
+// Attendance form submit
+document.getElementById('attendanceForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const assignmentId = document.getElementById('attendanceAssignmentId').value;
+    const payload = {
+        date: document.getElementById('attendanceDate').value,
+        days: parseFloat(document.getElementById('attendanceDays').value),
+        notes: document.getElementById('attendanceNotes').value
+    };
+    if (!payload.days || payload.days <= 0) { alert('Nombre de jours invalide'); return; }
+    
+    fetch(`/api/project/{{ project.id }}/workers/${assignmentId}/attendance`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(res => {
+        if (res.success) location.reload();
+        else alert(res.error || 'Erreur lors de l\'enregistrement');
+    })
+    .catch(() => alert('Erreur réseau'));
+});
+</script>
+
+<style>
+.table th {
+    background: #f8f9fa;
+    font-weight: 600;
+}
+.btn-group {
+    gap: 5px;
+}
+.modal-header .btn-close-white {
+    filter: brightness(0) invert(1);
+}
+</style>
+
+{% endblock %}
