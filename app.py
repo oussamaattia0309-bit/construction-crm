@@ -21,6 +21,13 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
+# Allowed file extensions for upload
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 # Database Models
 project_contacts = db.Table('project_contacts',
     db.Column('project_id', db.Integer, db.ForeignKey('project.id'), primary_key=True),
@@ -31,6 +38,16 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(120), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=True)
+    avatar = db.Column(db.String(200), default='default.png')
+    last_login = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    role = db.Column(db.String(20), default='staff')
+    is_active = db.Column(db.Boolean, default=True)
+    two_factor_enabled = db.Column(db.Boolean, default=False)
+    notification_email = db.Column(db.Boolean, default=True)
+    notification_login_alert = db.Column(db.Boolean, default=True)
+    last_login_ip = db.Column(db.String(45))
     
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -296,6 +313,10 @@ def login():
         user = User.query.filter_by(username=username).first()
         
         if user and user.check_password(password):
+            # Update last login time and IP
+            user.last_login = datetime.utcnow()
+            user.last_login_ip = request.remote_addr
+            db.session.commit()
             login_user(user)
             return redirect(url_for('index'))
         flash('Invalid username or password')
@@ -332,7 +353,117 @@ def change_password():
 @app.route('/account-management')
 @login_required
 def account_management():
-    return render_template('account_management.html')
+    # Mock current session data (replace with actual session tracking)
+    current_session = {
+        'browser': 'Chrome',
+        'os': 'Windows'
+    }
+    
+    # Mock active sessions (replace with actual session tracking)
+    active_sessions = []
+    
+    return render_template('account_management.html', 
+                          current_session=current_session,
+                          active_sessions=active_sessions)
+
+@app.route('/account/upload-avatar', methods=['POST'])
+@login_required
+def upload_avatar():
+    if 'file' not in request.files:
+        return jsonify({'success': False, 'error': 'No file uploaded'})
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'success': False, 'error': 'No file selected'})
+    
+    if not allowed_file(file.filename):
+        return jsonify({'success': False, 'error': 'Invalid file type'})
+    
+    # Create uploads directory if it doesn't exist
+    upload_dir = os.path.join(app.static_folder, 'uploads', 'avatars')
+    os.makedirs(upload_dir, exist_ok=True)
+    
+    # Generate unique filename
+    filename = secure_filename(f"{current_user.id}_{int(datetime.utcnow().timestamp())}_{file.filename}")
+    filepath = os.path.join(upload_dir, filename)
+    
+    # Save file
+    file.save(filepath)
+    
+    # Update user avatar
+    current_user.avatar = filename
+    db.session.commit()
+    
+    return jsonify({'success': True})
+
+@app.route('/account/update-email', methods=['POST'])
+@login_required
+def update_email():
+    data = request.get_json()
+    new_email = data.get('email')
+    
+    if not new_email:
+        return jsonify({'success': False, 'error': 'Email is required'})
+    
+    # Check if email already exists
+    existing_user = User.query.filter_by(email=new_email).first()
+    if existing_user and existing_user.id != current_user.id:
+        return jsonify({'success': False, 'error': 'Email already in use'})
+    
+    current_user.email = new_email
+    db.session.commit()
+    
+    return jsonify({'success': True})
+
+@app.route('/account/update-notifications', methods=['POST'])
+@login_required
+def update_notifications():
+    data = request.get_json()
+    notification_type = data.get('type')
+    enabled = data.get('enabled', False)
+    
+    if notification_type == 'email':
+        current_user.notification_email = enabled
+    
+    db.session.commit()
+    
+    return jsonify({'success': True})
+
+@app.route('/account/update-login-alerts', methods=['POST'])
+@login_required
+def update_login_alerts():
+    data = request.get_json()
+    enabled = data.get('enabled', False)
+    
+    current_user.notification_login_alert = enabled
+    db.session.commit()
+    
+    return jsonify({'success': True})
+
+@app.route('/account/revoke-session', methods=['POST'])
+@login_required
+def revoke_session():
+    # Implement session revocation logic
+    return jsonify({'success': True, 'message': 'Session revoked'})
+
+@app.route('/account/sign-out-all', methods=['POST'])
+@login_required
+def sign_out_all_devices():
+    # Implement sign out all devices logic
+    return jsonify({'success': True, 'message': 'Signed out from all other devices'})
+
+@app.route('/account/delete', methods=['POST'])
+@login_required
+def delete_account():
+    # Prevent deletion of admin accounts
+    if current_user.role == 'admin':
+        return jsonify({'success': False, 'error': 'Cannot delete admin account'})
+    
+    # Delete user account
+    db.session.delete(current_user)
+    db.session.commit()
+    
+    return jsonify({'success': True})
 
 # ==================== CONTACT ROUTES ====================
 @app.route('/contacts')
