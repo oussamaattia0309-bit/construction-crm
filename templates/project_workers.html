@@ -25,7 +25,7 @@
     </div>
 
     <!-- SUBCONTRACTORS SECTION -->
-    <div class="card mb-4 shadow-sm">
+    <div class="card mb-4 shadow-sm card-subcontractors">
         <div class="card-header bg-white py-3">
             <div class="d-flex justify-content-between align-items-center">
                 <h5 class="mb-0"><i class="fas fa-handshake me-2 text-primary"></i>Sous-traitants</h5>
@@ -43,8 +43,7 @@
                             <th>Rôle</th>
                             <th>Contrat</th>
                             <th>Payé</th>
-                            <th>Solde</th>
-                            <th>Dernier paiement</th>
+                            <th>Reste à payer</th>
                             <th>Statut</th>
                             <th>Actions</th>
                         </tr>
@@ -52,7 +51,7 @@
                     <tbody>
                         {% for a in subcontractors %}
                         {% set remaining = (a.contract_amount or 0) - (a.amount_paid or 0) %}
-                        <tr>
+                        <tr data-assignment-id="{{ a.id }}">
                             <td><strong>{{ a.contact.name }}</strong></td>
                             <td>{{ a.contact.notes or '—' }}</td>
                             <td>
@@ -61,15 +60,8 @@
                             <td>{{ a.role or '—' }}</td>
                             <td class="fw-bold">{{ '%.2f'|format(a.contract_amount or 0) }} TND</td>
                             <td class="text-success">{{ '%.2f'|format(a.amount_paid or 0) }} TND</td>
-                            <td class="{% if remaining > 0 %}text-warning{% else %}text-success{% endif %}">
+                            <td class="{%- if remaining > 0 %}text-warning{% else %}text-success{% endif %}">
                                 {{ '%.2f'|format(remaining) }} TND
-                            </td>
-                            <td>
-                                {% if a.last_payment_date %}
-                                {{ a.last_payment_date.strftime('%d/%m/%Y') }}
-                                {% else %}
-                                <span class="text-muted">—</span>
-                                {% endif %}
                             </td>
                             <td>
                                 {% if a.amount_paid >= a.contract_amount and a.contract_amount > 0 %}
@@ -96,12 +88,18 @@
                                         <i class="fas fa-file-pdf"></i>
                                     </a>
                                     {% endif %}
+                                    <button class="btn btn-outline-secondary" onclick="openEditModal({{ a.id }})" title="Éditer">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-outline-danger" onclick="deleteWorker({{ a.id }})" title="Supprimer">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
                         {% else %}
                         <tr>
-                            <td colspan="10" class="text-center text-muted py-5">
+                            <td colspan="9" class="text-center text-muted py-5">
                                 <i class="fas fa-handshake fa-3x mb-3 d-block text-muted"></i>
                                 Aucun sous-traitant assigné à ce projet
                             </td>
@@ -115,7 +113,7 @@
                             <td>{{ '%.2f'|format(subcontractors|sum(attribute='contract_amount')) }} TND</td>
                             <td>{{ '%.2f'|format(subcontractors|sum(attribute='amount_paid')) }} TND</td>
                             <td>{{ '%.2f'|format(subcontractors|sum(attribute='contract_amount') - subcontractors|sum(attribute='amount_paid')) }} TND</td>
-                            <td colspan="3"></td>
+                            <td colspan="2"></td>
                         </tr>
                     </tfoot>
                     {% endif %}
@@ -125,7 +123,7 @@
     </div>
 
     <!-- DAILY WORKERS SECTION -->
-    <div class="card mb-4 shadow-sm">
+    <div class="card mb-4 shadow-sm card-dailyworkers">
         <div class="card-header bg-white py-3">
             <div class="d-flex justify-content-between align-items-center">
                 <h5 class="mb-0"><i class="fas fa-hard-hat me-2 text-success"></i>Ouvriers journaliers</h5>
@@ -144,8 +142,7 @@
                             <th>Taux journalier</th>
                             <th>Total gagné</th>
                             <th>Payé</th>
-                            <th>Solde</th>
-                            <th>Dernière présence</th>
+                            <th>Reste à payer</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -161,15 +158,8 @@
                             <td>{{ '%.2f'|format(a.daily_rate or 0) }} TND</td>
                             <td class="fw-bold">{{ '%.2f'|format(total_earned) }} TND</td>
                             <td class="text-success">{{ '%.2f'|format(a.amount_paid or 0) }} TND</td>
-                            <td class="{% if remaining > 0 %}text-warning{% else %}text-success{% endif %}">
+                            <td class="{%- if remaining > 0 %}text-warning{% else %}text-success{% endif %}">
                                 {{ '%.2f'|format(remaining) }} TND
-                            </td>
-                            <td>
-                                {% if a.last_attendance %}
-                                {{ a.last_attendance.strftime('%d/%m/%Y') }}
-                                {% else %}
-                                <span class="text-muted">—</span>
-                                {% endif %}
                             </td>
                             <td>
                                 <div class="btn-group btn-group-sm">
@@ -182,12 +172,18 @@
                                     <button class="btn btn-outline-info" onclick="viewAttendanceHistory({{ a.id }})">
                                         <i class="fas fa-history"></i>
                                     </button>
+                                    <button class="btn btn-outline-secondary" onclick="openEditModal({{ a.id }})" title="Éditer">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-outline-danger" onclick="deleteWorker({{ a.id }})" title="Supprimer">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
                         {% else %}
                         <tr>
-                            <td colspan="10" class="text-center text-muted py-5">
+                            <td colspan="9" class="text-center text-muted py-5">
                                 <i class="fas fa-hard-hat fa-3x mb-3 d-block text-muted"></i>
                                 Aucun ouvrier journalier assigné à ce projet
                             </td>
@@ -200,7 +196,7 @@
                             <td colspan="5">Totaux:</td>
                             <td>{{ '%.2f'|format(daily_workers|sum(attribute='days_worked') * daily_workers|sum(attribute='daily_rate')) }} TND</td>
                             <td>{{ '%.2f'|format(daily_workers|sum(attribute='amount_paid')) }} TND</td>
-                            <td colspan="3"></td>
+                            <td colspan="2"></td>
                         </tr>
                     </tfoot>
                     {% endif %}
@@ -224,6 +220,7 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Sélectionner un contact existant</label>
+                        <input class="form-control mb-2" type="search" id="subcontractorContactSearch" placeholder="Rechercher un contact (nom, téléphone, email)">
                         <select class="form-select" name="contact_id" id="subcontractorContactSelect" required>
                             <option value="">Chargement des contacts...</option>
                         </select>
@@ -263,6 +260,7 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Sélectionner un contact existant</label>
+                        <input class="form-control mb-2" type="search" id="dailyWorkerContactSearch" placeholder="Rechercher un contact (nom, téléphone, email)">
                         <select class="form-select" name="contact_id" id="dailyWorkerContactSelect" required>
                             <option value="">Chargement des contacts...</option>
                         </select>
@@ -301,6 +299,7 @@
             <form id="paymentForm">
                 <div class="modal-body">
                     <input type="hidden" id="paymentAssignmentId">
+                    <input type="hidden" id="editingPaymentId">
                     <input type="hidden" id="paymentWorkerType">
                     <div class="mb-3">
                         <label class="form-label">Travailleur</label>
@@ -419,6 +418,48 @@
     </div>
 </div>
 
+            <!-- Edit Worker Modal -->
+            <div class="modal fade" id="editWorkerModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-secondary text-white">
+                            <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Éditer assignement</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form id="editWorkerForm">
+                            <div class="modal-body">
+                                <input type="hidden" id="editWorkerId">
+                                <input type="hidden" id="editWorkerType">
+                                <div class="mb-3">
+                                    <label class="form-label">Rôle / Tâche</label>
+                                    <input type="text" class="form-control" id="editRole">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Date de début</label>
+                                    <input type="date" class="form-control" id="editStartDate">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Montant du contrat (TND)</label>
+                                    <input type="number" step="0.01" class="form-control" id="editContractAmount">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Taux journalier (TND)</label>
+                                    <input type="number" step="0.01" class="form-control" id="editDailyRate">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Notes</label>
+                                    <textarea class="form-control" id="editNotes" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                <button type="submit" class="btn btn-primary">Sauvegarder</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
 <script>
 // Set today's date for date inputs
 document.addEventListener('DOMContentLoaded', function() {
@@ -440,9 +481,16 @@ function loadContacts() {
         .then(list => {
             const subSelect = document.getElementById('subcontractorContactSelect');
             const dailySelect = document.getElementById('dailyWorkerContactSelect');
-            const options = list.map(c => `<option value="${c.id}">${c.name} ${c.phone ? '- ' + c.phone : ''}</option>`).join('');
+            // keep a global contacts array for filtering
+            window._WORKER_CONTACTS = list || [];
+            const options = list.map(c => `<option value="${c.id}" data-name="${(c.name||'').toLowerCase()}" data-phone="${(c.phone||'').toLowerCase()}" data-email="${(c.email||'').toLowerCase()}">${c.name} ${c.phone ? '- ' + c.phone : ''}</option>`).join('');
             if (subSelect) subSelect.innerHTML = '<option value="">Sélectionner un contact</option>' + options;
             if (dailySelect) dailySelect.innerHTML = '<option value="">Sélectionner un contact</option>' + options;
+            // attach simple search listeners
+            const subSearch = document.getElementById('subcontractorContactSearch');
+            const dailySearch = document.getElementById('dailyWorkerContactSearch');
+            if (subSearch) subSearch.addEventListener('input', e => filterContactSelect(e.target.value, 'subcontractorContactSelect'));
+            if (dailySearch) dailySearch.addEventListener('input', e => filterContactSelect(e.target.value, 'dailyWorkerContactSelect'));
         })
         .catch(() => {
             const subSelect = document.getElementById('subcontractorContactSelect');
@@ -450,6 +498,87 @@ function loadContacts() {
             if (subSelect) subSelect.innerHTML = '<option value="">Erreur chargement</option>';
             if (dailySelect) dailySelect.innerHTML = '<option value="">Erreur chargement</option>';
         });
+}
+
+// Filter a select's options by search text (matches name, phone, email)
+function filterContactSelect(q, selectId) {
+    const ql = (q || '').toLowerCase().trim();
+    const sel = document.getElementById(selectId);
+    if (!sel) return;
+    for (let i = 0; i < sel.options.length; i++) {
+        const opt = sel.options[i];
+        if (!opt.value) { opt.hidden = false; continue; } // keep placeholder
+        const name = (opt.getAttribute('data-name') || '');
+        const phone = (opt.getAttribute('data-phone') || '');
+        const email = (opt.getAttribute('data-email') || '');
+        const match = !ql || name.includes(ql) || phone.includes(ql) || email.includes(ql);
+        opt.hidden = !match;
+    }
+}
+
+// Recalculate and update totals in the payments modal
+function recalcPaymentTotals(assignmentId) {
+    const content = document.getElementById('paymentHistoryContent');
+    if (!content) return;
+    const rows = Array.from(content.querySelectorAll('table tbody tr'));
+    const totalPaid = rows.reduce((s, r) => {
+        const amtCell = r.querySelector('td:nth-child(2)');
+        if (!amtCell) return s;
+        const txt = amtCell.textContent || '';
+        const num = parseFloat(txt.replace(/[^0-9.-]+/g, '')) || 0;
+        return s + num;
+    }, 0);
+
+    const wdata = (window.WORKER_DATA && window.WORKER_DATA[String(assignmentId)]) || null;
+    let totalDue = 0;
+    if (wdata) {
+        if (wdata.worker_type === 'subcontractor') totalDue = parseFloat(wdata.contract_amount || 0);
+        else totalDue = (parseFloat(wdata.daily_rate || 0) || 0) * (parseFloat(wdata.days_worked || 0) || 0);
+    }
+    const remaining = (totalDue - totalPaid) || 0;
+
+    const paidEl = document.getElementById('paymentsTotalPaid');
+    const remEl = document.getElementById('paymentsRemaining');
+    if (paidEl) paidEl.textContent = (totalPaid).toFixed(2) + ' TND';
+    if (remEl) remEl.textContent = (remaining).toFixed(2) + ' TND';
+}
+
+// Update main worker table row (paid and remaining) in-place
+function updateMainWorkerRow(assignmentId, amountPaid) {
+    const row = document.querySelector(`tr[data-assignment-id="${assignmentId}"]`);
+    if (!row) return;
+    const wdata = (window.WORKER_DATA && window.WORKER_DATA[String(assignmentId)]) || null;
+    // find paid and remaining cell indexes depending on worker type
+    if (wdata && wdata.worker_type === 'subcontractor') {
+        // columns: ... contract(5), paid(6), remaining(7), status(8), actions(9)
+        const paidCell = row.querySelector('td:nth-child(6)');
+        const remainingCell = row.querySelector('td:nth-child(7)');
+        if (paidCell) paidCell.textContent = (parseFloat(amountPaid || 0)).toFixed(2) + ' TND';
+        const total = parseFloat(wdata.contract_amount || 0);
+        const rem = (total - (parseFloat(amountPaid || 0) || 0));
+        if (remainingCell) {
+            remainingCell.textContent = rem.toFixed(2) + ' TND';
+            remainingCell.className = rem > 0 ? 'text-warning' : 'text-success';
+        }
+    } else {
+        // daily worker: columns: name(1), role(2), days(3), this month(4), rate(5), total earned(6), paid(7), remaining(8), actions(9)
+        const paidCell = row.querySelector('td:nth-child(7)');
+        const remainingCell = row.querySelector('td:nth-child(8)');
+        if (paidCell) paidCell.textContent = (parseFloat(amountPaid || 0)).toFixed(2) + ' TND';
+        const rate = parseFloat(wdata.daily_rate || 0) || 0;
+        const days = parseFloat(wdata.days_worked || 0) || 0;
+        const totalEarned = rate * days;
+        const rem = (totalEarned - (parseFloat(amountPaid || 0) || 0));
+        if (remainingCell) {
+            remainingCell.textContent = rem.toFixed(2) + ' TND';
+            remainingCell.className = rem > 0 ? 'text-warning' : 'text-success';
+        }
+        // also update Total earned cell (6)
+        const totalEarnedCell = row.querySelector('td:nth-child(6)');
+        if (totalEarnedCell) totalEarnedCell.textContent = totalEarned.toFixed(2) + ' TND';
+    }
+    // update WORKER_DATA.amount_paid so future calculations use latest value
+    if (window.WORKER_DATA && window.WORKER_DATA[String(assignmentId)]) window.WORKER_DATA[String(assignmentId)].amount_paid = parseFloat(amountPaid || 0);
 }
 
 // Open payment modal
@@ -485,25 +614,86 @@ function viewPaymentHistory(assignmentId, workerType) {
     fetch(`/api/project/{{ project.id }}/workers/${assignmentId}/payments`)
         .then(r => r.json())
         .then(data => {
-            if (data.length === 0) {
+            if (!data || data.length === 0) {
                 content.innerHTML = '<div class="text-center py-4 text-muted">Aucun paiement enregistré</div>';
                 return;
             }
+
+            const rows = data.map(p => {
+                const notes = p.notes ? p.notes.replace(/</g, '&lt;').replace(/>/g, '&gt;') : '—';
+                return `
+                    <tr data-id="${p.id}">
+                        <td>${p.date || '—'}</td>
+                        <td class="fw-bold text-success">${(p.amount||0).toFixed(2)} TND</td>
+                        <td>${p.method || '—'}</td>
+                        <td>${notes}</td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-secondary edit-payment" data-id="${p.id}" data-date="${p.date||''}" data-amount="${p.amount||0}" data-method="${p.method||''}" data-notes="${(p.notes||'').replace(/"/g,'&quot;')}"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-outline-danger delete-payment" data-id="${p.id}"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            // compute totals and remaining
+            const totalPaid = data.reduce((s,p) => s + (parseFloat(p.amount) || 0), 0);
+            const wdata = (window.WORKER_DATA && window.WORKER_DATA[String(assignmentId)]) || null;
+            let totalDue = 0;
+            if (wdata) {
+                if (wdata.worker_type === 'subcontractor') {
+                    totalDue = parseFloat(wdata.contract_amount || 0);
+                } else {
+                    totalDue = (parseFloat(wdata.daily_rate || 0) || 0) * (parseFloat(wdata.days_worked || 0) || 0);
+                }
+            }
+            const remaining = (totalDue - totalPaid) || 0;
+
             content.innerHTML = `
+                <div class="mb-3 d-flex justify-content-between align-items-center" id="paymentsTotals">
+                    <div><strong>Total payé:</strong> <span id="paymentsTotalPaid">${(totalPaid).toFixed(2)} TND</span></div>
+                    <div><strong>Reste à payer:</strong> <span id="paymentsRemaining">${(remaining).toFixed(2)} TND</span></div>
+                </div>
                 <table class="table table-sm">
-                    <thead><tr><th>Date</th><th>Montant</th><th>Mode</th><th>Notes</th></tr></thead>
-                    <tbody>
-                        ${data.map(p => `
-                            <tr>
-                                <td>${p.date || '—'}</td>
-                                <td class="fw-bold text-success">${p.amount} TND</td>
-                                <td>${p.method || '—'}</td>
-                                <td>${p.notes || '—'}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
+                    <thead><tr><th>Date</th><th>Montant</th><th>Mode</th><th>Notes</th><th>Actions</th></tr></thead>
+                    <tbody>${rows}</tbody>
                 </table>
             `;
+
+            // attach handlers for edit/delete
+            content.querySelectorAll('.edit-payment').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    document.getElementById('editingPaymentId').value = id;
+                    document.getElementById('paymentAssignmentId').value = assignmentId;
+                    document.getElementById('paymentAmount').value = parseFloat(this.dataset.amount) || '';
+                    document.getElementById('paymentDate').value = this.dataset.date || '';
+                    document.getElementById('paymentMethod').value = this.dataset.method || '';
+                    document.getElementById('paymentNotes').value = this.dataset.notes || '';
+                    const pm = new bootstrap.Modal(document.getElementById('paymentModal'));
+                    pm.show();
+                });
+            });
+
+            content.querySelectorAll('.delete-payment').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    if (!confirm('Confirmer la suppression de ce paiement ?')) return;
+                    fetch(`/api/project/{{ project.id }}/workers/${assignmentId}/payments/${id}`, { method: 'DELETE' })
+                        .then(r => r.json()).then(res => {
+                            if (res.success) {
+                                // remove row
+                                const row = content.querySelector(`tr[data-id="${id}"]`);
+                                if (row) row.remove();
+                                // recalc totals
+                                recalcPaymentTotals(assignmentId);
+                                // update main table if amount_paid returned
+                                if (res.amount_paid !== undefined) updateMainWorkerRow(assignmentId, res.amount_paid);
+                            } else alert(res.error || 'Erreur lors de la suppression');
+                        }).catch(() => alert('Erreur réseau'));
+                });
+            });
         })
         .catch(() => {
             content.innerHTML = '<div class="text-center py-4 text-danger">Erreur de chargement</div>';
@@ -601,6 +791,7 @@ document.getElementById('addDailyWorkerForm')?.addEventListener('submit', functi
 document.getElementById('paymentForm')?.addEventListener('submit', function(e) {
     e.preventDefault();
     const assignmentId = document.getElementById('paymentAssignmentId').value;
+    const editingId = document.getElementById('editingPaymentId')?.value;
     const payload = {
         amount: parseFloat(document.getElementById('paymentAmount').value),
         payment_date: document.getElementById('paymentDate').value,
@@ -608,18 +799,94 @@ document.getElementById('paymentForm')?.addEventListener('submit', function(e) {
         notes: document.getElementById('paymentNotes').value
     };
     if (!payload.amount || payload.amount <= 0) { alert('Montant invalide'); return; }
-    
-    fetch(`/api/project/{{ project.id }}/workers/${assignmentId}/payment`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    })
-    .then(r => r.json())
-    .then(res => {
-        if (res.success) location.reload();
-        else alert(res.error || 'Erreur lors du paiement');
-    })
-    .catch(() => alert('Erreur réseau'));
+    if (editingId) {
+        // update existing payment in-place
+        fetch(`/api/project/{{ project.id }}/workers/${assignmentId}/payments/${editingId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount: payload.amount, date: payload.payment_date, method: payload.payment_method, notes: payload.notes })
+        }).then(r => r.json()).then(res => {
+            if (res.success) {
+                // update row in modal
+                const content = document.getElementById('paymentHistoryContent');
+                const row = content.querySelector(`tr[data-id="${editingId}"]`);
+                if (row) {
+                    row.querySelector('td:nth-child(1)').textContent = payload.payment_date || '';
+                    row.querySelector('td:nth-child(2)').textContent = (payload.amount||0).toFixed(2) + ' TND';
+                    row.querySelector('td:nth-child(3)').textContent = payload.payment_method || '';
+                    row.querySelector('td:nth-child(4)').textContent = payload.notes || '—';
+                }
+                recalcPaymentTotals(assignmentId);
+                // update main table if returned
+                if (res.amount_paid !== undefined) updateMainWorkerRow(assignmentId, res.amount_paid);
+                const pm = bootstrap.Modal.getInstance(document.getElementById('paymentModal'));
+                if (pm) pm.hide();
+            } else alert(res.error || 'Erreur lors de la mise à jour');
+        }).catch(() => alert('Erreur réseau'));
+    } else {
+        fetch(`/api/project/{{ project.id }}/workers/${assignmentId}/payment`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(r => r.json())
+        .then(res => {
+            if (res.success) {
+                // append new payment row to modal if open
+                try {
+                    const content = document.getElementById('paymentHistoryContent');
+                    const tbody = content.querySelector('table tbody');
+                    if (tbody) {
+                        const p = res.payment || { id: res.payment_id || Date.now(), date: payload.payment_date, amount: payload.amount, method: payload.payment_method, notes: payload.notes };
+                        const tr = document.createElement('tr');
+                        tr.setAttribute('data-id', p.id);
+                        tr.innerHTML = `
+                            <td>${p.date || ''}</td>
+                            <td class="fw-bold text-success">${(p.amount||0).toFixed(2)} TND</td>
+                            <td>${p.method || ''}</td>
+                            <td>${p.notes || '—'}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-secondary edit-payment" data-id="${p.id}" data-date="${p.date||''}" data-amount="${p.amount||0}" data-method="${p.method||''}" data-notes="${(p.notes||'').replace(/"/g,'&quot;')}"><i class="fas fa-edit"></i></button>
+                                    <button class="btn btn-outline-danger delete-payment" data-id="${p.id}"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </td>`;
+                        tbody.prepend(tr);
+                        // reattach handlers for the new row
+                        tr.querySelector('.edit-payment')?.addEventListener('click', function() {
+                            const id = this.dataset.id;
+                            document.getElementById('editingPaymentId').value = id;
+                            document.getElementById('paymentAssignmentId').value = assignmentId;
+                            document.getElementById('paymentAmount').value = parseFloat(this.dataset.amount) || '';
+                            document.getElementById('paymentDate').value = this.dataset.date || '';
+                            document.getElementById('paymentMethod').value = this.dataset.method || '';
+                            document.getElementById('paymentNotes').value = this.dataset.notes || '';
+                            const pm = new bootstrap.Modal(document.getElementById('paymentModal'));
+                            pm.show();
+                        });
+                        tr.querySelector('.delete-payment')?.addEventListener('click', function() {
+                            const id = this.dataset.id;
+                            if (!confirm('Confirmer la suppression de ce paiement ?')) return;
+                            fetch(`/api/project/{{ project.id }}/workers/${assignmentId}/payments/${id}`, { method: 'DELETE' })
+                                .then(r => r.json()).then(res => {
+                                    if (res.success) {
+                                        tr.remove();
+                                        recalcPaymentTotals(assignmentId);
+                                        if (res.amount_paid !== undefined) updateMainWorkerRow(assignmentId, res.amount_paid);
+                                    } else alert(res.error || 'Erreur lors de la suppression');
+                                }).catch(() => alert('Erreur réseau'));
+                        });
+                        recalcPaymentTotals(assignmentId);
+                        // update main table with returned amount_paid if present
+                        if (res.amount_paid !== undefined) updateMainWorkerRow(assignmentId, res.amount_paid);
+                    }
+                } catch (e) { /* ignore DOM errors */ }
+            } else alert(res.error || 'Erreur lors du paiement');
+        })
+        .catch(() => alert('Erreur réseau'));
+    }
+    // clear editing id after submit
+    if (document.getElementById('editingPaymentId')) document.getElementById('editingPaymentId').value = '';
 });
 
 // Attendance form submit
@@ -645,6 +912,126 @@ document.getElementById('attendanceForm')?.addEventListener('submit', function(e
     })
     .catch(() => alert('Erreur réseau'));
 });
+
+// Build worker data map for edit modal (id -> data)
+const WORKER_DATA = {
+{% for w in subcontractors %}
+    "{{ w.id }}": {{ {'id': w.id, 'worker_type': 'subcontractor', 'role': w.role or '', 'start_date': w.start_date.strftime('%Y-%m-%d') if w.start_date else '', 'contract_amount': w.contract_amount or 0, 'daily_rate': w.daily_rate or 0, 'days_worked': w.days_worked or 0, 'amount_paid': w.amount_paid or 0, 'notes': w.notes or ''}|tojson }},
+{% endfor %}
+{% for w in daily_workers %}
+    "{{ w.id }}": {{ {'id': w.id, 'worker_type': 'daily_worker', 'role': w.role or '', 'start_date': w.start_date.strftime('%Y-%m-%d') if w.start_date else '', 'contract_amount': w.contract_amount or 0, 'daily_rate': w.daily_rate or 0, 'days_worked': w.days_worked or 0, 'amount_paid': w.amount_paid or 0, 'notes': w.notes or ''}|tojson }},
+{% endfor %}
+};
+
+// Open edit modal prefilled with worker data
+function openEditModal(workerId) {
+    const data = WORKER_DATA[workerId];
+    if (!data) { alert('Données introuvables pour ce travailleur'); return; }
+    document.getElementById('editWorkerId').value = workerId;
+    document.getElementById('editWorkerType').value = data.worker_type;
+    document.getElementById('editRole').value = data.role || '';
+    document.getElementById('editStartDate').value = data.start_date || '';
+    document.getElementById('editContractAmount').value = data.contract_amount || '';
+    document.getElementById('editDailyRate').value = data.daily_rate || '';
+    document.getElementById('editNotes').value = data.notes || '';
+    const modal = new bootstrap.Modal(document.getElementById('editWorkerModal'));
+    modal.show();
+}
+
+// Submit edit form
+document.getElementById('editWorkerForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const id = document.getElementById('editWorkerId').value;
+    const payload = {
+        role: document.getElementById('editRole').value,
+        start_date: document.getElementById('editStartDate').value,
+        contract_amount: parseFloat(document.getElementById('editContractAmount').value) || 0,
+        daily_rate: parseFloat(document.getElementById('editDailyRate').value) || 0,
+        notes: document.getElementById('editNotes').value
+    };
+
+    fetch(`/api/project/{{ project.id }}/workers/${id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(res => {
+        if (res.success) location.reload();
+        else alert(res.error || 'Erreur lors de la mise à jour');
+    })
+    .catch(() => alert('Erreur réseau'));
+});
+
+// Delete worker
+function deleteWorker(workerId) {
+    if (!confirm('Confirmer la suppression de cet assignement ?')) return;
+    fetch(`/api/project/{{ project.id }}/workers/${workerId}`, { method: 'DELETE' })
+        .then(r => r.json())
+        .then(res => {
+            if (res.success) location.reload();
+            else alert(res.error || 'Erreur lors de la suppression');
+        })
+        .catch(() => alert('Erreur réseau'));
+}
+</script>
+
+<script>
+// Bootstrap modal stacking helper: ensure newly opened modals appear above existing ones
+document.addEventListener('show.bs.modal', function (event) {
+    const modal = event.target;
+    // blur any focused element that lives inside a different modal to avoid aria-hidden focus errors
+    try {
+        const active = document.activeElement;
+        if (active) {
+            const parentModal = active.closest('.modal');
+            if (parentModal && parentModal !== modal) active.blur();
+        }
+    } catch (e) { /* ignore */ }
+
+    // count currently visible modals (already have .show)
+    const visible = document.querySelectorAll('.modal.show').length;
+    const zBase = 1050; // bootstrap default backdrop z-index is 1040/1050
+    const zIndex = zBase + (visible * 20);
+    modal.style.zIndex = zIndex;
+
+    // mark other open modals as inert/aria-hidden so screen readers won't see them
+    document.querySelectorAll('.modal.show').forEach(m => {
+        if (m !== modal) {
+            try { m.setAttribute('aria-hidden', 'true'); } catch (e) {}
+            try { m.inert = true; } catch (e) {}
+        }
+    });
+
+    // adjust the backdrop that was just added (it's last .modal-backdrop)
+    setTimeout(() => {
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        if (backdrops.length) {
+            const bd = backdrops[backdrops.length - 1];
+            bd.style.zIndex = zIndex - 10;
+            bd.classList.add('stacked');
+        }
+        // ensure the modal we're showing is visible to AT
+        try { modal.setAttribute('aria-hidden', 'false'); } catch (e) {}
+    }, 0);
+});
+
+document.addEventListener('hidden.bs.modal', function (event) {
+    const modal = event.target;
+    // remove inert/aria-hidden from any remaining open modals
+    const open = document.querySelectorAll('.modal.show');
+    if (open.length) {
+        open.forEach(m => {
+            try { m.removeAttribute('aria-hidden'); } catch (e) {}
+            try { m.inert = false; } catch (e) {}
+        });
+        // ensure body still has modal-open
+        document.body.classList.add('modal-open');
+    } else {
+        // no open modals, ensure body class cleaned up
+        document.body.classList.remove('modal-open');
+    }
+});
 </script>
 
 <style>
@@ -658,6 +1045,64 @@ document.getElementById('attendanceForm')?.addEventListener('submit', function(e
 .modal-header .btn-close-white {
     filter: brightness(0) invert(1);
 }
+
+/* Visual differentiation for worker tables */
+.card-subcontractors {
+    border-left: 6px solid #0d6efd; /* bootstrap primary */
+}
+.card-subcontractors .card-header {
+    background: linear-gradient(90deg, rgba(13,110,253,0.06), rgba(255,255,255,0));
+}
+.card-subcontractors table th {
+    background: #dfeeff; /* slightly stronger */
+    color: #0b3d91; /* darker blue for better contrast */
+    font-weight: 700;
+}
+
+.card-dailyworkers {
+    border-left: 6px solid #198754; /* bootstrap success */
+}
+.card-dailyworkers .card-header {
+    background: linear-gradient(90deg, rgba(25,135,84,0.08), rgba(255,255,255,0));
+}
+.card-dailyworkers table th {
+    background: #dff6e6; /* slightly stronger */
+    color: #0b662e; /* darker green for better contrast */
+    font-weight: 700;
+}
+
+/* Slightly stronger hover to make rows easier to scan */
+.card-subcontractors .table-hover tbody tr:hover {
+    background-color: rgba(13,110,253,0.04);
+}
+.card-dailyworkers .table-hover tbody tr:hover {
+    background-color: rgba(25,135,84,0.035);
+}
+
+/* Ensure table text is dark for good contrast */
+.card-subcontractors .table th,
+.card-subcontractors .table td,
+.card-dailyworkers .table th,
+.card-dailyworkers .table td,
+.card .table th,
+.card .table td {
+    color: #212529; /* bootstrap body color */
+}
+
+/* Make header text more readable */
+.card .card-header h5 {
+    color: #212529;
+    font-weight: 700;
+}
+
+/* Compact badges and clearer header spacing */
+.card .card-header .badge {
+    font-size: 0.85rem;
+    padding: 0.35rem 0.55rem;
+}
+
+/* Make icons a bit more visible */
+.card-header i.fas { color: inherit; opacity: 0.9; }
 </style>
 
 {% endblock %}

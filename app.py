@@ -108,6 +108,7 @@ class ProjectWorker(db.Model):
     start_date = db.Column(db.Date)
     contract_amount = db.Column(db.Float, default=0.0)  # For subcontractors
     daily_rate = db.Column(db.Float, default=0.0)  # For daily workers
+    days_worked = db.Column(db.Float, default=0.0)  # Total days worked for daily workers
     amount_paid = db.Column(db.Float, default=0.0)
     notes = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -560,6 +561,16 @@ def project_workers(id):
     subcontractors = [w for w in workers if w.worker_type == 'subcontractor']
     daily_workers = [w for w in workers if w.worker_type == 'daily_worker']
     return render_template('project_workers.html', project=project, subcontractors=subcontractors, daily_workers=daily_workers)
+
+
+@app.route('/project/<int:id>/workers-v2')
+@login_required
+def project_workers_v2(id):
+    project = Project.query.get_or_404(id)
+    subcontractors = ProjectWorker.query.filter_by(project_id=id, worker_type='subcontractor').all()
+    daily_workers = ProjectWorker.query.filter_by(project_id=id, worker_type='daily_worker').all()
+    contacts = Contact.query.all()
+    return render_template('project_workers_v2.html', project=project, subcontractors=subcontractors, daily_workers=daily_workers, contacts=contacts)
 
 @app.route('/projects/<int:id>', methods=['POST'])
 @login_required
@@ -1053,14 +1064,26 @@ def add_project_worker(project_id):
     """Add a worker (subcontractor or daily worker) to a project"""
     try:
         data = request.get_json()
-        
-        contact = Contact.query.get(data.get('contact_id'))
-        if not contact:
-            return jsonify({'success': False, 'error': 'Contact not found'}), 404
+        # Accept either contact_id or contact_name. If name provided and not found, create a new Contact.
+        contact = None
+        if data.get('contact_id'):
+            contact = Contact.query.get(data.get('contact_id'))
+            if not contact:
+                return jsonify({'success': False, 'error': 'Contact not found'}), 404
+        else:
+            name = (data.get('contact_name') or '').strip()
+            if not name:
+                return jsonify({'success': False, 'error': 'Missing contact identifier'}), 400
+            # try to find existing contact by exact name
+            contact = Contact.query.filter_by(name=name).first()
+            if not contact:
+                contact = Contact(name=name)
+                db.session.add(contact)
+                db.session.flush()  # assign id
         
         existing = ProjectWorker.query.filter_by(
             project_id=project_id,
-            contact_id=data.get('contact_id')
+            contact_id=contact.id
         ).first()
         
         if existing:
@@ -1068,12 +1091,14 @@ def add_project_worker(project_id):
         
         worker = ProjectWorker(
             project_id=project_id,
-            contact_id=data.get('contact_id'),
+            contact_id=contact.id,
             worker_type=data.get('worker_type'),
             role=data.get('role'),
             start_date=datetime.strptime(data.get('start_date'), '%Y-%m-%d').date() if data.get('start_date') else None,
             contract_amount=float(data.get('contract_amount', 0)),
             daily_rate=float(data.get('daily_rate', 0)),
+            days_worked=float(data.get('days_worked', 0)),
+            amount_paid=float(data.get('amount_paid', 0)) if data.get('amount_paid') is not None else 0,
             notes=data.get('notes')
         )
         
@@ -1087,12 +1112,74 @@ def add_project_worker(project_id):
                 'contact_id': worker.contact_id,
                 'name': worker.contact.name if worker.contact else 'Unknown',
                 'worker_type': worker.worker_type,
-                'role': worker.role
+                'role': worker.role,
+                'days_worked': worker.days_worked
             }
         })
     except Exception as e:
         db.session.rollback()
         print(f"Error adding project worker: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/project/<int:project_id>/workers/<int:worker_id>', methods=['POST', 'PUT'])
+@login_required
+def update_project_worker(project_id, worker_id):
+    """Update a worker assignment for a project"""
+    try:
+        worker = ProjectWorker.query.filter_by(id=worker_id, project_id=project_id).first()
+        if not worker:
+            return jsonify({'success': False, 'error': 'Worker not found'}), 404
+
+        data = request.get_json() or {}
+        # allow updating contact by id or by name (create contact if necessary)
+        if 'contact_id' in data and data.get('contact_id'):
+            contact = Contact.query.get(data.get('contact_id'))
+            if contact:
+                worker.contact_id = contact.id
+        elif 'contact_name' in data and data.get('contact_name'):
+            name = (data.get('contact_name') or '').strip()
+            if name:
+                contact = Contact.query.filter_by(name=name).first()
+                if not contact:
+                    contact = Contact(name=name)
+                    db.session.add(contact)
+                    db.session.flush()
+                worker.contact_id = contact.id
+        # Update allowed fields
+        if 'role' in data:
+            worker.role = data.get('role')
+        if 'start_date' in data:
+            sd = data.get('start_date')
+            worker.start_date = datetime.strptime(sd, '%Y-%m-%d').date() if sd else None
+        if 'contract_amount' in data:
+            worker.contract_amount = float(data.get('contract_amount') or 0)
+        if 'daily_rate' in data:
+            worker.daily_rate = float(data.get('daily_rate') or 0)
+        if 'days_worked' in data:
+            worker.days_worked = float(data.get('days_worked') or 0)
+        if 'amount_paid' in data:
+            try:
+                worker.amount_paid = float(data.get('amount_paid') or 0)
+            except Exception:
+                worker.amount_paid = 0
+        if 'notes' in data:
+            worker.notes = data.get('notes')
+
+        db.session.commit()
+
+        return jsonify({'success': True, 'worker': {
+            'id': worker.id,
+            'role': worker.role,
+            'start_date': worker.start_date.strftime('%Y-%m-%d') if worker.start_date else None,
+            'contract_amount': worker.contract_amount,
+            'daily_rate': worker.daily_rate,
+            'days_worked': worker.days_worked,
+            'notes': worker.notes
+        }})
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error updating worker: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/project/<int:project_id>/workers/<int:worker_id>', methods=['DELETE'])
@@ -1145,10 +1232,19 @@ def record_worker_payment(project_id, worker_id):
         worker.amount_paid = (worker.amount_paid or 0) + amount
         db.session.commit()
 
+        # return created payment info so frontend can use the real id
         return jsonify({
             'success': True,
             'amount_paid': worker.amount_paid,
-            'remaining_balance': worker.remaining_balance
+            'remaining_balance': worker.remaining_balance,
+            'payment': {
+                'id': payment.id,
+                'date': payment.date.strftime('%Y-%m-%d') if payment.date else None,
+                'amount': payment.amount,
+                'method': payment.method,
+                'notes': payment.notes
+            },
+            'payment_id': payment.id
         })
     except Exception as e:
         db.session.rollback()
@@ -1173,6 +1269,65 @@ def get_worker_payments(project_id, worker_id):
     except Exception as e:
         print(f"Error getting payments: {e}")
         return jsonify([]), 500
+
+
+@app.route('/api/project/<int:project_id>/workers/<int:worker_id>/payments/<int:payment_id>', methods=['PUT'])
+@login_required
+def update_worker_payment(project_id, worker_id, payment_id):
+    try:
+        worker = ProjectWorker.query.filter_by(id=worker_id, project_id=project_id).first()
+        if not worker:
+            return jsonify({'success': False, 'error': 'Worker not found'}), 404
+        payment = Payment.query.filter_by(id=payment_id, project_worker_id=worker.id).first()
+        if not payment:
+            return jsonify({'success': False, 'error': 'Payment not found'}), 404
+
+        data = request.get_json() or {}
+        old_amount = float(payment.amount or 0)
+        new_amount = float(data.get('amount', old_amount))
+        date_str = data.get('date')
+        method = data.get('method') or data.get('payment_method') or payment.method
+        notes = data.get('notes', payment.notes)
+
+        if date_str:
+            try:
+                payment.date = datetime.strptime(date_str, '%Y-%m-%d').date()
+            except Exception:
+                pass
+
+        payment.amount = new_amount
+        payment.method = method
+        payment.notes = notes
+
+        # adjust worker total paid
+        worker.amount_paid = (worker.amount_paid or 0) + (new_amount - old_amount)
+
+        db.session.commit()
+        return jsonify({'success': True, 'payment_id': payment.id, 'amount_paid': worker.amount_paid})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/project/<int:project_id>/workers/<int:worker_id>/payments/<int:payment_id>', methods=['DELETE'])
+@login_required
+def delete_worker_payment(project_id, worker_id, payment_id):
+    try:
+        worker = ProjectWorker.query.filter_by(id=worker_id, project_id=project_id).first()
+        if not worker:
+            return jsonify({'success': False, 'error': 'Worker not found'}), 404
+        payment = Payment.query.filter_by(id=payment_id, project_worker_id=worker.id).first()
+        if not payment:
+            return jsonify({'success': False, 'error': 'Payment not found'}), 404
+
+        amt = float(payment.amount or 0)
+        db.session.delete(payment)
+        worker.amount_paid = max(0, (worker.amount_paid or 0) - amt)
+        db.session.commit()
+        return jsonify({'success': True, 'amount_paid': worker.amount_paid})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 @app.route('/api/project/<int:project_id>/workers/<int:worker_id>/attendance')
@@ -2084,6 +2239,18 @@ def ensure_runtime_migrations():
                 except Exception as inner_e:
                     db.session.rollback()
                     print('Failed to add notes column to attendance (before_first_request):', inner_e)
+
+            # Add days_worked column to project_worker table if it doesn't exist
+            res = db.session.execute(text("PRAGMA table_info('project_worker')")).fetchall()
+            cols = [row[1] for row in res]
+            if 'days_worked' not in cols:
+                try:
+                    db.session.execute(text("ALTER TABLE project_worker ADD COLUMN days_worked FLOAT DEFAULT 0.0"))
+                    db.session.commit()
+                    print("Added 'days_worked' column to project_worker table")
+                except Exception as inner_e:
+                    db.session.rollback()
+                    print('Failed to add days_worked column to project_worker:', inner_e)
     except Exception as e:
         print('ensure_runtime_migrations failed:', e)
 

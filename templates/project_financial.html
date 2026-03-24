@@ -21,7 +21,7 @@
                     <a href="{{ url_for('project_detail', id=project.id) }}" class="btn btn-outline-primary" title="Back to project details">
                         <i class="fas fa-arrow-left me-2"></i>Project Details
                     </a>
-                    <a href="{{ url_for('project_workers', id=project.id) }}" class="btn btn-outline-primary">
+                    <a href="{{ url_for('project_workers_v2', id=project.id) }}" class="btn btn-outline-primary">
                         <i class="fas fa-users me-2"></i>Gérer la main-d'œuvre
                     </a>
                     <span class="badge fs-6 px-3 py-2" style="background-color: var(--primary); color: white;">
@@ -1552,6 +1552,97 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 <!-- Worker management JavaScript removed; moved to templates/project_workers.html -->
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Prefill edit expense modal when edit button clicked
+    document.querySelectorAll('.edit-expense').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.dataset.id;
+            document.getElementById('edit_expense_id').value = id;
+            document.getElementById('edit_date').value = this.dataset.date || '';
+            document.getElementById('edit_amount').value = this.dataset.amount || '';
+            document.getElementById('edit_nature').value = this.dataset.nature || '';
+            document.getElementById('edit_category').value = this.dataset.category || '';
+            document.getElementById('edit_comment').value = this.dataset.comment || '';
+            const form = document.getElementById('editExpenseForm');
+            form.action = `/project/{{ project.id }}/financial/edit-expense/${id}`;
+        });
+    });
+
+    // Show delete confirmation and set form action
+    document.querySelectorAll('.delete-expense').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.dataset.id;
+            const nature = this.dataset.nature || '';
+            document.getElementById('deleteExpenseNature').textContent = nature;
+            const form = document.getElementById('deleteExpenseForm');
+            form.action = `/project/{{ project.id }}/financial/delete-expense/${id}`;
+            const deleteModalEl = document.getElementById('deleteExpenseModal');
+            const modal = new bootstrap.Modal(deleteModalEl);
+            modal.show();
+        });
+    });
+
+    // Handle edit form submit via AJAX to update row in-place
+    const editForm = document.getElementById('editExpenseForm');
+    if (editForm) {
+        editForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit_expense_id').value;
+            const data = {
+                date: document.getElementById('edit_date').value,
+                amount: parseFloat(document.getElementById('edit_amount').value) || 0,
+                nature: document.getElementById('edit_nature').value,
+                category: document.getElementById('edit_category').value,
+                comment: document.getElementById('edit_comment').value
+            };
+            fetch(`/project/{{ project.id }}/financial/edit-expense/${id}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            }).then(r => r.json()).then(res => {
+                if (res.success) {
+                    const btn = document.querySelector(`.edit-expense[data-id="${id}"]`);
+                    const row = btn ? btn.closest('tr') : null;
+                    if (row) {
+                        const dateCell = row.querySelector('td:nth-child(1)');
+                        const d = new Date(data.date);
+                        const formatted = d.toLocaleDateString('fr-FR');
+                        dateCell.innerHTML = `<i class="fas fa-calendar-day me-1 text-muted small"></i>${formatted}`;
+                        row.querySelector('td:nth-child(2)').textContent = data.nature;
+                        row.querySelector('td:nth-child(3)').textContent = data.amount.toFixed(2);
+                        row.querySelector('td:nth-child(4)').textContent = data.comment || '—';
+                        const badge = row.querySelector('td:nth-child(5) .badge-category');
+                        if (badge) badge.textContent = data.category;
+                    }
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editExpenseModal'));
+                    if (modal) modal.hide();
+                } else {
+                    alert('Erreur lors de la mise à jour');
+                }
+            }).catch(() => alert('Erreur réseau'));
+        });
+    }
+
+    // Handle delete form submit via AJAX and remove row
+    const deleteForm = document.getElementById('deleteExpenseForm');
+    if (deleteForm) {
+        deleteForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const action = this.action;
+            fetch(action, { method: 'POST' }).then(r => r.json()).then(res => {
+                if (res.success) {
+                    const id = action.split('/').pop();
+                    const row = document.querySelector(`.edit-expense[data-id="${id}"]`)?.closest('tr') || document.querySelector(`.delete-expense[data-id="${id}"]`)?.closest('tr');
+                    if (row) row.remove();
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteExpenseModal'));
+                    if (modal) modal.hide();
+                } else {
+                    alert('Erreur lors de la suppression');
+                }
+            }).catch(() => alert('Erreur réseau'));
+        });
+    }
+});
 </script>
 
 <style>

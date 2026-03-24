@@ -1,0 +1,882 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid px-4 py-3">
+  <!-- Page Header -->
+  <div class="page-header mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center gap-3">
+        <a href="{{ url_for('project_detail', id=project.id) }}" class="btn btn-outline-secondary rounded-circle btn-icon">
+          <i class="fas fa-arrow-left"></i>
+        </a>
+        <div>
+          <h1 class="h3 mb-1 fw-bold">Gestion main-d'œuvre</h1>
+          <p class="text-muted mb-0">{{ project.name }}</p>
+        </div>
+      </div>
+      <div class="d-flex gap-2">
+        <a href="{{ url_for('project_workers_v2', id=project.id) }}" class="btn btn-light border">
+          <i class="fas fa-sync-alt me-2"></i>Rafraîchir
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info Banner -->
+  <div class="alert alert-light border-start border-4 border-info shadow-sm mb-4" role="alert">
+    <div class="d-flex align-items-center">
+      <i class="fas fa-info-circle text-info me-3 fs-5"></i>
+      <div class="flex-grow-1">
+        <strong class="text-dark">Mode édition rapide</strong>
+        <p class="mb-0 text-muted">Cliquez sur une cellule pour l'éditer — Appuyez sur <kbd class="bg-light border">Entrée</kbd> pour sauvegarder</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subcontractors Card -->
+  <div class="card mb-4 card-subcontractors shadow-sm border-0">
+    <div class="card-header bg-white border-0 py-4">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <div class="d-flex align-items-center gap-3">
+            <div class="icon-box bg-primary bg-opacity-10 rounded-circle p-3">
+              <i class="fas fa-handshake text-primary fs-4"></i>
+            </div>
+            <div>
+              <h5 class="mb-1 fw-bold">Sous-traitants</h5>
+              <small class="text-muted">Contrats fixes par projet</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="d-flex justify-content-md-end align-items-center gap-2">
+            <div class="search-box position-relative">
+              <input id="subSearch" class="form-control form-control-sm ps-5" placeholder="Rechercher..." style="min-width:200px">
+              <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+            </div>
+            <span class="badge bg-primary rounded-pill px-3 py-2">{{ subcontractors|length }}</span>
+            <button id="addSubcontractorRow" class="btn btn-sm btn-primary rounded-pill px-3">
+              <i class="fas fa-plus me-1"></i> Ajouter
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table id="subcontractorsTable" class="table table-hover mb-0 align-middle">
+            <thead class="bg-light">
+              <tr>
+                <th class="ps-4">Nom</th>
+                <th>Rôle</th>
+                <th>Contrat</th>
+                <th>Payé</th>
+                <th>Restant</th>
+                <th class="text-end pe-4">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for w in subcontractors %}
+              <tr data-id="{{ w.id }}">
+                <td class="ps-4 editable select-name">{{ w.contact.name }}</td>
+                <td class="editable">{{ w.role or '' }}</td>
+                <td class="editable number">{{ '%.2f'|format(w.contract_amount or 0) }}</td>
+                <td class="editable number">{{ '%.2f'|format(w.amount_paid or 0) }}</td>
+                <td class="remaining">{{ '%.2f'|format((w.contract_amount or 0) - (w.amount_paid or 0)) }}</td>
+                <td class="text-end pe-4">
+                  <button class="btn btn-sm btn-link text-danger p-0 delete-row" title="Supprimer">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+            <tfoot class="bg-light fw-semibold">
+              <tr>
+                <td class="ps-4"><strong>Totaux:</strong></td>
+                <td></td>
+                <td id="sub_contract_sum">0.00</td>
+                <td id="sub_paid_sum">0.00</td>
+                <td id="sub_remaining_sum">0.00</td>
+                <td class="pe-4"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Daily Workers Card -->
+  <div class="card mb-4 card-dailyworkers shadow-sm border-0">
+    <div class="card-header bg-white border-0 py-4">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <div class="d-flex align-items-center gap-3">
+            <div class="icon-box bg-success bg-opacity-10 rounded-circle p-3">
+              <i class="fas fa-hard-hat text-success fs-4"></i>
+            </div>
+            <div>
+              <h5 class="mb-1 fw-bold">Ouvriers journaliers</h5>
+              <small class="text-muted">Payés à la journée</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="d-flex justify-content-md-end align-items-center gap-2">
+            <div class="search-box position-relative">
+              <input id="dailySearch" class="form-control form-control-sm ps-5" placeholder="Rechercher..." style="min-width:200px">
+              <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+            </div>
+            <span class="badge bg-success rounded-pill px-3 py-2">{{ daily_workers|length }}</span>
+            <button id="addDailyRow" class="btn btn-sm btn-success rounded-pill px-3">
+              <i class="fas fa-plus me-1"></i> Ajouter
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table id="dailyTable" class="table table-hover mb-0 align-middle">
+            <thead class="bg-light">
+              <tr>
+                <th class="ps-4">Nom</th>
+                <th>Rôle</th>
+                <th>Jours</th>
+                <th>Taux</th>
+                <th>Total</th>
+                <th>Payé</th>
+                <th>Restant</th>
+                <th class="text-end pe-4">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for w in daily_workers %}
+              <tr data-id="{{ w.id }}">
+                <td class="ps-4 editable select-name">{{ w.contact.name }}</td>
+                <td class="editable">{{ w.role or '' }}</td>
+                <td class="editable number">{{ w.days_worked or 0 }}</td>
+                <td class="editable number">{{ '%.2f'|format(w.daily_rate or 0) }}</td>
+                <td class="total">{{ '%.2f'|format((w.days_worked or 0) * (w.daily_rate or 0)) }}</td>
+                <td class="editable number">{{ '%.2f'|format(w.amount_paid or 0) }}</td>
+                <td class="remaining">{{ '%.2f'|format(((w.days_worked or 0) * (w.daily_rate or 0)) - (w.amount_paid or 0)) }}</td>
+                <td class="text-end pe-4">
+                  <button class="btn btn-sm btn-link text-danger p-0 delete-row" title="Supprimer">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+            <tfoot class="bg-light fw-semibold">
+              <tr>
+                <td class="ps-4"><strong>Totaux:</strong></td>
+                <td></td>
+                <td id="daily_days_sum">0</td>
+                <td></td>
+                <td id="daily_total_sum">0.00</td>
+                <td id="daily_paid_sum">0.00</td>
+                <td id="daily_remaining_sum">0.00</td>
+                <td class="pe-4"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Worker Expenses Chart -->
+  <div class="card mb-4 shadow-sm border-0">
+    <div class="card-header bg-white border-0 py-4">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-3">
+          <div class="icon-box bg-info bg-opacity-10 rounded-circle p-3">
+            <i class="fas fa-chart-pie text-info fs-4"></i>
+          </div>
+          <div>
+            <h5 class="mb-1 fw-bold">Répartition des dépenses</h5>
+            <small class="text-muted">Analyse des coûts par type de travailleur</small>
+          </div>
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-outline-primary" id="refreshChart">
+            <i class="fas fa-sync-alt me-1"></i> Actualiser
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-lg-6 mb-4 mb-lg-0">
+          <div class="chart-container" style="position: relative; height: 350px;">
+            <canvas id="workerExpensesChart"></canvas>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="chart-legend">
+            <h6 class="mb-4 fw-bold">Détail des dépenses</h6>
+            <div class="expense-summary mb-3">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="legend-color bg-primary rounded-circle" style="width: 12px; height: 12px;"></span>
+                  <span class="fw-medium">Sous-traitants</span>
+                </div>
+                <span class="fw-bold" id="subcontractorsTotal">0.00 TND</span>
+              </div>
+              <div class="progress mb-2" style="height: 8px;">
+                <div class="progress-bar bg-primary" id="subcontractorsProgress" style="width: 0%"></div>
+              </div>
+              <small class="text-muted" id="subcontractorsCount">0 sous-traitant(s)</small>
+            </div>
+            <div class="expense-summary">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="legend-color bg-success rounded-circle" style="width: 12px; height: 12px;"></span>
+                  <span class="fw-medium">Ouvriers journaliers</span>
+                </div>
+                <span class="fw-bold" id="dailyWorkersTotal">0.00 TND</span>
+              </div>
+              <div class="progress mb-2" style="height: 8px;">
+                <div class="progress-bar bg-success" id="dailyWorkersProgress" style="width: 0%"></div>
+              </div>
+              <small class="text-muted" id="dailyWorkersCount">0 ouvrier(s)</small>
+            </div>
+            <hr class="my-4">
+            <div class="total-expenses">
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="fw-bold">Total des dépenses</span>
+                <span class="fw-bold fs-5 text-primary" id="totalExpenses">0.00 TND</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// embed contacts for dropdowns
+window._CONTACTS = {{ contacts|map(attribute='name')|list|tojson }};
+
+// also provide a mapping name->id for save
+window._CONTACTS_MAP = [
+{% for c in contacts %}
+  [{{ c.id }}, {{ c.name|tojson }}]{{ ',' if not loop.last else '' }}
+{% endfor %}
+];
+
+// build a datalist for contact names
+document.addEventListener('DOMContentLoaded', () => {
+  const dl = document.createElement('datalist');
+  dl.id = 'contactsList';
+  (window._CONTACTS || []).forEach(name => {
+    const opt = document.createElement('option'); opt.value = name; dl.appendChild(opt);
+  });
+  document.body.appendChild(dl);
+});
+
+// Toast helper (Bootstrap toasts)
+function showToast(message, type='info', timeout=3000) {
+  // Toasts are disabled for this page to reduce noise during testing.
+  // Keep a console log for debugging instead of showing UI notifications.
+  try { console.log('[toast]', type, message); } catch (e) {}
+}
+
+// Inline-edit helpers
+function makeCellEditable(td) {
+  const orig = td.textContent.trim();
+  const cls = td.classList.contains('number') ? 'form-control form-control-sm' : 'form-control form-control-sm';
+  const input = document.createElement('input');
+  // if this cell is a name selector, use the contacts datalist
+  if (td.classList.contains('select-name')) {
+    input.setAttribute('list', 'contactsList');
+    input.type = 'text';
+  } else {
+    input.type = td.classList.contains('number') ? 'number' : 'text';
+  }
+  input.className = cls;
+  input.value = orig;
+  td.innerHTML = '';
+  td.appendChild(input);
+  input.focus();
+
+  function cancel() { td.innerHTML = orig; }
+  function save() {
+    td.innerHTML = input.value;
+    td.dispatchEvent(new CustomEvent('cell-saved'));
+    // schedule autosave for the whole row after edits
+    const tr = td.closest('tr');
+    if (tr) {
+      const isDaily = tr.closest('table') && tr.closest('table').id === 'dailyTable';
+      scheduleAutoSave(tr, isDaily, 700);
+    }
+  }
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') save();
+    if (e.key === 'Escape') cancel();
+  });
+  input.addEventListener('blur', save);
+}
+
+// Debounced autosave helper — stores timer on the row element
+function scheduleAutoSave(tr, isDaily, delay = 700) {
+  try {
+    if (tr._autosaveTimer) clearTimeout(tr._autosaveTimer);
+    tr._autosaveTimer = setTimeout(() => {
+      saveRow(tr, isDaily);
+      tr._autosaveTimer = null;
+    }, delay);
+  } catch (e) { console.error('autosave schedule error', e); }
+}
+
+function attachRowHandlers(tbody, isDaily) {
+  // single-click to edit cells (more Excel-like) and handle row actions
+  tbody.addEventListener('click', (e) => {
+    const saveBtn = e.target.closest('.save-row');
+    const delBtn = e.target.closest('.delete-row');
+    const td = e.target.closest('td.editable');
+
+    // If clicked an editable cell (and not a button inside it), open editor
+    if (td && !saveBtn && !delBtn) { makeCellEditable(td); return; }
+
+    // Save button
+    if (saveBtn) {
+      const tr = saveBtn.closest('tr');
+      if (tr) {
+        // cancel any pending autosave and save immediately
+        if (tr._autosaveTimer) { clearTimeout(tr._autosaveTimer); tr._autosaveTimer = null; }
+        saveRow(tr, isDaily);
+      }
+      return;
+    }
+
+    // Delete button
+    if (delBtn) {
+      const tr = delBtn.closest('tr');
+      const id = tr && tr.dataset.id;
+      if (!id) { tr.remove(); recalcSums(); showToast('Assignement retiré', 'success'); return; }
+      if (!confirm('Supprimer cet assignement ?')) return;
+      fetch(`/api/project/{{ project.id }}/workers/${id}`, { method: 'DELETE' })
+        .then(r => r.json())
+        .then(res => {
+          if (res.success) { tr.remove(); recalcSums(); showToast('Assignement supprimé', 'success'); }
+          else showToast(res.error||'Erreur', 'danger');
+        })
+        .catch(()=>showToast('Erreur réseau', 'danger'));
+      return;
+    }
+  });
+}
+
+function rowToPayload(tr, isDaily) {
+  const cells = tr.querySelectorAll('td');
+  if (isDaily) {
+    return {
+      contact_id: findContactIdByName(cells[0].textContent.trim()),
+      contact_name: cells[0].textContent.trim(),
+      role: cells[1].textContent.trim(),
+      days_worked: parseFloat(cells[2].textContent) || 0,
+      daily_rate: parseFloat(cells[3].textContent) || 0,
+      amount_paid: parseFloat(cells[5].textContent) || 0,
+      worker_type: 'daily_worker'
+    };
+  }
+  return {
+    contact_id: findContactIdByName(cells[0].textContent.trim()),
+    contact_name: cells[0].textContent.trim(),
+    role: cells[1].textContent.trim(),
+    contract_amount: parseFloat(cells[2].textContent) || 0,
+    amount_paid: parseFloat(cells[3].textContent) || 0,
+    worker_type: 'subcontractor'
+  };
+}
+
+// recalc totals when a cell is saved (update total and remaining in the row)
+document.addEventListener('cell-saved', function(e) {
+  const td = e.target; // td that dispatched
+  const tr = td.closest('tr');
+  if (!tr) return;
+  const isDaily = tr.closest('table').id === 'dailyTable';
+  if (isDaily) {
+    const days = parseFloat(tr.querySelector('td:nth-child(3)').textContent) || 0;
+    const rate = parseFloat(tr.querySelector('td:nth-child(4)').textContent) || 0;
+    const total = (days * rate) || 0;
+    const paid = parseFloat(tr.querySelector('td:nth-child(6)').textContent) || 0;
+    tr.querySelector('td.total').textContent = total.toFixed(2);
+    tr.querySelector('td.remaining').textContent = (total - paid).toFixed(2);
+  } else {
+    const contract = parseFloat(tr.querySelector('td:nth-child(3)').textContent) || 0;
+    const paid = parseFloat(tr.querySelector('td:nth-child(4)').textContent) || 0;
+    tr.querySelector('td.remaining').textContent = (contract - paid).toFixed(2);
+  }
+  // update table sums after any cell edit
+  recalcSums();
+});
+
+function findContactIdByName(name) {
+  if (!name) return null;
+  // try exact match in contacts list
+  const names = window._CONTACTS || [];
+  for (let i = 0; i < names.length; i++) {
+    if ((names[i]||'').toLowerCase() === name.toLowerCase()) {
+      // map index to id using _CONTACTS_MAP where each item is [id,name]
+      const map = window._CONTACTS_MAP || [];
+      for (let j = 0; j < map.length; j++) if ((map[j][1]||'').toLowerCase() === name.toLowerCase()) return map[j][0];
+    }
+  }
+  return null;
+}
+
+function saveRow(tr, isDaily) {
+  const id = tr.dataset.id;
+  const payload = rowToPayload(tr, isDaily);
+  // basic validation: require a name
+  if (!payload.contact_name || payload.contact_name.trim() === '') {
+    showToast('Veuillez saisir le nom du contact', 'warning');
+    // focus the name cell
+    const nameCell = tr.querySelector('td.select-name');
+    if (nameCell) makeCellEditable(nameCell);
+    return;
+  }
+  const url = id ? `/api/project/{{ project.id }}/workers/${id}` : `/api/project/{{ project.id }}/workers`;
+  const method = id ? 'PUT' : 'POST';
+  // Optimistic update: update UI immediately, then send request
+  recalcRow(tr);
+  recalcSums();
+  showToast('En cours d\'enregistrement...', 'info', 1200);
+  // disable save button and show spinner
+  const saveBtn = tr.querySelector('.save-row');
+  const origInner = saveBtn ? saveBtn.innerHTML : null;
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>'; }
+
+  fetch(url, { method: method, headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) })
+    .then(r => r.json())
+    .then(res => {
+      if (res.success) {
+        if (res.worker && res.worker.id) {
+          tr.dataset.id = res.worker.id;
+          // update displayed name with server-canonical value
+          if (res.worker.name) tr.querySelector('td.select-name').textContent = res.worker.name;
+        }
+        recalcRow(tr);
+        recalcSums();
+        showToast('Enregistré', 'success');
+      } else {
+        showToast(res.error || 'Erreur', 'danger');
+      }
+    })
+    .catch(()=>showToast('Erreur réseau', 'danger'))
+    .finally(() => { if (saveBtn) { saveBtn.disabled = false; if (origInner !== null) saveBtn.innerHTML = origInner; } });
+}
+
+function recalcRow(tr) {
+  const isDaily = tr.closest('table').id === 'dailyTable';
+  if (isDaily) {
+    const days = parseFloat(tr.querySelector('td:nth-child(3)').textContent) || 0;
+    const rate = parseFloat(tr.querySelector('td:nth-child(4)').textContent) || 0;
+    const total = (days * rate) || 0;
+    const paid = parseFloat(tr.querySelector('td:nth-child(6)').textContent) || 0;
+    tr.querySelector('td.total').textContent = total.toFixed(2);
+    tr.querySelector('td.remaining').textContent = (total - paid).toFixed(2);
+  } else {
+    const contract = parseFloat(tr.querySelector('td:nth-child(3)').textContent) || 0;
+    const paid = parseFloat(tr.querySelector('td:nth-child(4)').textContent) || 0;
+    tr.querySelector('td.remaining').textContent = (contract - paid).toFixed(2);
+  }
+}
+
+
+function recalcSums() {
+  // subcontractors
+  let subContract = 0, subPaid = 0, subRem = 0;
+  document.querySelectorAll('#subcontractorsTable tbody tr').forEach(tr => {
+    const contract = parseFloat(tr.querySelector('td:nth-child(3)')?.textContent) || 0;
+    const paid = parseFloat(tr.querySelector('td:nth-child(4)')?.textContent) || 0;
+    subContract += contract; subPaid += paid; subRem += (contract - paid);
+  });
+  document.getElementById('sub_contract_sum').textContent = subContract.toFixed(2);
+  document.getElementById('sub_paid_sum').textContent = subPaid.toFixed(2);
+  document.getElementById('sub_remaining_sum').textContent = subRem.toFixed(2);
+
+  // daily
+  let daysSum = 0, totalEarned = 0, dailyPaid = 0, dailyRem = 0;
+  document.querySelectorAll('#dailyTable tbody tr').forEach(tr => {
+    const days = parseFloat(tr.querySelector('td:nth-child(3)')?.textContent) || 0;
+    const rate = parseFloat(tr.querySelector('td:nth-child(4)')?.textContent) || 0;
+    const total = days * rate;
+    const paid = parseFloat(tr.querySelector('td:nth-child(6)')?.textContent) || 0;
+    daysSum += days; totalEarned += total; dailyPaid += paid; dailyRem += (total - paid);
+  });
+  document.getElementById('daily_days_sum').textContent = daysSum;
+  document.getElementById('daily_total_sum').textContent = totalEarned.toFixed(2);
+  document.getElementById('daily_paid_sum').textContent = dailyPaid.toFixed(2);
+  document.getElementById('daily_remaining_sum').textContent = dailyRem.toFixed(2);
+}
+// Add empty row templates
+function addEmptyRow(tbody, isDaily) {
+  const tr = document.createElement('tr');
+  tr.innerHTML = isDaily ? `
+    <td class="editable select-name"></td>
+    <td class="editable"></td>
+    <td class="editable number">0</td>
+    <td class="editable number">0.00</td>
+    <td class="total">0.00</td>
+    <td class="editable number">0.00</td>
+    <td class="remaining">0.00</td>
+    <td><button class="btn btn-sm btn-danger delete-row" title="Supprimer" aria-label="Supprimer assignement"><i class="bi bi-trash"></i></button></td>
+  ` : `
+    <td class="editable select-name"></td>
+    <td class="editable"></td>
+    <td class="editable number">0.00</td>
+    <td class="editable number">0.00</td>
+    <td class="remaining">0.00</td>
+    <td><button class="btn btn-sm btn-danger delete-row" title="Supprimer" aria-label="Supprimer assignement"><i class="bi bi-trash"></i></button></td>
+  `;
+  tbody.appendChild(tr);
+  // focus name cell for quick entry
+  const nameCell = tr.querySelector('td.select-name');
+  if (nameCell) makeCellEditable(nameCell);
+}
+
+// Calculate all rows on initial load
+function calculateAllRows() {
+  // Calculate daily workers rows
+  document.querySelectorAll('#dailyTable tbody tr').forEach(tr => {
+    recalcRow(tr);
+  });
+
+  // Calculate subcontractors rows
+  document.querySelectorAll('#subcontractorsTable tbody tr').forEach(tr => {
+    recalcRow(tr);
+  });
+}
+
+// Init
+document.addEventListener('DOMContentLoaded', () => {
+  const subTbody = document.querySelector('#subcontractorsTable tbody');
+  const dailyTbody = document.querySelector('#dailyTable tbody');
+  attachRowHandlers(subTbody, false);
+  attachRowHandlers(dailyTbody, true);
+
+  document.getElementById('addSubcontractorRow').addEventListener('click', () => addEmptyRow(subTbody, false));
+  document.getElementById('addDailyRow').addEventListener('click', () => addEmptyRow(dailyTbody, true));
+
+  // make existing rows editable by double-click
+  document.querySelectorAll('#subcontractorsTable td.editable, #dailyTable td.editable').forEach(td => {
+    td.addEventListener('dblclick', () => makeCellEditable(td));
+  });
+
+  // initial calculations for all rows
+  calculateAllRows();
+
+  // initial sums
+  recalcSums();
+
+  // wire search inputs
+  const subSearch = document.getElementById('subSearch');
+  const dailySearch = document.getElementById('dailySearch');
+  subSearch?.addEventListener('input', e => filterTable('#subcontractorsTable tbody', e.target.value));
+  dailySearch?.addEventListener('input', e => filterTable('#dailyTable tbody', e.target.value));
+
+  // initialize chart
+  initWorkerExpensesChart();
+});
+
+// Chart initialization and update functions
+let workerExpensesChart = null;
+
+function initWorkerExpensesChart() {
+  const ctx = document.getElementById('workerExpensesChart');
+  if (!ctx) return;
+
+  workerExpensesChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Sous-traitants', 'Ouvriers journaliers'],
+      datasets: [{
+        data: [0, 0],
+        backgroundColor: [
+          'rgba(13, 110, 253, 0.8)',
+          'rgba(25, 135, 84, 0.8)'
+        ],
+        borderColor: [
+          'rgba(13, 110, 253, 1)',
+          'rgba(25, 135, 84, 1)'
+        ],
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const label = context.label || '';
+              const value = context.parsed || 0;
+              const total = context.dataset.data.reduce((a, b) => a + b, 0);
+              const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+              return `${label}: ${value.toFixed(2)} TND (${percentage}%)`;
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // Initial chart update
+  updateWorkerExpensesChart();
+
+  // Add refresh button listener
+  document.getElementById('refreshChart')?.addEventListener('click', updateWorkerExpensesChart);
+}
+
+function updateWorkerExpensesChart() {
+  if (!workerExpensesChart) return;
+
+  // Get subcontractors total
+  let subContract = 0;
+  let subCount = 0;
+  document.querySelectorAll('#subcontractorsTable tbody tr').forEach(tr => {
+    const contract = parseFloat(tr.querySelector('td:nth-child(3)')?.textContent) || 0;
+    subContract += contract;
+    subCount++;
+  });
+
+  // Get daily workers total
+  let dailyTotal = 0;
+  let dailyCount = 0;
+  document.querySelectorAll('#dailyTable tbody tr').forEach(tr => {
+    const days = parseFloat(tr.querySelector('td:nth-child(3)')?.textContent) || 0;
+    const rate = parseFloat(tr.querySelector('td:nth-child(4)')?.textContent) || 0;
+    dailyTotal += (days * rate);
+    dailyCount++;
+  });
+
+  // Update chart data
+  const total = subContract + dailyTotal;
+  workerExpensesChart.data.datasets[0].data = [subContract, dailyTotal];
+  workerExpensesChart.update();
+
+  // Update summary display
+  document.getElementById('subcontractorsTotal').textContent = `${subContract.toFixed(2)} TND`;
+  document.getElementById('subcontractorsCount').textContent = `${subCount} sous-traitant(s)`;
+  document.getElementById('subcontractorsProgress').style.width = total > 0 ? `${(subContract / total * 100).toFixed(1)}%` : '0%';
+
+  document.getElementById('dailyWorkersTotal').textContent = `${dailyTotal.toFixed(2)} TND`;
+  document.getElementById('dailyWorkersCount').textContent = `${dailyCount} ouvrier(s)`;
+  document.getElementById('dailyWorkersProgress').style.width = total > 0 ? `${(dailyTotal / total * 100).toFixed(1)}%` : '0%';
+
+  document.getElementById('totalExpenses').textContent = `${total.toFixed(2)} TND`;
+}
+
+// Update chart when data changes
+document.addEventListener('cell-saved', updateWorkerExpensesChart);
+document.addEventListener('DOMContentLoaded', () => {
+  // Update chart when rows are added or removed
+  const observer = new MutationObserver(() => {
+    updateWorkerExpensesChart();
+  });
+
+  const subTable = document.querySelector('#subcontractorsTable tbody');
+  const dailyTable = document.querySelector('#dailyTable tbody');
+
+  if (subTable) observer.observe(subTable, { childList: true });
+  if (dailyTable) observer.observe(dailyTable, { childList: true });
+});
+
+function filterTable(selector, q) {
+  const ql = (q||'').toLowerCase().trim();
+  document.querySelectorAll(selector + ' tr').forEach(tr => {
+    const text = (tr.textContent||'').toLowerCase();
+    tr.style.display = !ql || text.includes(ql) ? '' : 'none';
+  });
+}
+</script>
+
+<style>
+/* Base styles */
+.select-name { min-width: 160px; }
+.table td { vertical-align: middle; }
+
+/* Icon boxes */
+.icon-box {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Search box styling */
+.search-box input {
+  border-radius: 20px;
+  padding: 0.375rem 1rem;
+  border: 1px solid #dee2e6;
+  transition: all 0.2s ease;
+}
+
+.search-box input:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.1);
+}
+
+/* Card accents and table polish */
+.card-subcontractors {
+  border-left: 4px solid #0d6efd;
+  border-radius: 0.5rem;
+}
+
+.card-subcontractors .card-header {
+  background: linear-gradient(90deg, rgba(13,110,253,0.04), rgba(255,255,255,0));
+  border-bottom: 1px solid rgba(13,110,253,0.08);
+}
+
+.card-subcontractors table th {
+  background: linear-gradient(180deg, #f8faff 0%, #f0f4ff 100%);
+  color: #0b3d91;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #e0e8ff;
+}
+
+.card-dailyworkers {
+  border-left: 4px solid #198754;
+  border-radius: 0.5rem;
+}
+
+.card-dailyworkers .card-header {
+  background: linear-gradient(90deg, rgba(25,135,84,0.04), rgba(255,255,255,0));
+  border-bottom: 1px solid rgba(25,135,84,0.08);
+}
+
+.card-dailyworkers table th {
+  background: linear-gradient(180deg, #f8fff8 0%, #f0fff4 100%);
+  color: #0b662e;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #e0ffe8;
+}
+
+/* Card header styling */
+.card .card-header h5 {
+  color: #212529;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.card .card-header small {
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+/* Table hover effect */
+.table-hover tbody tr:hover {
+  background-color: rgba(0,0,0,0.02);
+  transition: background-color 0.15s ease;
+}
+
+/* Button styling */
+.btn-outline-primary,
+.btn-outline-success {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s ease;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-success:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Badge styling */
+.badge {
+  font-weight: 500;
+}
+
+/* Delete button styling */
+.delete-row {
+  transition: all 0.2s ease;
+  opacity: 0.7;
+}
+
+.delete-row:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* Editable cells */
+.editable {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.editable:hover {
+  background-color: rgba(13,110,253,0.04);
+}
+
+/* Responsive column hiding for small screens */
+@media (max-width: 767px) {
+  /* subcontractors: hide Role (2) and Contract (3) */
+  #subcontractorsTable th:nth-child(2), #subcontractorsTable td:nth-child(2),
+  #subcontractorsTable th:nth-child(3), #subcontractorsTable td:nth-child(3) {
+    display: none;
+  }
+
+  /* daily: hide Role (2), Rate (4), Total (5) */
+  #dailyTable th:nth-child(2), #dailyTable td:nth-child(2),
+  #dailyTable th:nth-child(4), #dailyTable td:nth-child(4),
+  #dailyTable th:nth-child(5), #dailyTable td:nth-child(5) {
+    display: none;
+  }
+
+  /* Adjust button sizes */
+  .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8125rem;
+  }
+
+  /* Adjust icon box size */
+  .icon-box {
+    width: 48px;
+    height: 48px;
+  }
+
+  /* Adjust search input */
+  .search-box input {
+    min-width: 150px !important;
+  }
+}
+
+/* Animation for new rows */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+tbody tr {
+  animation: slideIn 0.3s ease;
+}
+</style>
+
+{% endblock %}
