@@ -1,456 +1,193 @@
-{% extends "base.html" %}
+================================================================================
+                    REFACTOR WORKER MANAGEMENT
+              Separate Page Approach - Instructions
+================================================================================
 
-{% block content %}
-<style>
-/* Workers Management Styles - Unified for Subcontractors & Daily Workers */
-.worker-card {
-    transition: all 0.3s ease;
-    border-left: 4px solid transparent;
-}
+PROBLEM:
+Worker management (subcontractors and daily workers) is embedded in 
+project_financial.html with complex modals causing Bootstrap conflicts and 
+JavaScript errors (backdrop issues, null element errors).
 
-.worker-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-}
+SOLUTION:
+Create a standalone worker management page and remove worker management 
+from the financial page entirely.
 
-.worker-card.subcontractor {
-    border-left-color: var(--primary);
-}
+================================================================================
+INSTRUCTION 1: CREATE NEW WORKER MANAGEMENT PAGE
+================================================================================
 
-.worker-card.daily {
-    border-left-color: var(--success);
-}
+Create a new template file called:
+templates/project_workers.html
 
-.worker-avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    color: white;
-    font-size: 1.2rem;
-}
+This page should contain:
 
-.worker-type-badge {
-    padding: 0.25rem 0.75rem;
-    border-radius: 15px;
-    font-size: 0.7rem;
-    font-weight: 600;
-}
+A. HEADER SECTION:
+   - Back button that links to project_financial page
+   - Project name displayed
+   - "Add Subcontractor" button
+   - "Add Daily Worker" button
 
-.worker-type-badge.subcontractor {
-    background: var(--primary);
-    color: white;
-}
+B. SUBCONTRACTORS TABLE with columns:
+   - Name
+   - Specialty
+   - Contact (phone + email)
+   - Task / Role
+   - Contract Amount
+   - Paid Amount
+   - Remaining Balance (calculated: contract - paid)
+   - Status badge (Payé / Partiel / Non payé)
+   - Actions: Record Payment button, View Details button
 
-.worker-type-badge.daily {
-    background: var(--success);
-    color: white;
-}
+C. DAILY WORKERS TABLE with columns:
+   - Name
+   - Role / Task
+   - Days Worked
+   - Daily Rate
+   - Total Earned (calculated: days × rate)
+   - Paid Amount
+   - Remaining Balance (calculated: earned - paid)
+   - Status badge
+   - Actions: Record Attendance button, Record Payment button, View Details button
 
-.rate-badge {
-    background: linear-gradient(135deg, var(--primary), var(--accent));
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-weight: 600;
-    font-size: 0.9rem;
-}
+D. SIMPLE MODALS:
+   - Add Subcontractor Modal (name, contact, specialty, role, contract amount)
+   - Add Daily Worker Modal (name, contact, role, daily rate)
+   - Record Payment Modal (amount, date, method)
+   - Record Attendance Modal (date, number of days, notes)
 
-.stats-card {
-    background: linear-gradient(135deg, var(--primary), var(--accent));
-    color: white;
-    padding: 1.5rem;
-    border-radius: 15px;
-    text-align: center;
-}
+E. JAVASCRIPT FUNCTIONS:
+   - recordPayment(assignmentId, workerType) - opens payment modal
+   - recordAttendance(assignmentId) - opens attendance modal
+   - Form submissions with fetch API to backend
+   - Reload page after success (location.reload())
 
-.stats-card .stat-number {
-    font-size: 2rem;
-    font-weight: bold;
-}
+================================================================================
+INSTRUCTION 2: ADD ROUTE IN app.py
+================================================================================
 
-.stats-card .stat-label {
-    font-size: 0.85rem;
-    opacity: 0.9;
-}
+Add this route:
 
-.work-summary {
-    background: var(--light-bg);
-    padding: 0.75rem;
-    border-radius: 10px;
-    text-align: center;
-}
-
-.work-summary .number {
-    font-size: 1.3rem;
-    font-weight: bold;
-    color: var(--primary);
-}
-
-.work-summary .label {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-}
-
-.payment-progress {
-    height: 6px;
-    border-radius: 3px;
-    background: #e9ecef;
-}
-
-.payment-progress-bar {
-    height: 6px;
-    border-radius: 3px;
-    background: var(--success);
-}
-
-.project-badge {
-    background: var(--light-bg);
-    padding: 0.25rem 0.75rem;
-    border-radius: 15px;
-    font-size: 0.75rem;
-    margin: 0.25rem;
-    display: inline-block;
-}
-
-.quick-action-btn {
-    background: white;
-    border: 2px solid var(--primary);
-    color: var(--primary);
-    padding: 0.75rem 1.5rem;
-    border-radius: 25px;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: all 0.3s ease;
-}
-
-.quick-action-btn:hover {
-    background: var(--primary);
-    color: white;
-    transform: translateY(-2px);
-}
-
-.filter-buttons .btn {
-    border-radius: 20px;
-    padding: 0.5rem 1.25rem;
-}
-
-.filter-buttons .btn.active {
-    background: var(--primary);
-    color: white;
-    border-color: var(--primary);
-}
-</style>
-
-<div class="container-fluid mt-4">
-    <!-- Header -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center flex-wrap">
-                <div>
-                    <h1 class="mb-2">
-                        <i class="fas fa-hard-hat me-2 text-primary"></i>Worker Management
-                    </h1>
-                    <p class="text-muted mb-0">Manage subcontractors and daily workers, track payments and attendance</p>
-                </div>
-                <div class="d-flex gap-2 flex-wrap mt-2 mt-sm-0">
-                    <a href="{{ url_for('worker_add', type='subcontractor') }}" class="quick-action-btn">
-                        <i class="fas fa-handshake"></i>
-                        Add Subcontractor
-                    </a>
-                    <a href="{{ url_for('worker_add', type='daily') }}" class="quick-action-btn">
-                        <i class="fas fa-user-plus"></i>
-                        Add Daily Worker
-                    </a>
-                    <a href="{{ url_for('payment_new') }}" class="quick-action-btn">
-                        <i class="fas fa-money-check-alt"></i>
-                        Record Payment
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Stats Overview -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-3 col-6">
-            <div class="stats-card">
-                <div class="stat-number">{{ subcontractors|length }}</div>
-                <div class="stat-label">Subcontractors</div>
-            </div>
-        </div>
-        <div class="col-md-3 col-6">
-            <div class="stats-card" style="background: linear-gradient(135deg, var(--success), #2ecc71);">
-                <div class="stat-number">{{ daily_workers|length }}</div>
-                <div class="stat-label">Daily Workers</div>
-            </div>
-        </div>
-        <div class="col-md-3 col-6">
-            <div class="stats-card" style="background: linear-gradient(135deg, #f39c12, #e67e22);">
-                <div class="stat-number">{{ total_pending_payments|round|int }} DT</div>
-                <div class="stat-label">Pending Payments</div>
-            </div>
-        </div>
-        <div class="col-md-3 col-6">
-            <div class="stats-card" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">
-                <div class="stat-number">{{ days_worked_this_month }}</div>
-                <div class="stat-label">Days Worked ({{ current_month }})</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Filter Tabs -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="filter-buttons d-flex gap-2">
-                <button class="btn btn-outline-primary active" data-filter="all">All Workers</button>
-                <button class="btn btn-outline-primary" data-filter="subcontractor">Subcontractors</button>
-                <button class="btn btn-outline-primary" data-filter="daily">Daily Workers</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Workers List -->
-    <div class="row g-4" id="workerList">
-        <!-- SUBCONTRACTORS SECTION -->
-        {% for worker in subcontractors %}
-        <div class="col-lg-4 col-md-6 worker-item" data-type="subcontractor" data-name="{{ worker.name|lower }}">
-            <div class="card worker-card subcontractor h-100">
-                <div class="card-body">
-                    <!-- Worker Header -->
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="worker-avatar bg-primary">
-                            {{ worker.name[:2].upper() }}
-                        </div>
-                        <div class="ms-3 flex-grow-1">
-                            <div class="d-flex align-items-center gap-2 mb-1">
-                                <h5 class="mb-0">{{ worker.name }}</h5>
-                                <span class="worker-type-badge subcontractor">Subcontractor</span>
-                            </div>
-                            <small class="text-muted">{{ worker.email }}</small>
-                        </div>
-                        <div class="dropdown">
-                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
-                                <i class="fas fa-ellipsis-v"></i>
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{{ url_for('worker_detail', id=worker.id) }}"><i class="fas fa-eye me-2"></i>View Details</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('worker_edit', id=worker.id) }}"><i class="fas fa-edit me-2"></i>Edit</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('payment_add', worker_id=worker.id) }}"><i class="fas fa-money-bill me-2"></i>Record Payment</a></li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Contact Info -->
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <small class="text-muted">Phone</small>
-                            <span>{{ worker.phone or '—' }}</span>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <small class="text-muted">Specialty</small>
-                            <span class="badge bg-light text-dark">{{ worker.specialty or 'General' }}</span>
-                        </div>
-                    </div>
-
-                    <!-- Payment Summary -->
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <small class="text-muted">Total Contract</small>
-                            <strong>{{ worker.total_contract_amount }} DT</strong>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <small class="text-muted">Paid</small>
-                            <span class="text-success">{{ worker.paid_amount }} DT</span>
-                        </div>
-                        <div class="progress payment-progress mb-2">
-                            <div class="payment-progress-bar" style="width: {{ (worker.paid_amount / worker.total_contract_amount * 100) if worker.total_contract_amount else 0 }}%"></div>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <small class="text-muted">Remaining</small>
-                            <strong class="text-warning">{{ worker.total_contract_amount - worker.paid_amount }} DT</strong>
-                        </div>
-                    </div>
-
-                    <!-- Current Projects -->
-                    {% if worker.current_projects %}
-                    <div class="mt-2">
-                        <small class="text-muted d-block mb-2">Projects:</small>
-                        <div>
-                            {% for project in worker.current_projects %}
-                            <span class="project-badge">{{ project.name }}</span>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    <!-- Past Projects Count -->
-                    {% if worker.past_projects_count %}
-                    <div class="mt-2 text-muted small">
-                        <i class="fas fa-history me-1"></i> {{ worker.past_projects_count }} past project(s)
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-
-        <!-- DAILY WORKERS SECTION -->
-        {% for worker in daily_workers %}
-        <div class="col-lg-4 col-md-6 worker-item" data-type="daily" data-name="{{ worker.name|lower }}">
-            <div class="card worker-card daily h-100">
-                <div class="card-body">
-                    <!-- Worker Header -->
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="worker-avatar" style="background: var(--success);">
-                            {{ worker.name[:2].upper() }}
-                        </div>
-                        <div class="ms-3 flex-grow-1">
-                            <div class="d-flex align-items-center gap-2 mb-1">
-                                <h5 class="mb-0">{{ worker.name }}</h5>
-                                <span class="worker-type-badge daily">Daily Worker</span>
-                            </div>
-                            <small class="text-muted">{{ worker.email }}</small>
-                        </div>
-                        <div class="dropdown">
-                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
-                                <i class="fas fa-ellipsis-v"></i>
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{{ url_for('worker_detail', id=worker.id) }}"><i class="fas fa-eye me-2"></i>View Details</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('worker_edit', id=worker.id) }}"><i class="fas fa-edit me-2"></i>Edit</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('attendance_add', worker_id=worker.id) }}"><i class="fas fa-calendar-check me-2"></i>Record Work Day</a></li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Contact & Rate -->
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <small class="text-muted">Daily Rate</small>
-                            <span class="rate-badge">{{ worker.daily_rate }} DT / day</span>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <small class="text-muted">Phone</small>
-                            <span>{{ worker.phone or '—' }}</span>
-                        </div>
-                    </div>
-
-                    <!-- Work Summary This Month -->
-                    <div class="work-summary mb-3">
-                        <div class="number">{{ worker.days_worked_this_month or 0 }}</div>
-                        <div class="label">Days worked this month</div>
-                        <div class="mt-1"><strong>{{ (worker.days_worked_this_month or 0) * worker.daily_rate }} DT</strong> earned</div>
-                    </div>
-
-                    <!-- Current Projects -->
-                    {% if worker.current_projects %}
-                    <div class="mt-2">
-                        <small class="text-muted d-block mb-2">Current Projects:</small>
-                        <div>
-                            {% for project in worker.current_projects %}
-                            <span class="project-badge">{{ project.name }}</span>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    <!-- Payment Status -->
-                    <div class="mt-2 pt-2 border-top">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <small class="text-muted">Payment Status</small>
-                            {% if worker.payment_status == 'paid' %}
-                            <span class="badge bg-success">Paid for this month</span>
-                            {% elif worker.payment_status == 'partial' %}
-                            <span class="badge bg-warning">Partial Payment</span>
-                            {% else %}
-                            <span class="badge bg-danger">Unpaid</span>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-
-    <!-- Empty State -->
-    {% if not subcontractors and not daily_workers %}
-    <div class="text-center py-5">
-        <i class="fas fa-hard-hat fa-3x text-muted mb-3"></i>
-        <h4 class="text-muted">No Workers Yet</h4>
-        <p class="text-muted mb-4">Add subcontractors or daily workers to start managing your team.</p>
-        <div class="d-flex gap-3 justify-content-center">
-            <a href="{{ url_for('worker_add', type='subcontractor') }}" class="btn btn-primary">
-                <i class="fas fa-handshake me-2"></i>Add Subcontractor
-            </a>
-            <a href="{{ url_for('worker_add', type='daily') }}" class="btn btn-success">
-                <i class="fas fa-user-plus me-2"></i>Add Daily Worker
-            </a>
-        </div>
-    </div>
-    {% endif %}
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Filter functionality
-    const filterButtons = document.querySelectorAll('[data-filter]');
-    const workerItems = document.querySelectorAll('.worker-item');
+@app.route('/project/<int:id>/workers')
+@login_required
+def project_workers(id):
+    project = Project.query.get_or_404(id)
     
-    function filterWorkers(type) {
-        workerItems.forEach(item => {
-            if (type === 'all' || item.dataset.type === type) {
-                item.style.display = '';
-            } else {
-                item.style.display = 'none';
-            }
-        });
-    }
+    # Query subcontractors for this project
+    subcontractors = query with join between Worker and ProjectWorker
+    filter: project_id = id, worker.type = 'subcontractor'
     
-    filterButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            // Update active state
-            filterButtons.forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            
-            // Filter workers
-            const filterType = this.dataset.filter;
-            filterWorkers(filterType);
-        });
-    });
+    # Query daily workers for this project
+    daily_workers = query with join between Worker and ProjectWorker
+    filter: project_id = id, worker.type = 'daily_worker'
     
-    // Search functionality
-    const searchInput = document.createElement('input');
-    searchInput.type = 'text';
-    searchInput.placeholder = 'Search workers...';
-    searchInput.className = 'form-control';
-    searchInput.style.maxWidth = '250px';
-    
-    const filterSection = document.querySelector('.filter-buttons');
-    if (filterSection) {
-        const searchContainer = document.createElement('div');
-        searchContainer.className = 'ms-auto';
-        searchContainer.appendChild(searchInput);
-        filterSection.parentElement.appendChild(searchContainer);
-        
-        searchInput.addEventListener('keyup', function() {
-            const term = this.value.toLowerCase();
-            workerItems.forEach(item => {
-                const name = item.dataset.name || '';
-                if (name.includes(term)) {
-                    item.style.display = '';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        });
-    }
-});
-</script>
-{% endblock %}
+    return render_template('project_workers.html', 
+                         project=project,
+                         subcontractors=subcontractors,
+                         daily_workers=daily_workers)
+
+================================================================================
+INSTRUCTION 3: ADD NAVIGATION BUTTON ON FINANCIAL PAGE
+================================================================================
+
+In templates/project_financial.html, add this button near the top (next to other buttons):
+
+<a href="{{ url_for('project_workers', id=project.id) }}" class="btn btn-outline-primary">
+    <i class="fas fa-users me-2"></i>Gérer la main-d'œuvre
+</a>
+
+================================================================================
+INSTRUCTION 4: REMOVE WORKER MANAGEMENT FROM FINANCIAL PAGE
+================================================================================
+
+In templates/project_financial.html, DELETE:
+
+A. The entire div with class containing "PROJECT WORKERS SECTION" comment
+   (find: <!-- PROJECT WORKERS SECTION --> and delete everything until its closing div)
+
+B. The entire "PROJECT WORKERS SECTION" JavaScript functions:
+   - openImportWorkerModal
+   - openAddNewWorkerModal
+   - handleWorkerTypeChange
+   - loadContacts
+   - displayContacts
+   - selectContactForAssignment
+   - handleProjectAssignment
+   - handleAddNewWorker
+   - refreshWorkerTables
+   - updateSubcontractorsTable
+   - updateDailyWorkersTable
+   - showSkeletonLoaders
+   - hideSkeletonLoaders
+   - generateSkeletonRows
+
+C. All worker-related modals at the bottom of the file:
+   - importWorkerModal
+   - projectAssignmentModal
+   - addNewWorkerModal
+
+================================================================================
+INSTRUCTION 5: CREATE API ENDPOINTS (if not existing)
+================================================================================
+
+Add these API routes in app.py:
+
+A. POST /api/workers/add-to-project
+   - Receives: name, type, phone, email, specialty, project_id, role, contract_amount (or daily_rate)
+   - Creates worker if not exists
+   - Creates ProjectWorker assignment
+   - Returns JSON success
+
+B. POST /api/assignment/<id>/payment
+   - Receives: amount, payment_date, payment_method, notes
+   - Creates Payment record
+   - Updates ProjectWorker.paid_amount
+   - Returns JSON success
+
+C. POST /api/assignment/<id>/attendance
+   - Receives: date, days, notes
+   - Creates Attendance record
+   - Updates ProjectWorker.days_worked
+   - Returns JSON success
+
+================================================================================
+INSTRUCTION 6: UPDATE MODELS (if needed)
+================================================================================
+
+Ensure these models exist or add them:
+
+ProjectWorker model:
+- id, project_id, worker_id, role, contract_amount, daily_rate, days_worked, paid_amount, status, start_date, end_date
+
+Payment model:
+- id, assignment_id, amount, payment_date, payment_method, notes
+
+Attendance model:
+- id, assignment_id, date, days, notes
+
+Worker model:
+- id, name, type, phone, email, specialty, default_rate, address, notes
+
+================================================================================
+EXPECTED RESULT AFTER REFACTOR
+================================================================================
+
+1. Financial page: Clean, faster, no modals, only financial data
+2. Worker management: Separate page with full functionality
+3. No Bootstrap modal conflicts
+4. No JavaScript null element errors
+5. Easy to maintain and debug
+
+================================================================================
+BENEFITS OF THIS APPROACH
+================================================================================
+
+| Problem Before | Solution After |
+|----------------|----------------|
+| Modal conflicts | Separate page eliminates modals |
+| JavaScript errors | Isolated JavaScript per page |
+| Bootstrap backdrop errors | No nested modals |
+| Hard to debug | Clear separation of concerns |
+| Slow page load | Lighter financial page |
+| Complex code | Clean, focused code |
+
+================================================================================

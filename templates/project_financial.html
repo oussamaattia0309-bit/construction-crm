@@ -441,23 +441,49 @@
                         </h5>
                         <div class="d-flex align-items-center gap-2">
                             <span class="badge px-3 py-2" style="background-color: var(--primary-mid);">0 prestataires</span>
-                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addSubcontractorModal">
-                                <i class="fas fa-plus me-1"></i>Ajouter
+                            <button class="btn btn-sm btn-outline-primary" onclick="openImportWorkerModal('subcontractor')">
+                                <i class="fas fa-user-import me-1"></i>Importer
+                            </button>
+                            <button class="btn btn-sm btn-primary" onclick="openAddNewWorkerModal('subcontractor')">
+                                <i class="fas fa-user-plus me-1"></i>Ajouter
                             </button>
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="row g-3">
-                            <!-- Placeholder for subcontractor cards -->
-                            <div class="col-12">
-                                <div class="text-center py-5">
-                                    <i class="fas fa-handshake fa-4x mb-3" style="color: var(--light-bg);"></i>
-                                    <p class="text-muted mb-2">Aucun sous-traitant assigné à ce projet</p>
-                                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addSubcontractorModal">
-                                        <i class="fas fa-plus me-1"></i>Ajouter un sous-traitant
-                                    </button>
-                                </div>
-                            </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0" id="subcontractorsTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th><i class="fas fa-user me-1"></i>Nom du sous-traitant</th>
+                                        <th><i class="fas fa-briefcase me-1"></i>Rôle / Tâche</th>
+                                        <th><i class="fas fa-file-contract me-1"></i>Contrat total</th>
+                                        <th><i class="fas fa-money-check-alt me-1"></i>Montant payé</th>
+                                        <th><i class="fas fa-balance-scale me-1"></i>Solde restant</th>
+                                        <th><i class="fas fa-info-circle me-1"></i>Statut</th>
+                                        <th><i class="fas fa-cogs me-1"></i>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="subcontractorsTableBody">
+                                    <tr class="text-center">
+                                        <td colspan="7" class="py-4">
+                                            <i class="fas fa-handshake fa-3x mb-3 text-muted"></i>
+                                            <p class="text-muted mb-2">Aucun sous-traitant assigné à ce projet</p>
+                                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addSubcontractorModal">
+                                                <i class="fas fa-plus me-1"></i>Ajouter un sous-traitant
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot class="table-light fw-bold">
+                                    <tr>
+                                        <td colspan="2"><i class="fas fa-calculator me-1"></i>Total sous-traitants:</td>
+                                        <td id="totalSubcontractorContract">0.00 TND</td>
+                                        <td id="totalSubcontractorPaid">0.00 TND</td>
+                                        <td id="totalSubcontractorRemaining">0.00 TND</td>
+                                        <td colspan="2"></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -471,23 +497,48 @@
                         </h5>
                         <div class="d-flex align-items-center gap-2">
                             <span class="badge px-3 py-2" style="background-color: var(--primary-mid);">0 ouvriers</span>
-                            <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#addDailyWorkerModal">
-                                <i class="fas fa-plus me-1"></i>Ajouter
+                            <button class="btn btn-sm btn-outline-success" onclick="openImportWorkerModal('daily_worker')">
+                                <i class="fas fa-user-import me-1"></i>Importer
+                            </button>
+                            <button class="btn btn-sm btn-success" onclick="openAddNewWorkerModal('daily_worker')">
+                                <i class="fas fa-user-plus me-1"></i>Ajouter
                             </button>
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="row g-3">
-                            <!-- Placeholder for daily worker cards -->
-                            <div class="col-12">
-                                <div class="text-center py-5">
-                                    <i class="fas fa-hard-hat fa-4x mb-3" style="color: var(--light-bg);"></i>
-                                    <p class="text-muted mb-2">Aucun ouvrier journalier assigné à ce projet</p>
-                                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addDailyWorkerModal">
-                                        <i class="fas fa-plus me-1"></i>Ajouter un ouvrier
-                                    </button>
-                                </div>
-                            </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0" id="dailyWorkersTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th><i class="fas fa-user me-1"></i>Nom de l'ouvrier</th>
+                                        <th><i class="fas fa-briefcase me-1"></i>Rôle / Tâche</th>
+                                        <th><i class="fas fa-calendar-day me-1"></i>Jours travaillés</th>
+                                        <th><i class="fas fa-money-bill-wave me-1"></i>Taux journalier</th>
+                                        <th><i class="fas fa-money-check-alt me-1"></i>Montant payé</th>
+                                        <th><i class="fas fa-info-circle me-1"></i>Statut</th>
+                                        <th><i class="fas fa-cogs me-1"></i>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dailyWorkersTableBody">
+                                    <tr class="text-center">
+                                        <td colspan="7" class="py-4">
+                                            <i class="fas fa-hard-hat fa-3x mb-3 text-muted"></i>
+                                            <p class="text-muted mb-2">Aucun ouvrier journalier assigné à ce projet</p>
+                                            <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addDailyWorkerModal">
+                                                <i class="fas fa-plus me-1"></i>Ajouter un ouvrier
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot class="table-light fw-bold">
+                                    <tr>
+                                        <td colspan="3"><i class="fas fa-calculator me-1"></i>Total ouvriers:</td>
+                                        <td id="totalDailyWorkerRate">0.00 TND/jour</td>
+                                        <td id="totalDailyWorkerPaid">0.00 TND</td>
+                                        <td colspan="2"></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -495,6 +546,14 @@
             </div>
         </div>
     </div>
+
+    <!-- Spacer to separate sections -->
+    <div class="mt-4"></div>
+
+    <!-- Action Buttons -->
+    <div class="card dashboard-card mb-4">
+        <div class="card-body">
+            <div class="d-flex flex-wrap gap-2">
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addExpenseModal" title="Add expense">
                     <i class="fas fa-plus-circle me-2"></i>Add Expense
                 </button>
@@ -1622,6 +1681,697 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize document display
     renderDocuments();
 });
+
+// Worker Management JavaScript
+let currentWorkerType = 'subcontractor';
+let allContacts = [];
+
+// Global renderDocuments function to prevent errors
+function renderDocuments() {
+    console.log('renderDocuments called - Documents are rendered server-side');
+    return;
+}
+
+// Consolidate all DOMContentLoaded functionality into one listener
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOMContentLoaded fired - Worker Management System loading...');
+    
+    // Check if Bootstrap is loaded
+    if (typeof bootstrap === 'undefined') {
+        console.error('Bootstrap is not loaded! Modals will not work.');
+        alert('Attention: Bootstrap n\'est pas chargé. Les fonctionnalités des modals ne fonctionneront pas.');
+    } else {
+        console.log('Bootstrap is loaded successfully');
+    }
+    
+    // Check if all required modal elements exist
+    const requiredModals = ['importWorkerModal', 'addNewWorkerModal', 'projectAssignmentModal'];
+    const missingModals = [];
+    
+    requiredModals.forEach(modalId => {
+        const modal = document.getElementById(modalId);
+        if (!modal) {
+            missingModals.push(modalId);
+        }
+    });
+    
+    if (missingModals.length > 0) {
+        console.error('Missing modal elements:', missingModals);
+        alert('Attention: Certains modals sont manquants: ' + missingModals.join(', '));
+    } else {
+        console.log('All required modal elements found');
+    }
+    
+    // Initialize document display (from original script)
+    renderDocuments();
+    
+    // Initialize worker toggle functionality
+    const workersToggle = document.querySelector('.workers-toggle');
+    const workersToggleIcon = document.querySelector('.workers-toggle-icon');
+    
+    if (workersToggle && workersToggleIcon) {
+        workersToggle.addEventListener('click', function() {
+            setTimeout(() => {
+                if (workersToggleIcon.classList.contains('fa-chevron-right')) {
+                    workersToggleIcon.classList.remove('fa-chevron-right');
+                    workersToggleIcon.classList.add('fa-chevron-down');
+                } else {
+                    workersToggleIcon.classList.remove('fa-chevron-down');
+                    workersToggleIcon.classList.add('fa-chevron-right');
+                }
+            }, 100);
+        });
+    }
+    
+    // Setup modal event listeners
+    setupModalEventListeners();
+    
+    // Setup worker type change listener
+    document.getElementById('newWorkerType')?.addEventListener('change', handleWorkerTypeChange);
+    
+    // Setup search listener
+    document.getElementById('importWorkerSearch')?.addEventListener('input', handleContactSearch);
+    
+    // Make functions globally accessible for testing
+    window.testWorkerFunctions = function() {
+        console.log('Testing worker functions...');
+        console.log('openImportWorkerModal:', typeof openImportWorkerModal);
+        console.log('openAddNewWorkerModal:', typeof openAddNewWorkerModal);
+        console.log('currentWorkerType:', currentWorkerType);
+        console.log('Bootstrap available:', typeof bootstrap !== 'undefined');
+        return 'Functions are available!';
+    };
+    
+    console.log('Worker Management System loaded successfully!');
+});
+
+function setupModalEventListeners() {
+    // Import Worker Modal
+    document.getElementById('importWorkerModal')?.addEventListener('show.bs.modal', function() {
+        loadContacts(currentWorkerType);
+    });
+    
+    // Project Assignment Form
+    document.getElementById('projectAssignmentForm')?.addEventListener('submit', handleProjectAssignment);
+    
+    // Add New Worker Form
+    document.getElementById('addNewWorkerForm')?.addEventListener('submit', handleAddNewWorker);
+}
+
+function openImportWorkerModal(workerType) {
+    console.log('openImportWorkerModal called:', workerType);
+    currentWorkerType = workerType;
+    
+    // Update modal title
+    const typeLabel = workerType === 'subcontractor' ? 'Sous-traitants' : 'Ouvriers journaliers';
+    const typeElement = document.getElementById('importWorkerType');
+    if (typeElement) typeElement.textContent = typeLabel;
+    
+    // Load contacts
+    loadContacts(workerType);
+    
+    // Show modal using Bootstrap
+    const modalEl = document.getElementById('importWorkerModal');
+    if (modalEl) {
+        const bsModal = new bootstrap.Modal(modalEl);
+        bsModal.show();
+    }
+}
+
+function openAddNewWorkerModal(workerType) {
+    console.log('openAddNewWorkerModal called:', workerType);
+    currentWorkerType = workerType;
+    
+    // Set worker type
+    const workerTypeEl = document.getElementById('newWorkerType');
+    if (workerTypeEl) {
+        workerTypeEl.value = workerType;
+    }
+    
+    // Set today's date
+    const today = new Date().toISOString().split('T')[0];
+    const startDateEl = document.getElementById('newWorkerStartDate');
+    if (startDateEl) startDateEl.value = today;
+    
+    // Show modal
+    const modalEl = document.getElementById('addNewWorkerModal');
+    if (modalEl) {
+        const bsModal = new bootstrap.Modal(modalEl);
+        bsModal.show();
+    }
+}
+
+function handleWorkerTypeChange() {
+    const workerType = document.getElementById('newWorkerType').value;
+    const contractField = document.getElementById('newWorkerContractField');
+    const rateField = document.getElementById('newWorkerProjectRateField');
+    const defaultRateField = document.getElementById('newWorkerDefaultRateField');
+    
+    if (workerType === 'subcontractor') {
+        contractField.style.display = 'block';
+        rateField.style.display = 'none';
+        defaultRateField.style.display = 'none';
+        document.getElementById('newWorkerContractAmount').required = true;
+        document.getElementById('newWorkerProjectRate').required = false;
+    } else {
+        contractField.style.display = 'none';
+        rateField.style.display = 'block';
+        defaultRateField.style.display = 'block';
+        document.getElementById('newWorkerContractAmount').required = false;
+        document.getElementById('newWorkerProjectRate').required = true;
+    }
+}
+
+async function loadContacts(workerType) {
+    try {
+        showLoadingInImportModal();
+        
+        // Fetch ALL contacts from the API
+        const response = await fetch('/api/contacts');
+        if (!response.ok) {
+            throw new Error('Failed to fetch contacts');
+        }
+        
+        const contacts = await response.json();
+        
+        // Map API response to our format - store all contacts
+        allContacts = contacts.map(contact => ({
+            id: contact.id,
+            name: contact.name,
+            phone: contact.phone || '',
+            email: contact.email || '',
+            type: contact.type || 'other',
+            company: contact.company || '',
+            default_rate: 0
+        }));
+        
+        // Show ALL contacts (no filtering by type initially)
+        displayContacts(allContacts);
+        
+    } catch (error) {
+        console.error('Error loading contacts:', error);
+        showErrorInImportModal('Erreur lors du chargement des contacts');
+    }
+}
+
+function displayContacts(contacts) {
+    const listContainer = document.getElementById('importWorkerList');
+    
+    if (contacts.length === 0) {
+        listContainer.innerHTML = `
+            <div class="text-center py-4">
+                <i class="fas fa-users fa-3x mb-3 text-muted"></i>
+                <p class="text-muted">Aucun contact trouvé</p>
+            </div>
+        `;
+        return;
+    }
+    
+    listContainer.innerHTML = contacts.map(contact => `
+        <div class="list-group-item list-group-item-action">
+            <div class="d-flex w-100 justify-content-between align-items-center">
+                <div>
+                    <h6 class="mb-1">${contact.name}</h6>
+                    <p class="mb-1 text-muted">
+                        <i class="fas fa-phone me-1"></i>${contact.phone || 'N/A'}
+                        ${contact.email ? `<br><i class="fas fa-envelope me-1"></i>${contact.email}` : ''}
+                    </p>
+                    <small>
+                        <span class="badge bg-${contact.type === 'Fournisseur' ? 'primary' : contact.type === 'Ouvrier' ? 'success' : 'secondary'}">
+                            ${contact.type || 'Contact'}
+                        </span>
+                        ${contact.company ? `<span class="ms-2"><i class="fas fa-building me-1"></i>${contact.company}</span>` : ''}
+                    </small>
+                </div>
+                <button class="btn btn-sm btn-primary" onclick="selectContactForAssignment(${contact.id})">
+                    <i class="fas fa-check me-1"></i>Sélectionner
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function handleContactSearch() {
+    const searchTerm = document.getElementById('importWorkerSearch').value.toLowerCase();
+    const filteredContacts = allContacts.filter(contact => 
+        contact.type === currentWorkerType && (
+            contact.name.toLowerCase().includes(searchTerm) ||
+            (contact.phone && contact.phone.includes(searchTerm)) ||
+            (contact.email && contact.email.toLowerCase().includes(searchTerm))
+        )
+    );
+    displayContacts(filteredContacts);
+}
+
+function selectContactForAssignment(contactId) {
+    const contact = allContacts.find(c => c.id === contactId);
+    if (!contact) return;
+    
+    // Close import modal properly
+    const importModal = document.getElementById('importWorkerModal');
+    const importInstance = bootstrap.Modal.getInstance(importModal);
+    if (importInstance) {
+        importInstance.hide();
+    }
+    
+    // Wait for modal to close
+    setTimeout(() => {
+        // Setup assignment modal
+        document.getElementById('assignmentWorkerId').value = contact.id;
+        document.getElementById('assignmentWorkerType').value = contact.type;
+        document.getElementById('assignmentWorkerName').textContent = contact.name;
+        
+        // Show/hide appropriate fields
+        const contractField = document.getElementById('assignmentContractField');
+        const rateField = document.getElementById('assignmentRateField');
+        
+        if (contact.type === 'subcontractor') {
+            contractField.style.display = 'block';
+            rateField.style.display = 'none';
+            document.getElementById('assignmentContractAmount').required = true;
+            document.getElementById('assignmentDailyRate').required = false;
+        } else {
+            contractField.style.display = 'none';
+            rateField.style.display = 'block';
+            document.getElementById('assignmentContractAmount').required = false;
+            document.getElementById('assignmentDailyRate').required = true;
+            if (contact.default_rate) {
+                document.getElementById('assignmentDailyRate').value = contact.default_rate;
+            }
+        }
+        
+        // Set today's date
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('assignmentStartDate').value = today;
+        
+        // Show assignment modal
+        const assignmentModal = document.getElementById('projectAssignmentModal');
+        const modal = new bootstrap.Modal(assignmentModal, {
+            backdrop: true,
+            keyboard: true,
+            focus: true
+        });
+        modal.show();
+    }, 350);
+}
+
+async function handleProjectAssignment(e) {
+    e.preventDefault();
+    
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const btnText = submitBtn.querySelector('.btn-text');
+    const spinner = submitBtn.querySelector('.spinner-border');
+    
+    // Show loading state
+    btnText.textContent = 'Affectation...';
+    spinner.classList.remove('d-none');
+    submitBtn.disabled = true;
+    
+    try {
+        const formData = {
+            worker_id: parseInt(document.getElementById('assignmentWorkerId').value),
+            worker_type: document.getElementById('assignmentWorkerType').value,
+            role: document.getElementById('assignmentRole').value,
+            start_date: document.getElementById('assignmentStartDate').value,
+            notes: document.getElementById('assignmentNotes').value,
+            contract_amount: document.getElementById('assignmentContractAmount').value ? 
+                parseFloat(document.getElementById('assignmentContractAmount').value) : null,
+            daily_rate: document.getElementById('assignmentDailyRate').value ? 
+                parseFloat(document.getElementById('assignmentDailyRate').value) : null
+        };
+        
+        // Simulate API call - replace with actual endpoint
+        // const response = await fetch(`/api/project/{{ project.id }}/workers/import`, {
+        //     method: 'POST',
+        //     headers: { 'Content-Type': 'application/json' },
+        //     body: JSON.stringify(formData)
+        // });
+        
+        // Mock success
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Close modal and reset form
+        bootstrap.Modal.getInstance(document.getElementById('projectAssignmentModal')).hide();
+        e.target.reset();
+        
+        // Show success toast
+        showToast('Travailleur affecté au projet avec succès', 'success');
+        
+        // Refresh tables
+        await refreshWorkerTables();
+        
+    } catch (error) {
+        console.error('Error assigning worker:', error);
+        showToast('Erreur lors de l\'affectation du travailleur', 'error');
+    } finally {
+        // Reset button state
+        btnText.textContent = 'Affecter au projet';
+        spinner.classList.add('d-none');
+        submitBtn.disabled = false;
+    }
+}
+
+async function handleAddNewWorker(e) {
+    e.preventDefault();
+    
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const btnText = submitBtn.querySelector('.btn-text');
+    const spinner = submitBtn.querySelector('.spinner-border');
+    
+    // Show loading state
+    btnText.textContent = 'Création...';
+    spinner.classList.remove('d-none');
+    submitBtn.disabled = true;
+    
+    try {
+        const workerData = {
+            type: document.getElementById('newWorkerType').value,
+            name: document.getElementById('newWorkerName').value,
+            phone: document.getElementById('newWorkerPhone').value,
+            email: document.getElementById('newWorkerEmail').value,
+            address: document.getElementById('newWorkerAddress').value,
+            specialty: document.getElementById('newWorkerSpecialty').value,
+            default_rate: document.getElementById('newWorkerDefaultRate').value ? 
+                parseFloat(document.getElementById('newWorkerDefaultRate').value) : null,
+            notes: document.getElementById('newWorkerNotes').value
+        };
+        
+        const assignmentData = {
+            role: document.getElementById('newWorkerRole').value,
+            start_date: document.getElementById('newWorkerStartDate').value,
+            notes: document.getElementById('newWorkerProjectNotes').value,
+            contract_amount: document.getElementById('newWorkerContractAmount').value ? 
+                parseFloat(document.getElementById('newWorkerContractAmount').value) : null,
+            daily_rate: document.getElementById('newWorkerProjectRate').value ? 
+                parseFloat(document.getElementById('newWorkerProjectRate').value) : null
+        };
+        
+        // Simulate API calls - replace with actual endpoints
+        // const workerResponse = await fetch('/api/workers', {
+        //     method: 'POST',
+        //     headers: { 'Content-Type': 'application/json' },
+        //     body: JSON.stringify(workerData)
+        // });
+        // const worker = await workerResponse.json();
+        
+        // const assignmentResponse = await fetch(`/api/project/{{ project.id }}/workers/assign`, {
+        //     method: 'POST',
+        //     headers: { 'Content-Type': 'application/json' },
+        //     body: JSON.stringify({ worker_id: worker.id, ...assignmentData })
+        // });
+        
+        // Mock success
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Close modal and reset form
+        bootstrap.Modal.getInstance(document.getElementById('addNewWorkerModal')).hide();
+        e.target.reset();
+        
+        // Show success toast
+        showToast('Travailleur créé et affecté au projet avec succès', 'success');
+        
+        // Refresh tables
+        await refreshWorkerTables();
+        
+    } catch (error) {
+        console.error('Error adding worker:', error);
+        showToast('Erreur lors de la création du travailleur', 'error');
+    } finally {
+        // Reset button state
+        btnText.textContent = 'Créer et affecter';
+        spinner.classList.add('d-none');
+        submitBtn.disabled = false;
+    }
+}
+
+async function refreshWorkerTables() {
+    // Show skeleton loaders
+    showSkeletonLoaders();
+    
+    try {
+        // Fetch workers from API
+        const response = await fetch(`/api/project/{{ project.id }}/workers`);
+        const workers = await response.json();
+        
+        // Separate subcontractors and daily workers
+        const subcontractors = workers.filter(w => w.worker_type === 'subcontractor');
+        const dailyWorkers = workers.filter(w => w.worker_type === 'daily_worker');
+        
+        // Update tables
+        updateSubcontractorsTable(subcontractors);
+        updateDailyWorkersTable(dailyWorkers);
+        
+        // Update counts
+        document.querySelector('[style*="0 prestataires"]')?.textContent = `${subcontractors.length} prestataire${subcontractors.length !== 1 ? 's' : ''}`;
+        document.querySelector('[style*="0 ouvriers"]')?.textContent = `${dailyWorkers.length} ouvrier${dailyWorkers.length !== 1 ? 's' : ''}`;
+        
+    } catch (error) {
+        console.error('Error refreshing tables:', error);
+        hideSkeletonLoaders();
+    }
+}
+
+function updateSubcontractorsTable(workers) {
+    const tbody = document.getElementById('subcontractorsTableBody');
+    if (!tbody) return;
+    
+    if (workers.length === 0) {
+        tbody.innerHTML = `
+            <tr class="text-center">
+                <td colspan="7" class="py-4">
+                    <i class="fas fa-handshake fa-3x mb-3 text-muted"></i>
+                    <p class="text-muted mb-2">Aucun sous-traitant assigné à ce projet</p>
+                    <button class="btn btn-primary btn-sm" onclick="openImportWorkerModal('subcontractor')">
+                        <i class="fas fa-user-import me-1"></i>Importer un sous-traitant
+                    </button>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tbody.innerHTML = workers.map(worker => {
+        const statusClass = worker.status === 'paid' ? 'bg-success' : worker.status === 'partial' ? 'bg-warning' : 'bg-secondary';
+        const statusLabel = worker.status === 'paid' ? 'Payé' : worker.status === 'partial' ? 'Partiel' : 'En attente';
+        
+        return `
+            <tr>
+                <td><strong>${worker.name}</strong><br><small class="text-muted">${worker.phone || ''}</small></td>
+                <td>${worker.role || '-'}</td>
+                <td>${worker.contract_amount.toFixed(2)} TND</td>
+                <td>${worker.amount_paid.toFixed(2)} TND</td>
+                <td>${worker.remaining_balance.toFixed(2)} TND</td>
+                <td><span class="badge ${statusClass}">${statusLabel}</span></td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary" onclick="recordPayment(${worker.id})" title="Enregistrer paiement">
+                        <i class="fas fa-dollar-sign"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="removeWorker(${worker.id})" title="Retirer">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+    
+    // Update totals
+    const totalContract = workers.reduce((sum, w) => sum + w.contract_amount, 0);
+    const totalPaid = workers.reduce((sum, w) => sum + w.amount_paid, 0);
+    const totalRemaining = workers.reduce((sum, w) => sum + w.remaining_balance, 0);
+    
+    document.getElementById('totalSubcontractorContract').textContent = totalContract.toFixed(2) + ' TND';
+    document.getElementById('totalSubcontractorPaid').textContent = totalPaid.toFixed(2) + ' TND';
+    document.getElementById('totalSubcontractorRemaining').textContent = totalRemaining.toFixed(2) + ' TND';
+}
+
+function updateDailyWorkersTable(workers) {
+    const tbody = document.getElementById('dailyWorkersTableBody');
+    if (!tbody) return;
+    
+    if (workers.length === 0) {
+        tbody.innerHTML = `
+            <tr class="text-center">
+                <td colspan="7" class="py-4">
+                    <i class="fas fa-hard-hat fa-3x mb-3 text-muted"></i>
+                    <p class="text-muted mb-2">Aucun ouvrier journalier assigné à ce projet</p>
+                    <button class="btn btn-success btn-sm" onclick="openImportWorkerModal('daily_worker')">
+                        <i class="fas fa-user-import me-1"></i>Importer un ouvrier
+                    </button>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tbody.innerHTML = workers.map(worker => `
+        <tr>
+            <td><strong>${worker.name}</strong><br><small class="text-muted">${worker.phone || ''}</small></td>
+            <td>${worker.role || '-'}</td>
+            <td>${worker.daily_rate.toFixed(2)} TND/jour</td>
+            <td>${worker.start_date || '-'}</td>
+            <td><span class="badge bg-success">Actif</span></td>
+            <td>
+                <button class="btn btn-sm btn-outline-primary" onclick="recordPayment(${worker.id})" title="Enregistrer paiement">
+                    <i class="fas fa-dollar-sign"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" onclick="removeWorker(${worker.id})" title="Retirer">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+async function removeWorker(workerId) {
+    if (!confirm('Êtes-vous sûr de vouloir retirer ce travailleur du projet?')) return;
+    
+    try {
+        const response = await fetch(`/api/project/{{ project.id }}/workers/${workerId}`, {
+            method: 'DELETE'
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+            showToast('Travailleur retiré avec succès', 'success');
+            refreshWorkerTables();
+        } else {
+            showToast('Erreur: ' + result.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error removing worker:', error);
+        showToast('Erreur lors de la suppression', 'error');
+    }
+}
+
+async function recordPayment(workerId) {
+    const amount = prompt('Montant du paiement:');
+    if (!amount || isNaN(amount) || parseFloat(amount) <= 0) return;
+    
+    try {
+        const response = await fetch(`/api/project/{{ project.id }}/workers/${workerId}/payment`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount: parseFloat(amount) })
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+            showToast('Paiement enregistré avec succès', 'success');
+            refreshWorkerTables();
+        } else {
+            showToast('Erreur: ' + result.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error recording payment:', error);
+        showToast('Erreur lors de l\'enregistrement', 'error');
+    }
+}
+
+function showLoadingInImportModal() {
+    document.getElementById('importWorkerList').innerHTML = `
+        <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Chargement...</span>
+            </div>
+            <p class="mt-2 text-muted">Chargement des contacts...</p>
+        </div>
+    `;
+}
+
+function showErrorInImportModal(message) {
+    document.getElementById('importWorkerList').innerHTML = `
+        <div class="text-center py-4">
+            <i class="fas fa-exclamation-triangle fa-3x mb-3 text-warning"></i>
+            <p class="text-muted">${message}</p>
+        </div>
+    `;
+}
+
+function showSkeletonLoaders() {
+    // Add skeleton loader classes to table bodies
+    const subcontractorsBody = document.getElementById('subcontractorsTableBody');
+    const dailyWorkersBody = document.getElementById('dailyWorkersTableBody');
+    
+    if (subcontractorsBody) {
+        subcontractorsBody.innerHTML = generateSkeletonRows(3);
+    }
+    if (dailyWorkersBody) {
+        dailyWorkersBody.innerHTML = generateSkeletonRows(3);
+    }
+}
+
+function hideSkeletonLoaders() {
+    // This would be replaced with actual data updates
+    console.log('Skeleton loaders hidden');
+}
+
+function generateSkeletonRows(count) {
+    return Array(count).fill(0).map(() => `
+        <tr>
+            <td><div class="skeleton" style="height: 20px; width: 150px;"></div></td>
+            <td><div class="skeleton" style="height: 20px; width: 120px;"></div></td>
+            <td><div class="skeleton" style="height: 20px; width: 80px;"></div></td>
+            <td><div class="skeleton" style="height: 20px; width: 80px;"></div></td>
+            <td><div class="skeleton" style="height: 20px; width: 80px;"></div></td>
+            <td><div class="skeleton" style="height: 20px; width: 60px;"></div></td>
+            <td><div class="skeleton" style="height: 20px; width: 100px;"></div></td>
+        </tr>
+    `).join('');
+}
+
+function showToast(message, type = 'info') {
+    const toastContainer = document.querySelector('.toast-container');
+    const toastId = 'toast-' + Date.now();
+    
+    const bgClass = type === 'success' ? 'bg-success' : 
+                   type === 'error' ? 'bg-danger' : 
+                   type === 'warning' ? 'bg-warning' : 'bg-info';
+    
+    const toastHTML = `
+        <div id="${toastId}" class="toast align-items-center text-white ${bgClass} border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    `;
+    
+    toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+    
+    const toastElement = document.getElementById(toastId);
+    const toast = new bootstrap.Toast(toastElement, { delay: 3000 });
+    toast.show();
+    
+    // Remove toast element after it's hidden
+    toastElement.addEventListener('hidden.bs.toast', () => {
+        toastElement.remove();
+    });
+}
+
+// Add skeleton loader styles
+const skeletonStyles = `
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 4px;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+`;
+
+// Add styles to head
+if (!document.querySelector('#skeleton-styles')) {
+    const styleSheet = document.createElement('style');
+    styleSheet.id = 'skeleton-styles';
+    styleSheet.textContent = skeletonStyles;
+    document.head.appendChild(styleSheet);
+}
 </script>
 
 <style>
@@ -1858,4 +2608,177 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 }
 </style>
+
+<!-- Import Worker Modal -->
+<div class="modal fade" id="importWorkerModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #6f42c1, #5a2d91); color: white;">
+                <h5 class="modal-title"><i class="fas fa-user-import me-2"></i>Importer un travailleur - <span id="importWorkerType">Sous-traitants</span></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" class="form-control" id="importWorkerSearch" placeholder="Rechercher par nom, téléphone, email...">
+                    </div>
+                </div>
+                <div id="importWorkerList" class="list-group" style="max-height: 400px; overflow-y: auto;">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p class="mt-2 text-muted">Chargement des contacts...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Project Assignment Modal -->
+<div class="modal fade" id="projectAssignmentModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #6f42c1, #5a2d91); color: white;">
+                <h5 class="modal-title"><i class="fas fa-briefcase me-2"></i>Affecter au projet</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="projectAssignmentForm">
+                <div class="modal-body">
+                    <input type="hidden" id="assignmentWorkerId">
+                    <input type="hidden" id="assignmentWorkerType">
+                    <div class="alert alert-info">
+                        <i class="fas fa-user me-2"></i>
+                        <strong>Travailleur sélectionné:</strong> <span id="assignmentWorkerName"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-briefcase me-1 text-muted"></i>Rôle / Tâche pour ce projet</label>
+                        <input type="text" class="form-control" id="assignmentRole" required placeholder="Ex: Installation électrique, Maçonnerie...">
+                    </div>
+                    <div class="mb-3" id="assignmentContractField">
+                        <label class="form-label"><i class="fas fa-file-contract me-1 text-muted"></i>Montant du contrat (TND)</label>
+                        <input type="number" step="0.01" class="form-control" id="assignmentContractAmount" placeholder="0.00">
+                    </div>
+                    <div class="mb-3" id="assignmentRateField" style="display: none;">
+                        <label class="form-label"><i class="fas fa-money-bill-wave me-1 text-muted"></i>Taux journalier pour ce projet (TND)</label>
+                        <input type="number" step="0.01" class="form-control" id="assignmentDailyRate" placeholder="0.00">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-calendar me-1 text-muted"></i>Date de début</label>
+                        <input type="date" class="form-control" id="assignmentStartDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-comment me-1 text-muted"></i>Notes</label>
+                        <textarea class="form-control" id="assignmentNotes" rows="2" placeholder="Notes spécifiques à ce projet..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-text">Affecter au projet</span>
+                        <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add New Worker Modal -->
+<div class="modal fade" id="addNewWorkerModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #28a745, #20c997); color: white;">
+                <h5 class="modal-title"><i class="fas fa-user-plus me-2"></i>Ajouter un nouveau travailleur</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addNewWorkerForm">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="mb-3"><i class="fas fa-user me-2"></i>Informations du travailleur</h6>
+                            <div class="mb-3">
+                                <label class="form-label"><i class="fas fa-tag me-1 text-muted"></i>Type de travailleur *</label>
+                                <select class="form-select" id="newWorkerType" required>
+                                    <option value="">Sélectionner un type</option>
+                                    <option value="subcontractor">Sous-traitant</option>
+                                    <option value="daily_worker">Ouvrier journalier</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label"><i class="fas fa-user me-1 text-muted"></i>Nom complet *</label>
+                                <input type="text" class="form-control" id="newWorkerName" required placeholder="Nom complet">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label"><i class="fas fa-phone me-1 text-muted"></i>Téléphone</label>
+                                <input type="tel" class="form-control" id="newWorkerPhone" placeholder="Numéro de téléphone">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label"><i class="fas fa-envelope me-1 text-muted"></i>Email</label>
+                                <input type="email" class="form-control" id="newWorkerEmail" placeholder="adresse@email.com">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label"><i class="fas fa-map-marker-alt me-1 text-muted"></i>Adresse</label>
+                                <textarea class="form-control" id="newWorkerAddress" rows="2" placeholder="Adresse complète"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label"><i class="fas fa-tools me-1 text-muted"></i>Spécialité / Métier</label>
+                                <input type="text" class="form-control" id="newWorkerSpecialty" placeholder="Ex: Électricien, Plombier, Maçon...">
+                            </div>
+                            <div class="mb-3" id="newWorkerDefaultRateField">
+                                <label class="form-label"><i class="fas fa-money-bill-wave me-1 text-muted"></i>Taux journalier par défaut (TND)</label>
+                                <input type="number" step="0.01" class="form-control" id="newWorkerDefaultRate" placeholder="0.00">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label"><i class="fas fa-comment me-1 text-muted"></i>Notes générales</label>
+                                <textarea class="form-control" id="newWorkerNotes" rows="2" placeholder="Notes sur le travailleur..."></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="mb-3"><i class="fas fa-briefcase me-2"></i>Affectation à ce projet</h6>
+                            <div class="mb-3">
+                                <label class="form-label"><i class="fas fa-briefcase me-1 text-muted"></i>Rôle / Tâche pour ce projet *</label>
+                                <input type="text" class="form-control" id="newWorkerRole" required placeholder="Ex: Installation électrique, Maçonnerie...">
+                            </div>
+                            <div class="mb-3" id="newWorkerContractField">
+                                <label class="form-label"><i class="fas fa-file-contract me-1 text-muted"></i>Montant du contrat (TND) *</label>
+                                <input type="number" step="0.01" class="form-control" id="newWorkerContractAmount" placeholder="0.00">
+                            </div>
+                            <div class="mb-3" id="newWorkerProjectRateField" style="display: none;">
+                                <label class="form-label"><i class="fas fa-money-bill-wave me-1 text-muted"></i>Taux journalier pour ce projet (TND) *</label>
+                                <input type="number" step="0.01" class="form-control" id="newWorkerProjectRate" placeholder="0.00">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label"><i class="fas fa-calendar me-1 text-muted"></i>Date de début *</label>
+                                <input type="date" class="form-control" id="newWorkerStartDate" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label"><i class="fas fa-comment me-1 text-muted"></i>Notes spécifiques au projet</label>
+                                <textarea class="form-control" id="newWorkerProjectNotes" rows="2" placeholder="Notes spécifiques à ce projet..."></textarea>
+                            </div>
+                            <div class="alert alert-info mt-4">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Note:</strong> Le travailleur sera ajouté à la base de données des contacts ET affecté à ce projet en une seule opération.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-success">
+                        <span class="btn-text">Créer et affecter</span>
+                        <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;"></div>
+
 {% endblock %}

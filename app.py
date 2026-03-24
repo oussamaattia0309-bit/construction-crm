@@ -97,6 +97,40 @@ class Tool(db.Model):
     def __repr__(self):
         return f'<Tool {self.name}>'
 
+class ProjectWorker(db.Model):
+    """Model for tracking workers (subcontractors and daily workers) assigned to projects"""
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
+    contact_id = db.Column(db.Integer, db.ForeignKey('contact.id'), nullable=False)
+    worker_type = db.Column(db.String(50), nullable=False)  # 'subcontractor' or 'daily_worker'
+    role = db.Column(db.String(200))  # Role/task for this project
+    start_date = db.Column(db.Date)
+    contract_amount = db.Column(db.Float, default=0.0)  # For subcontractors
+    daily_rate = db.Column(db.Float, default=0.0)  # For daily workers
+    amount_paid = db.Column(db.Float, default=0.0)
+    notes = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    contact = db.relationship('Contact', backref='project_assignments')
+    project = db.relationship('Project', backref='workers')
+    
+    @property
+    def remaining_balance(self):
+        if self.worker_type == 'subcontractor':
+            return self.contract_amount - self.amount_paid
+        return 0.0
+    
+    @property
+    def status(self):
+        if self.worker_type == 'subcontractor':
+            if self.amount_paid >= self.contract_amount:
+                return 'paid'
+            elif self.amount_paid > 0:
+                return 'partial'
+            return 'pending'
+        return 'active'
+
 class ProjectExpense(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
@@ -941,6 +975,121 @@ def projects_list():
     except Exception as e:
         print(f"Error in projects_list: {e}")
         return jsonify([]), 500
+
+# ==================== PROJECT WORKERS API ====================
+@app.route('/api/project/<int:project_id>/workers')
+@login_required
+def get_project_workers(project_id):
+    """Get all workers (subcontractors and daily workers) for a project"""
+    try:
+        workers = ProjectWorker.query.filter_by(project_id=project_id).all()
+        return jsonify([{
+            'id': w.id,
+            'contact_id': w.contact_id,
+            'name': w.contact.name if w.contact else 'Unknown',
+            'phone': w.contact.phone if w.contact else '',
+            'worker_type': w.worker_type,
+            'role': w.role,
+            'start_date': w.start_date.strftime('%Y-%m-%d') if w.start_date else None,
+            'contract_amount': w.contract_amount,
+            'daily_rate': w.daily_rate,
+            'amount_paid': w.amount_paid,
+            'remaining_balance': w.remaining_balance,
+            'status': w.status,
+            'notes': w.notes
+        } for w in workers])
+    except Exception as e:
+        print(f"Error getting project workers: {e}")
+        return jsonify([]), 500
+
+@app.route('/api/project/<int:project_id>/workers', methods=['POST'])
+@login_required
+def add_project_worker(project_id):
+    """Add a worker (subcontractor or daily worker) to a project"""
+    try:
+        data = request.get_json()
+        
+        contact = Contact.query.get(data.get('contact_id'))
+        if not contact:
+            return jsonify({'success': False, 'error': 'Contact not found'}), 404
+        
+        existing = ProjectWorker.query.filter_by(
+            project_id=project_id,
+            contact_id=data.get('contact_id')
+        ).first()
+        
+        if existing:
+            return jsonify({'success': False, 'error': 'Contact already assigned to this project'}), 400
+        
+        worker = ProjectWorker(
+            project_id=project_id,
+            contact_id=data.get('contact_id'),
+            worker_type=data.get('worker_type'),
+            role=data.get('role'),
+            start_date=datetime.strptime(data.get('start_date'), '%Y-%m-%d').date() if data.get('start_date') else None,
+            contract_amount=float(data.get('contract_amount', 0)),
+            daily_rate=float(data.get('daily_rate', 0)),
+            notes=data.get('notes')
+        )
+        
+        db.session.add(worker)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'worker': {
+                'id': worker.id,
+                'contact_id': worker.contact_id,
+                'name': worker.contact.name if worker.contact else 'Unknown',
+                'worker_type': worker.worker_type,
+                'role': worker.role
+            }
+        })
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error adding project worker: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/project/<int:project_id>/workers/<int:worker_id>', methods=['DELETE'])
+@login_required
+def remove_project_worker(project_id, worker_id):
+    """Remove a worker from a project"""
+    try:
+        worker = ProjectWorker.query.filter_by(id=worker_id, project_id=project_id).first()
+        if not worker:
+            return jsonify({'success': False, 'error': 'Worker not found'}), 404
+        
+        db.session.delete(worker)
+        db.session.commit()
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/project/<int:project_id>/workers/<int:worker_id>/payment', methods=['POST'])
+@login_required
+def record_worker_payment(project_id, worker_id):
+    """Record a payment for a worker"""
+    try:
+        worker = ProjectWorker.query.filter_by(id=worker_id, project_id=project_id).first()
+        if not worker:
+            return jsonify({'success': False, 'error': 'Worker not found'}), 404
+        
+        data = request.get_json()
+        amount = float(data.get('amount', 0))
+        
+        worker.amount_paid += amount
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'amount_paid': worker.amount_paid,
+            'remaining_balance': worker.remaining_balance
+        })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 # ==================== CONTACT UPLOAD ====================
 @app.route('/contacts/upload', methods=['POST'])
