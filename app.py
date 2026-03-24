@@ -135,7 +135,8 @@ class ProjectWorker(db.Model):
         return 'active'
 
     @property
-    def days_worked(self):
+    def calculated_days_worked(self):
+        """Calculate total days worked from attendances"""
         try:
             return sum([a.days or 0 for a in self.attendances])
         except Exception:
@@ -327,6 +328,11 @@ def change_password():
             return redirect(url_for('index'))
     
     return render_template('change_password.html')
+
+@app.route('/account-management')
+@login_required
+def account_management():
+    return render_template('account_management.html')
 
 # ==================== CONTACT ROUTES ====================
 @app.route('/contacts')
@@ -566,11 +572,26 @@ def project_workers(id):
 @app.route('/project/<int:id>/workers-v2')
 @login_required
 def project_workers_v2(id):
-    project = Project.query.get_or_404(id)
-    subcontractors = ProjectWorker.query.filter_by(project_id=id, worker_type='subcontractor').all()
-    daily_workers = ProjectWorker.query.filter_by(project_id=id, worker_type='daily_worker').all()
-    contacts = Contact.query.all()
-    return render_template('project_workers_v2.html', project=project, subcontractors=subcontractors, daily_workers=daily_workers, contacts=contacts)
+    try:
+        project = Project.query.get_or_404(id)
+        print(f"DEBUG: Loading project {id}")
+        
+        subcontractors = ProjectWorker.query.filter_by(project_id=id, worker_type='subcontractor').options(db.joinedload(ProjectWorker.contact)).all()
+        daily_workers = ProjectWorker.query.filter_by(project_id=id, worker_type='daily_worker').options(db.joinedload(ProjectWorker.contact)).all()
+        contacts = Contact.query.all()
+        
+        print(f"DEBUG: Found {len(subcontractors)} subcontractors and {len(daily_workers)} daily workers")
+        
+        for w in daily_workers:
+            print(f"DEBUG: Worker {w.id} - contact_id: {w.contact_id}, contact: {w.contact.name if w.contact else None}, days_worked: {w.days_worked}, daily_rate: {w.daily_rate}, amount_paid: {w.amount_paid}")
+        
+        print(f"DEBUG: Rendering template...")
+        return render_template('project_workers_v2.html', project=project, subcontractors=subcontractors, daily_workers=daily_workers, contacts=contacts)
+    except Exception as e:
+        print(f"ERROR in project_workers_v2: {e}")
+        import traceback
+        traceback.print_exc()
+        raise
 
 @app.route('/projects/<int:id>', methods=['POST'])
 @login_required
@@ -1132,6 +1153,8 @@ def update_project_worker(project_id, worker_id):
             return jsonify({'success': False, 'error': 'Worker not found'}), 404
 
         data = request.get_json() or {}
+        print(f"DEBUG: Updating worker {worker_id} with data: {data}")
+        print(f"DEBUG: Current worker_type: {worker.worker_type}")
         # allow updating contact by id or by name (create contact if necessary)
         if 'contact_id' in data and data.get('contact_id'):
             contact = Contact.query.get(data.get('contact_id'))
@@ -1165,8 +1188,12 @@ def update_project_worker(project_id, worker_id):
                 worker.amount_paid = 0
         if 'notes' in data:
             worker.notes = data.get('notes')
+        # Preserve worker_type if provided
+        if 'worker_type' in data:
+            worker.worker_type = data.get('worker_type')
 
         db.session.commit()
+        print(f"DEBUG: After commit - days_worked: {worker.days_worked}, daily_rate: {worker.daily_rate}, amount_paid: {worker.amount_paid}, worker_type: {worker.worker_type}")
 
         return jsonify({'success': True, 'worker': {
             'id': worker.id,
@@ -1383,7 +1410,7 @@ def record_worker_attendance(project_id, worker_id):
         db.session.add(attendance)
         db.session.commit()
 
-        total_days = worker.days_worked
+        total_days = worker.calculated_days_worked
         return jsonify({'success': True, 'total_days': total_days})
     except Exception as e:
         db.session.rollback()
