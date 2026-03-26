@@ -3,10 +3,15 @@ function updateDashboard() {
     fetch('/api/dashboard')
         .then(response => response.json())
         .then(data => {
-            document.getElementById('contacts-count').textContent = data.contacts;
-            document.getElementById('providers-count').textContent = data.providers;
-            document.getElementById('projects-count').textContent = data.active_projects;
-            document.getElementById('budget-total').textContent = 'TND ' + data.total_budget.toLocaleString();
+            const contactsCount = document.getElementById('contacts-count');
+            const providersCount = document.getElementById('providers-count');
+            const projectsCount = document.getElementById('projects-count');
+            const budgetTotal = document.getElementById('budget-total');
+            
+            if (contactsCount) contactsCount.textContent = data.contacts;
+            if (providersCount) providersCount.textContent = data.providers;
+            if (projectsCount) projectsCount.textContent = data.active_projects;
+            if (budgetTotal) budgetTotal.textContent = 'TND ' + data.total_budget.toLocaleString();
         })
         .catch(error => console.error('Error loading dashboard:', error));
 }

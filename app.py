@@ -256,6 +256,29 @@ class Payment(db.Model):
     def __repr__(self):
         return f'<Payment pw={self.project_worker_id} date={self.date} amount={self.amount}>'
 
+class ProjectTask(db.Model):
+    """Model for project tasks in Gantt chart"""
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
+    name = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text)
+    start_date = db.Column(db.Date)
+    end_date = db.Column(db.Date)
+    progress = db.Column(db.Integer, default=0)
+    parent_id = db.Column(db.Integer, db.ForeignKey('project_task.id'), nullable=True)
+    dependency_type = db.Column(db.String(10))  # 'FS', 'SS', 'FF', 'SF' or NULL
+    assigned_to = db.Column(db.String(200))
+    status = db.Column(db.String(20), default='pending')  # 'pending', 'in_progress', 'completed'
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    project = db.relationship('Project', backref=db.backref('tasks', lazy=True, cascade='all, delete-orphan'))
+    parent = db.relationship('ProjectTask', remote_side=[id], backref=db.backref('children', lazy=True))
+
+    def __repr__(self):
+        return f'<ProjectTask {self.name} project={self.project_id}>'
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -1546,6 +1569,210 @@ def record_worker_attendance(project_id, worker_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# ==================== PROJECT TASKS (GANTT CHART) ====================
+@app.route('/api/project/<int:project_id>/tasks')
+@login_required
+def get_project_tasks(project_id):
+    """Get all tasks for a project for Gantt chart"""
+    try:
+        project = Project.query.get_or_404(project_id)
+        tasks = ProjectTask.query.filter_by(project_id=project_id).all()
+        
+        result = []
+        for task in tasks:
+            result.append({
+                'id': task.id,
+                'name': task.name,
+                'start_date': task.start_date.strftime('%Y-%m-%d') if task.start_date else None,
+                'end_date': task.end_date.strftime('%Y-%m-%d') if task.end_date else None,
+                'progress': task.progress,
+                'parent': task.parent_id,
+                'type': 'task',
+                'assigned_to': task.assigned_to,
+                'status': task.status,
+                'description': task.description
+            })
+        
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/project/<int:project_id>/tasks', methods=['POST'])
+@login_required
+def save_project_tasks(project_id):
+    """Save tasks (create, update, delete) for a project"""
+    try:
+        project = Project.query.get_or_404(project_id)
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
+        
+        # Handle single task save
+        if 'action' in data and data['action'] == 'save':
+            task_data = data.get('task', {})
+            task_id = task_data.get('id')
+            
+            if task_id:
+                # Update existing task
+                task = ProjectTask.query.filter_by(id=task_id, project_id=project_id).first()
+                if not task:
+                    return jsonify({'success': False, 'error': 'Task not found'}), 404
+                
+                task.name = task_data.get('name', task.name)
+                task.description = task_data.get('description', task.description)
+                if task_data.get('start_date'):
+                    task.start_date = datetime.strptime(task_data['start_date'], '%Y-%m-%d').date()
+                if task_data.get('end_date'):
+                    task.end_date = datetime.strptime(task_data['end_date'], '%Y-%m-%d').date()
+                task.progress = task_data.get('progress', task.progress)
+                task.parent_id = task_data.get('parent_id', task.parent_id)
+                task.assigned_to = task_data.get('assigned_to', task.assigned_to)
+                task.updated_at = datetime.utcnow()
+            else:
+                # Create new task
+                task = ProjectTask(
+                    project_id=project_id,
+                    name=task_data.get('name'),
+                    description=task_data.get('description'),
+                    start_date=datetime.strptime(task_data['start_date'], '%Y-%m-%d').date() if task_data.get('start_date') else None,
+                    end_date=datetime.strptime(task_data['end_date'], '%Y-%m-%d').date() if task_data.get('end_date') else None,
+                    progress=task_data.get('progress', 0),
+                    parent_id=task_data.get('parent_id'),
+                    assigned_to=task_data.get('assigned_to')
+                )
+                db.session.add(task)
+            
+            db.session.commit()
+            return jsonify({'success': True, 'task_id': task.id})
+        
+        # Handle delete action
+        elif 'action' in data and data['action'] == 'delete':
+            task_id = data.get('id')
+            if not task_id:
+                return jsonify({'success': False, 'error': 'Task ID required'}), 400
+            
+            task = ProjectTask.query.filter_by(id=task_id, project_id=project_id).first()
+            if not task:
+                return jsonify({'success': False, 'error': 'Task not found'}), 404
+            
+            db.session.delete(task)
+            db.session.commit()
+            return jsonify({'success': True})
+        
+        # Handle batch operations
+        elif 'tasks' in data:
+            for task_data in data['tasks']:
+                action = task_data.get('action')
+                
+                if action == 'create':
+                    task = ProjectTask(
+                        project_id=project_id,
+                        name=task_data.get('name'),
+                        start_date=datetime.strptime(task_data['start_date'], '%Y-%m-%d').date() if task_data.get('start_date') else None,
+                        end_date=datetime.strptime(task_data['end_date'], '%Y-%m-%d').date() if task_data.get('end_date') else None,
+                        progress=task_data.get('progress', 0)
+                    )
+                    db.session.add(task)
+                
+                elif action == 'update':
+                    task = ProjectTask.query.filter_by(id=task_data['id'], project_id=project_id).first()
+                    if task:
+                        if 'progress' in task_data:
+                            task.progress = task_data['progress']
+                        if 'end_date' in task_data:
+                            task.end_date = datetime.strptime(task_data['end_date'], '%Y-%m-%d').date()
+                        task.updated_at = datetime.utcnow()
+                
+                elif action == 'delete':
+                    task = ProjectTask.query.filter_by(id=task_data['id'], project_id=project_id).first()
+                    if task:
+                        db.session.delete(task)
+            
+            db.session.commit()
+            return jsonify({'success': True})
+        
+        return jsonify({'success': False, 'error': 'Invalid action'}), 400
+    
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/project/<int:project_id>/tasks/dependencies')
+@login_required
+def get_task_dependencies(project_id):
+    """Get task dependencies for a project"""
+    try:
+        project = Project.query.get_or_404(project_id)
+        tasks = ProjectTask.query.filter_by(project_id=project_id).all()
+        
+        result = []
+        for task in tasks:
+            if task.dependency_type and task.parent_id:
+                result.append({
+                    'id': task.id,
+                    'source': task.parent_id,
+                    'target': task.id,
+                    'type': task.dependency_type
+                })
+        
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/project/<int:project_id>/tasks/dependencies', methods=['POST'])
+@login_required
+def save_task_dependencies(project_id):
+    """Save task dependencies for a project"""
+    try:
+        project = Project.query.get_or_404(project_id)
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
+        
+        action = data.get('action')
+        
+        if action == 'save':
+            link = data.get('link', {})
+            task_id = link.get('target')
+            
+            task = ProjectTask.query.filter_by(id=task_id, project_id=project_id).first()
+            if not task:
+                return jsonify({'success': False, 'error': 'Task not found'}), 404
+            
+            task.parent_id = link.get('source')
+            task.dependency_type = link.get('type')
+            task.updated_at = datetime.utcnow()
+            
+            db.session.commit()
+            return jsonify({'success': True})
+        
+        elif action == 'delete':
+            link_id = data.get('id')
+            
+            task = ProjectTask.query.filter_by(id=link_id, project_id=project_id).first()
+            if not task:
+                return jsonify({'success': False, 'error': 'Task not found'}), 404
+            
+            task.parent_id = None
+            task.dependency_type = None
+            task.updated_at = datetime.utcnow()
+            
+            db.session.commit()
+            return jsonify({'success': True})
+        
+        return jsonify({'success': False, 'error': 'Invalid action'}), 400
+    
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 
 # ==================== CONTACT UPLOAD ====================
 @app.route('/contacts/upload', methods=['POST'])

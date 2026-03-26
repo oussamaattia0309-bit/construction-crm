@@ -1,0 +1,442 @@
+================================================================================
+                    GANTT CHART IMPLEMENTATION
+            DHTMLX Gantt - Complete Feature Set
+================================================================================
+
+CURRENT STATE:
+- Basic Gantt chart displays
+- Tasks load from API
+- Simple timeline visualization
+- No zoom controls
+- No edit capability
+- No add task button
+- No auto-save on drag
+
+================================================================================
+WHAT TO ADD (Instructions for AI Agent)
+================================================================================
+
+1. ADD SAMPLE TASK DATA (so chart shows something immediately)
+2. ADD ZOOM CONTROLS (+, - buttons to change timeline scale)
+3. ADD EDIT CAPABILITY (double-click to edit task)
+4. ADD "ADD TASK" BUTTON (create new tasks)
+5. ADD AUTO-SAVE (when user drags tasks or changes dates)
+6. ADD EDIT MODAL (Bootstrap modal for editing)
+
+================================================================================
+COMPLETE CODE TO ADD/REPLACE
+================================================================================
+
+A. UPDATE API ENDPOINT (app.py)
+--------------------------------------------------------------------------------
+
+Replace your existing get_project_tasks with:
+
+@app.route('/api/project/<int:project_id>/tasks', methods=['GET'])
+def get_project_tasks(project_id):
+    tasks = ProjectTask.query.filter_by(project_id=project_id).all()
+    
+    # Return sample data if no tasks exist
+    if not tasks:
+        sample_tasks = [
+            {"id": 1, "name": "Étude et conception", "start_date": "2026-03-01", "end_date": "2026-03-15", "progress": 100, "parent": 0},
+            {"id": 2, "name": "Terrassement", "start_date": "2026-03-16", "end_date": "2026-04-05", "progress": 40, "parent": 0},
+            {"id": 3, "name": "Fondation", "start_date": "2026-04-06", "end_date": "2026-04-30", "progress": 0, "parent": 0},
+            {"id": 4, "name": "Structure", "start_date": "2026-05-01", "end_date": "2026-06-15", "progress": 0, "parent": 0},
+            {"id": 5, "name": "Électricité / Plomberie", "start_date": "2026-06-16", "end_date": "2026-07-15", "progress": 0, "parent": 0},
+            {"id": 6, "name": "Finitions", "start_date": "2026-07-16", "end_date": "2026-08-15", "progress": 0, "parent": 0}
+        ]
+        return jsonify({"data": sample_tasks, "links": []})
+    
+    return jsonify({
+        "data": [{
+            "id": t.id,
+            "name": t.name,
+            "start_date": t.start_date.strftime('%Y-%m-%d'),
+            "end_date": t.end_date.strftime('%Y-%m-%d'),
+            "progress": t.progress,
+            "parent": t.parent_id or 0
+        } for t in tasks],
+        "links": []
+    })
+
+
+@app.route('/api/project/<int:project_id>/tasks', methods=['POST'])
+def save_project_task(project_id):
+    data = request.json
+    action = data.get('action')
+    
+    if action == 'create':
+        task = ProjectTask(
+            project_id=project_id,
+            name=data['task']['name'],
+            start_date=data['task']['start_date'],
+            end_date=data['task']['end_date'],
+            progress=data['task'].get('progress', 0),
+            parent_id=data['task'].get('parent', None)
+        )
+        db.session.add(task)
+        db.session.commit()
+        return jsonify({"success": True, "id": task.id})
+    
+    elif action == 'update':
+        task = ProjectTask.query.get(data['task']['id'])
+        if task:
+            task.name = data['task']['name']
+            task.start_date = data['task']['start_date']
+            task.end_date = data['task']['end_date']
+            task.progress = data['task']['progress']
+            task.parent_id = data['task'].get('parent', None)
+            db.session.commit()
+            return jsonify({"success": True})
+    
+    elif action == 'delete':
+        task = ProjectTask.query.get(data['id'])
+        if task:
+            db.session.delete(task)
+            db.session.commit()
+            return jsonify({"success": True})
+    
+    return jsonify({"success": False, "error": "Invalid action"})
+
+
+B. UPDATE GANTT HTML SECTION (project_detail.html)
+--------------------------------------------------------------------------------
+
+Replace your existing Gantt section with this complete version:
+
+<!-- GANTT CHART SECTION -->
+<div class="card dashboard-card mb-4">
+    <div class="card-header bg-white py-3">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-gantt me-2 text-primary"></i>
+                    Calendrier du projet
+                </h5>
+                <p class="text-muted small mb-0 mt-1">
+                    Visualisation des tâches, progression et dépendances
+                </p>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-sm btn-outline-secondary" id="gantt-zoom-out" title="Zoom arrière">
+                    <i class="fas fa-search-minus"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-secondary" id="gantt-zoom-in" title="Zoom avant">
+                    <i class="fas fa-search-plus"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-secondary" id="gantt-reset" title="Réinitialiser">
+                    <i class="fas fa-home"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-success" id="gantt-expand-all" title="Déplier tout">
+                    <i class="fas fa-expand-alt"></i>
+                </button>
+                <button class="btn btn-sm btn-primary" id="gantt-add-task">
+                    <i class="fas fa-plus me-1"></i>Ajouter une tâche
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div id="gantt-chart" style="height: 500px; width: 100%;"></div>
+    </div>
+</div>
+
+
+C. ADD EDIT TASK MODAL (add after existing modals)
+--------------------------------------------------------------------------------
+
+<!-- Edit Task Modal -->
+<div class="modal fade" id="editTaskModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Modifier la tâche</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editTaskForm">
+                <div class="modal-body">
+                    <input type="hidden" id="editTaskId">
+                    <div class="mb-3">
+                        <label class="form-label">Nom de la tâche *</label>
+                        <input type="text" class="form-control" id="editTaskName" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Date de début</label>
+                            <input type="date" class="form-control" id="editTaskStart">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Date de fin</label>
+                            <input type="date" class="form-control" id="editTaskEnd">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Progression (%)</label>
+                        <input type="range" class="form-range" id="editTaskProgress" min="0" max="100" value="0" 
+                               oninput="document.getElementById('editProgressValue').innerText = this.value + '%'">
+                        <div class="text-center mt-1"><span id="editProgressValue">0%</span></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="deleteTaskBtn">
+                        <i class="fas fa-trash me-1"></i>Supprimer
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+D. COMPLETE GANTT JAVASCRIPT (replace existing script)
+--------------------------------------------------------------------------------
+
+<script>
+let currentProjectId = {{ project.id }};
+let gantt;
+
+// Initialize Gantt
+function initGantt() {
+    gantt.init("gantt-chart");
+    
+    // Configure scale
+    gantt.config.scale_unit = "month";
+    gantt.config.step = 1;
+    gantt.config.subscales = [
+        {unit:"week", step:1, date:"%d %M"}
+    ];
+    
+    // Enable drag and drop
+    gantt.config.drag_links = true;
+    gantt.config.drag_progress = true;
+    gantt.config.drag_move = true;
+    gantt.config.drag_resize = true;
+    gantt.config.readonly = false;
+    
+    // Auto-save when task is updated (drag, resize, progress change)
+    gantt.attachEvent("onAfterTaskUpdate", function(id, task) {
+        saveTaskToServer({
+            id: task.id,
+            name: task.text,
+            start_date: task.start_date,
+            end_date: task.end_date,
+            progress: Math.round(task.progress * 100),
+            parent: task.parent === 0 ? null : task.parent
+        });
+        return true;
+    });
+    
+    // Auto-save when task is added
+    gantt.attachEvent("onAfterTaskAdd", function(id, task) {
+        saveTaskToServer({
+            id: task.id,
+            name: task.text,
+            start_date: task.start_date,
+            end_date: task.end_date,
+            progress: Math.round(task.progress * 100),
+            parent: task.parent === 0 ? null : task.parent
+        });
+        return true;
+    });
+    
+    // Delete task when removed
+    gantt.attachEvent("onAfterTaskDelete", function(id) {
+        fetch('/api/project/' + currentProjectId + '/tasks', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ action: 'delete', id: id })
+        });
+    });
+    
+    // Double-click to edit
+    gantt.attachEvent("onTaskDblClick", function(id, e) {
+        const task = gantt.getTask(id);
+        openEditModal(task);
+        return false;
+    });
+    
+    loadTasks();
+}
+
+// Load tasks from server
+function loadTasks() {
+    fetch(`/api/project/${currentProjectId}/tasks`)
+        .then(r => r.json())
+        .then(data => {
+            const tasks = data.data.map(task => ({
+                id: task.id,
+                text: task.name,
+                start_date: task.start_date,
+                end_date: task.end_date,
+                progress: task.progress / 100,
+                parent: task.parent || 0,
+                open: true
+            }));
+            gantt.parse({ data: tasks, links: [] });
+        });
+}
+
+// Save task to server
+function saveTaskToServer(task) {
+    fetch('/api/project/' + currentProjectId + '/tasks', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ 
+            action: task.id ? 'update' : 'create', 
+            task: task 
+        })
+    });
+}
+
+// Open edit modal
+function openEditModal(task) {
+    document.getElementById('editTaskId').value = task.id;
+    document.getElementById('editTaskName').value = task.text;
+    document.getElementById('editTaskStart').value = task.start_date;
+    document.getElementById('editTaskEnd').value = task.end_date;
+    const progress = Math.round(task.progress * 100);
+    document.getElementById('editTaskProgress').value = progress;
+    document.getElementById('editProgressValue').innerText = progress + '%';
+    
+    const modal = new bootstrap.Modal(document.getElementById('editTaskModal'));
+    modal.show();
+}
+
+// Add new task
+function addNewTask() {
+    const newId = Date.now();
+    const today = new Date();
+    const nextWeek = new Date(today);
+    nextWeek.setDate(today.getDate() + 7);
+    
+    gantt.addTask({
+        id: newId,
+        text: "Nouvelle tâche",
+        start_date: today,
+        end_date: nextWeek,
+        progress: 0,
+        parent: 0,
+        open: true
+    });
+}
+
+// Zoom controls
+function zoomIn() {
+    const scale = gantt.config.scale_unit;
+    if (scale === 'year') gantt.config.scale_unit = 'month';
+    else if (scale === 'month') gantt.config.scale_unit = 'week';
+    else if (scale === 'week') gantt.config.scale_unit = 'day';
+    gantt.render();
+}
+
+function zoomOut() {
+    const scale = gantt.config.scale_unit;
+    if (scale === 'day') gantt.config.scale_unit = 'week';
+    else if (scale === 'week') gantt.config.scale_unit = 'month';
+    else if (scale === 'month') gantt.config.scale_unit = 'year';
+    gantt.render();
+}
+
+function resetZoom() {
+    gantt.config.scale_unit = "month";
+    gantt.config.step = 1;
+    gantt.render();
+}
+
+function expandAll() {
+    gantt.eachTask(function(task) {
+        gantt.open(task.id);
+    });
+    gantt.render();
+}
+
+// Handle edit form submit
+document.getElementById('editTaskForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const taskId = parseInt(document.getElementById('editTaskId').value);
+    const updatedTask = {
+        id: taskId,
+        name: document.getElementById('editTaskName').value,
+        start_date: document.getElementById('editTaskStart').value,
+        end_date: document.getElementById('editTaskEnd').value,
+        progress: parseInt(document.getElementById('editTaskProgress').value),
+        parent: gantt.getTask(taskId)?.parent || 0
+    };
+    
+    gantt.updateTask(taskId, {
+        text: updatedTask.name,
+        start_date: updatedTask.start_date,
+        end_date: updatedTask.end_date,
+        progress: updatedTask.progress / 100
+    });
+    
+    bootstrap.Modal.getInstance(document.getElementById('editTaskModal')).hide();
+});
+
+// Handle delete button
+document.getElementById('deleteTaskBtn')?.addEventListener('click', function() {
+    const taskId = parseInt(document.getElementById('editTaskId').value);
+    if (confirm('Supprimer cette tâche ?')) {
+        gantt.deleteTask(taskId);
+        bootstrap.Modal.getInstance(document.getElementById('editTaskModal')).hide();
+    }
+});
+
+// Handle add task button
+document.getElementById('gantt-add-task')?.addEventListener('click', addNewTask);
+
+// Handle zoom buttons
+document.getElementById('gantt-zoom-in')?.addEventListener('click', zoomIn);
+document.getElementById('gantt-zoom-out')?.addEventListener('click', zoomOut);
+document.getElementById('gantt-reset')?.addEventListener('click', resetZoom);
+document.getElementById('gantt-expand-all')?.addEventListener('click', expandAll);
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', initGantt);
+</script>
+
+
+E. ADDITIONAL CSS (add to your styles)
+--------------------------------------------------------------------------------
+
+<style>
+/* Gantt custom styling */
+.gantt_task_progress {
+    background-color: #28a745 !important;
+}
+.gantt_task_line {
+    border-radius: 8px !important;
+}
+.gantt_task_line.gantt_project {
+    background-color: #FF6600 !important;
+}
+.gantt_task_line.gantt_milestone {
+    background-color: #dc3545 !important;
+}
+.gantt_link_control {
+    background-color: #4DA8DA !important;
+}
+.gantt_link_arrow {
+    stroke: #FF6600 !important;
+}
+</style>
+
+================================================================================
+SUMMARY
+================================================================================
+
+After adding these changes, you will have:
+
+1. ✅ Gantt chart with sample tasks visible immediately
+2. ✅ Zoom in/out buttons to change timeline scale (day/week/month/year)
+3. ✅ Double-click any task to edit name, dates, progress
+4. ✅ Add Task button to create new tasks
+5. ✅ Auto-save when dragging tasks or changing dates
+6. ✅ Delete task functionality
+7. ✅ Expand all tasks button
+8. ✅ Professional styling matching the  CRM
+
+================================================================================

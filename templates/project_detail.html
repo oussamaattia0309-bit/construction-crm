@@ -1,5 +1,12 @@
 {% extends "base.html" %}
 
+{% block head %}
+<!-- DHTMLX Gantt CSS -->
+<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.css">
+<!-- DHTMLX Gantt JS -->
+<script src="https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.js"></script>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid mt-4">
     <div class="row">
@@ -82,6 +89,30 @@
                             </a>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- GANTT CHART SECTION -->
+        <div class="col-lg-12">
+            <div class="card dashboard-card mb-4 border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0">
+                                <i class="fas fa-chart-gantt me-2 text-primary"></i>
+                                Calendrier du projet
+                            </h5>
+                            <p class="text-muted small mb-0 mt-1">
+                                Visualisation des tâches, dépendances et progression
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Gantt Chart -->
+                    <div id="gantt-chart" style="height: 500px; width: 100%;"></div>
                 </div>
             </div>
         </div>
@@ -222,5 +253,64 @@
     .bg-soft-primary { background: rgba(13, 110, 253, 0.1); }
     .rounded-pill { border-radius: 50rem !important; }
     .dashboard-card { border-radius: 15px; }
+
+    /* Gantt custom styling */
+    .gantt_task_progress {
+        background-color: #28a745 !important;
+    }
+    .gantt_link_control {
+        background-color: #4DA8DA !important;
+    }
+    .gantt_link_arrow {
+        stroke: #FF6600 !important;
+    }
+    .gantt_task_line {
+        border-radius: 8px !important;
+    }
+    .gantt_task_line.gantt_project {
+        background-color: #FF6600 !important;
+    }
+    .gantt_task_line.gantt_milestone {
+        background-color: #dc3545 !important;
+    }
 </style>
+
+<script>
+let currentProjectId = {{ project.id }};
+
+// Initialize Gantt
+function initGantt() {
+    gantt.init("gantt-chart");
+    loadTasks();
+}
+
+// Load tasks from server
+function loadTasks() {
+    fetch(`/api/project/${currentProjectId}/tasks`)
+    .then(r => r.json())
+    .then(tasks => {
+        const data = {
+            data: tasks.map(task => ({
+                id: task.id,
+                text: task.name,
+                start_date: task.start_date,
+                end_date: task.end_date,
+                progress: task.progress / 100,
+                parent: task.parent || 0
+            })),
+            links: []
+        };
+        gantt.parse(data);
+    });
+}
+
+
+
+
+
+// Initialize on page load
+window.addEventListener('load', initGantt);
+</script>
+
+
 {% endblock %}
