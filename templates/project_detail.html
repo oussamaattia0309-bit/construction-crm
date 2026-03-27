@@ -399,6 +399,189 @@
 .gantt_delete_icon i {
     font-size: 14px;
 }
+
+/* Gantt Modal Styling */
+.gantt_cal_light {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    margin: 0 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+    border: none !important;
+    background: #ffffff !important;
+    min-width: 500px !important;
+    z-index: 9999 !important;
+}
+
+.gantt_cal_light .gantt_cal_ltitle {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    border-radius: 12px 12px 0 0 !important;
+    padding: 15px 20px !important;
+    border-bottom: none !important;
+}
+
+.gantt_cal_light .gantt_cal_ltitle .dhx_cal_ltitle_descr {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.gantt_cal_light .gantt_cal_ltitle .gantt_time {
+    font-weight: 500;
+    opacity: 0.95;
+}
+
+.gantt_cal_light .gantt_cal_ltitle .dhx_title {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.gantt_cal_light .gantt_cal_ltitle_controls {
+    top: 15px !important;
+    right: 15px !important;
+}
+
+.gantt_cal_light .gantt_cal_ltitle_close_btn {
+    color: white !important;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.gantt_cal_light .gantt_cal_ltitle_close_btn:hover {
+    opacity: 1;
+}
+
+.gantt_cal_light .gantt_cal_larea {
+    padding: 25px !important;
+}
+
+.gantt_cal_light .gantt_cal_lsection {
+    color: #495057 !important;
+    font-weight: 600 !important;
+    margin-bottom: 8px !important;
+    font-size: 14px !important;
+}
+
+.gantt_cal_light .gantt_cal_ltext textarea {
+    border: 1px solid #dee2e6 !important;
+    border-radius: 8px !important;
+    padding: 10px !important;
+    font-size: 14px !important;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    resize: vertical;
+    min-height: 70px;
+}
+
+.gantt_cal_light .gantt_cal_ltext textarea:focus {
+    outline: none;
+    border-color: #667eea !important;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+}
+
+.gantt_cal_light .gantt_time_selects select {
+    border: 1px solid #dee2e6 !important;
+    border-radius: 6px !important;
+    padding: 6px 10px !important;
+    font-size: 14px !important;
+    background: white !important;
+    color: #495057 !important;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.gantt_cal_light .gantt_time_selects select:focus {
+    outline: none;
+    border-color: #667eea !important;
+}
+
+.gantt_cal_light .gantt_duration_inputs input[type="text"] {
+    border: 1px solid #dee2e6 !important;
+    border-radius: 6px !important;
+    padding: 6px 10px !important;
+    font-size: 14px !important;
+    background: white !important;
+    color: #495057 !important;
+    width: 100px !important;
+    text-align: center;
+}
+
+.gantt_cal_light .gantt_duration_inputs input[type="button"] {
+    background: #f8f9fa !important;
+    border: 1px solid #dee2e6 !important;
+    border-radius: 6px !important;
+    padding: 6px 12px !important;
+    font-size: 16px !important;
+    color: #495057 !important;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.gantt_cal_light .gantt_duration_inputs input[type="button"]:hover {
+    background: #e9ecef !important;
+    border-color: #adb5bd !important;
+}
+
+.gantt_cal_light .gantt_duration_end_date {
+    color: #6c757d !important;
+    font-size: 13px !important;
+}
+
+.gantt_cal_light .gantt_cal_lcontrols {
+    background: #f8f9fa !important;
+    border-radius: 0 0 12px 12px !important;
+    padding: 15px 25px !important;
+    display: flex;
+    gap: 10px;
+    border-top: 1px solid #dee2e6 !important;
+}
+
+.gantt_cal_light .gantt_btn_set {
+    background: white !important;
+    border: 1px solid #dee2e6 !important;
+    border-radius: 8px !important;
+    padding: 8px 20px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    color: #495057 !important;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+}
+
+.gantt_cal_light .gantt_btn_set:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.gantt_cal_light .gantt_save_btn_set {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    border: none !important;
+    color: white !important;
+}
+
+.gantt_cal_light .gantt_save_btn_set:hover {
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4) !important;
+}
+
+.gantt_cal_light .gantt_delete_btn_set {
+    background: #dc3545 !important;
+    border: none !important;
+    color: white !important;
+}
+
+.gantt_cal_light .gantt_delete_btn_set:hover {
+    background: #c82333 !important;
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4) !important;
+}
+
+.gantt_cal_light .gantt_cancel_btn_set:hover {
+    background: #e9ecef !important;
+}
 </style>
 
 <script>
