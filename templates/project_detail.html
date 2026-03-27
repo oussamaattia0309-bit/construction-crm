@@ -825,8 +825,8 @@ function saveTaskToServer(task) {
         parent_id: task.parent === 0 ? null : task.parent
     };
     
-    // Always include the task ID for both new and existing tasks
-    if (task.id && !isNaN(task.id)) {
+    // ONLY include ID if it's a REAL database ID (small numbers, not temporary ones)
+    if (task.id && typeof task.id === 'number' && task.id < 1000000000) {
         taskData.id = task.id;
     }
     
