@@ -108,17 +108,8 @@
                             </p>
                         </div>
                         <div class="btn-group">
-                            <button class="btn btn-sm btn-outline-secondary" id="gantt-zoom-out" title="Zoom arrière">
-                                <i class="fas fa-search-minus"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-secondary" id="gantt-zoom-in" title="Zoom avant">
-                                <i class="fas fa-search-plus"></i>
-                            </button>
                             <button class="btn btn-sm btn-outline-secondary" id="gantt-reset" title="Réinitialiser">
-                                <i class="fas fa-home"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-secondary" id="gantt-expand-all" title="Déplier tout">
-                                <i class="fas fa-expand-alt"></i>
+                                <i class="fas fa-home"></i> Zoom pour tout voir
                             </button>
                             <button class="btn btn-sm btn-primary" id="gantt-add-task">
                                 <i class="fas fa-plus me-1"></i>Ajouter une tâche
@@ -389,6 +380,25 @@
 .gantt_link_arrow {
     stroke: #FF6600 !important;
 }
+
+/* Delete button styling */
+.gantt_delete_icon {
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gantt_delete_icon:hover {
+    background-color: #fee2e2;
+}
+
+.gantt_delete_icon i {
+    font-size: 14px;
+}
 </style>
 
 <script>
@@ -410,7 +420,8 @@ function initGantt() {
     gantt.config.scale_unit = "month";
     gantt.config.step = 1;
     gantt.config.subscales = [
-        {unit:"week", step:1, date:"%d %M"}
+        {unit:"week", step:1, date:"%d %M"},
+        {unit:"day", step:1, date:"%D"}
     ];
 
     // Configure task template to add different colors
@@ -483,18 +494,23 @@ function initGantt() {
         {name: "text", label: "Nom", tree: true, width: 200, resize: true, editor: {type: "text", map_to: "text"}},
         {name: "start_date", label: "Début", align: "center", width: 80, editor: {type: "date", map_to: "start_date"}},
         {name: "duration", label: "Durée", align: "center", width: 60, editor: {type: "number", map_to: "duration"}},
-        {name: "add", label: "", width: 44}
+        {name: "add", label: "", width: 44},
+        {name: "delete", label: "", width: 40, template: function(obj) {
+            return "<div class='gantt_delete_icon' onclick='deleteTask(" + obj.id + ")'><i class='fas fa-trash-alt text-danger'></i></div>";
+        }}
     ];
 
     // Auto-save when task is updated (drag, resize, progress change)
     gantt.attachEvent("onAfterTaskUpdate", function(id, task) {
-        saveTaskToServer(task);
+        const fullTask = gantt.getTask(id);
+        saveTaskToServer(fullTask);
         return true;
     });
 
     // Auto-save when task is dragged/moved in the timeline
     gantt.attachEvent("onAfterTaskDrag", function(id, mode, task) {
-        saveTaskToServer(task);
+        const fullTask = gantt.getTask(id);
+        saveTaskToServer(fullTask);
         return true;
     });
 
@@ -608,11 +624,14 @@ function saveTaskToServer(task) {
         return;
     }
 
-    // Format dates to YYYY-MM-DD strings
+    // Format dates to YYYY-MM-DD strings (preserving local timezone)
     const formatDate = (date) => {
         if (!date) return null;
         const d = new Date(date);
-        return d.toISOString().split('T')[0];
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
     };
     
     const taskData = {
@@ -623,8 +642,8 @@ function saveTaskToServer(task) {
         parent_id: task.parent === 0 ? null : task.parent
     };
     
-    // Only include ID if it's a real database ID (not a temporary one)
-    if (task.id && !isNaN(task.id) && task.id < 1000000000) {
+    // Always include the task ID for both new and existing tasks
+    if (task.id && !isNaN(task.id)) {
         taskData.id = task.id;
     }
     
@@ -780,6 +799,13 @@ function addNewTask() {
         parent: 0,
         open: true
     });
+}
+
+// Delete task
+function deleteTask(taskId) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?')) {
+        gantt.deleteTask(taskId);
+    }
 }
 
 // Zoom controls
