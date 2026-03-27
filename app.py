@@ -1702,6 +1702,23 @@ def save_project_tasks(project_id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@app.route('/api/project/<int:project_id>/tasks/all', methods=['DELETE'])
+@login_required
+def delete_all_project_tasks(project_id):
+    """Delete all tasks for a project"""
+    try:
+        project = Project.query.get_or_404(project_id)
+
+        # Delete all tasks for the project
+        ProjectTask.query.filter_by(project_id=project_id).delete()
+        db.session.commit()
+
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 @app.route('/api/project/<int:project_id>/tasks/dependencies')
 @login_required
 def get_task_dependencies(project_id):

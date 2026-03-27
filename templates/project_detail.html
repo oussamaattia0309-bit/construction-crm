@@ -25,12 +25,12 @@
                                 <label class="form-label fw-bold">Nom du Projet</label>
                                 <input type="text" name="name" class="form-control rounded-pill" value="{{ project.name }}" required>
                             </div>
-                            
+
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold">Nom du Client</label>
                                 <input type="text" name="client_name" class="form-control rounded-pill" value="{{ project.client_name or '' }}">
                             </div>
-                            
+
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold">Statut</label>
                                 <select name="status" class="form-select rounded-pill">
@@ -39,17 +39,17 @@
                                     <option value="completed" {{ 'selected' if project.status == 'completed' }}>Terminé</option>
                                 </select>
                             </div>
-                            
+
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold">Adresse</label>
                                 <input type="text" name="address" class="form-control rounded-pill" value="{{ project.address or '' }}">
                             </div>
-                            
+
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold">Date de Début</label>
                                 <input type="date" name="start_date" class="form-control rounded-pill" value="{{ project.start_date.strftime('%Y-%m-%d') if project.start_date else '' }}">
                             </div>
-                            
+
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold">Date de Fin</label>
                                 <input type="date" name="end_date" class="form-control rounded-pill" value="{{ project.end_date.strftime('%Y-%m-%d') if project.end_date else '' }}">
@@ -62,7 +62,7 @@
                                     <span class="input-group-text rounded-end-pill">TND</span>
                                 </div>
                             </div>
-                            
+
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold">Acompte / Reçu (TND)</label>
                                 <div class="input-group">
@@ -76,7 +76,7 @@
                                 <textarea name="description" class="form-control" rows="3">{{ project.description or '' }}</textarea>
                             </div>
                         </div>
-                        
+
                         <div class="mt-4 d-flex gap-2">
                             <button type="submit" class="btn btn-primary rounded-pill px-4">
                                 <i class="fas fa-save me-2"></i>Enregistrer
@@ -97,17 +97,36 @@
         <div class="col-lg-12">
             <div class="card dashboard-card mb-4 border-0 shadow-sm">
                 <div class="card-header bg-white py-3">
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                         <div>
                             <h5 class="mb-0">
                                 <i class="fas fa-chart-gantt me-2 text-primary"></i>
                                 Calendrier du projet
                             </h5>
                             <p class="text-muted small mb-0 mt-1">
-                                Visualisation des tâches, dépendances et progression
+                                Visualisation des tâches, progression et dépendances
                             </p>
                         </div>
-
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-outline-secondary" id="gantt-zoom-out" title="Zoom arrière">
+                                <i class="fas fa-search-minus"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" id="gantt-zoom-in" title="Zoom avant">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" id="gantt-reset" title="Réinitialiser">
+                                <i class="fas fa-home"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" id="gantt-expand-all" title="Déplier tout">
+                                <i class="fas fa-expand-alt"></i>
+                            </button>
+                            <button class="btn btn-sm btn-primary" id="gantt-add-task">
+                                <i class="fas fa-plus me-1"></i>Ajouter une tâche
+                            </button>
+                            <button class="btn btn-sm btn-danger" id="gantt-delete-all-tasks" title="Supprimer toutes les tâches">
+                                <i class="fas fa-trash-alt me-1"></i>Supprimer tout
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">
@@ -210,15 +229,18 @@
                             <input type="text" name="name" class="form-control rounded-pill" placeholder="Nom complet" required>
                         </div>
                         <div class="row g-2 mb-3">
-                            <div class="col-6">
+                            <div class="col-md-6">
                                 <input type="text" name="phone" class="form-control rounded-pill" placeholder="Téléphone">
                             </div>
-                            <div class="col-6">
+                            <div class="col-md-6">
                                 <input type="email" name="email" class="form-control rounded-pill" placeholder="Email">
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-success w-100 rounded-pill py-2 fw-bold text-white mt-2">
-                            Créer et lier au projet
+                        <div class="mb-3">
+                            <input type="text" name="company" class="form-control rounded-pill" placeholder="Entreprise">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 rounded-pill">
+                            <i class="fas fa-plus me-2"></i>Créer et lier
                         </button>
                     </form>
                 </div>
@@ -227,90 +249,544 @@
     </div>
 </div>
 
-<style>
-    .hr-text {
-        display: flex;
-        align-items: center;
-        text-align: center;
-        color: #adb5bd;
-        font-weight: bold;
-        font-size: 0.75rem;
-    }
-    .hr-text::before, .hr-text::after {
-        content: '';
-        flex: 1;
-        border-bottom: 1px solid #e9ecef;
-    }
-    .hr-text:not(:empty)::before { margin-right: 1rem; }
-    .hr-text:not(:empty)::after { margin-left: 1rem; }
-    
-    .btn-soft-primary { background: rgba(13, 110, 253, 0.1); color: #0d6efd; border: none; }
-    .btn-soft-primary:hover { background: #0d6efd; color: white; }
-    .btn-soft-success { background: rgba(25, 135, 84, 0.1); color: #198754; border: none; }
-    .btn-soft-success:hover { background: #198754; color: white; }
-    .btn-soft-danger { background: rgba(220, 53, 69, 0.1); color: #dc3545; border: none; }
-    .btn-soft-danger:hover { background: #dc3545; color: white; }
-    .bg-soft-primary { background: rgba(13, 110, 253, 0.1); }
-    .rounded-pill { border-radius: 50rem !important; }
-    .dashboard-card { border-radius: 15px; }
+<!-- Edit Task Modal -->
+<div class="modal fade" id="editTaskModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Modifier la tâche</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editTaskForm">
+                <div class="modal-body">
+                    <input type="hidden" id="editTaskId">
+                    <div class="mb-3">
+                        <label class="form-label">Nom de la tâche *</label>
+                        <input type="text" class="form-control" id="editTaskName" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Date de début</label>
+                            <input type="date" class="form-control" id="editTaskStart">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Date de fin</label>
+                            <input type="date" class="form-control" id="editTaskEnd">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Progression (%)</label>
+                        <input type="range" class="form-range" id="editTaskProgress" min="0" max="100" value="0"
+                               oninput="document.getElementById('editProgressValue').innerText = this.value + '%'">
+                        <div class="text-center mt-1"><span id="editProgressValue">0%</span></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="deleteTaskBtn">
+                        <i class="fas fa-trash me-1"></i>Supprimer
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
-    /* Gantt custom styling */
-    .gantt_task_progress {
-        background-color: #28a745 !important;
-    }
-    .gantt_link_control {
-        background-color: #4DA8DA !important;
-    }
-    .gantt_link_arrow {
-        stroke: #FF6600 !important;
-    }
-    .gantt_task_line {
-        border-radius: 8px !important;
-    }
-    .gantt_task_line.gantt_project {
-        background-color: #FF6600 !important;
-    }
-    .gantt_task_line.gantt_milestone {
-        background-color: #dc3545 !important;
-    }
+<style>
+/* Gantt custom styling */
+.gantt_task_progress {
+    background-color: rgba(255, 255, 255, 0.3) !important;
+}
+.gantt_task_line {
+    border-radius: 8px !important;
+}
+
+/* Late tasks - RED */
+.gantt_task_line.task_late {
+    background-color: #dc3545 !important;
+}
+.gantt_task_line.task_late .gantt_task_progress {
+    background-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Different task colors */
+.gantt_task_line.task_blue {
+    background-color: #007bff !important;
+}
+.gantt_task_line.task_green {
+    background-color: #28a745 !important;
+}
+.gantt_task_line.task_purple {
+    background-color: #6f42c1 !important;
+}
+.gantt_task_line.task_orange {
+    background-color: #fd7e14 !important;
+}
+.gantt_task_line.task_teal {
+    background-color: #20c997 !important;
+}
+.gantt_task_line.task_indigo {
+    background-color: #6610f2 !important;
+}
+.gantt_task_line.task_pink {
+    background-color: #e83e8c !important;
+}
+
+/* Task name colors in grid to match task bars */
+.gantt_row.task_blue .gantt_cell_tree {
+    background-color: rgba(0, 123, 255, 0.15);
+    color: #0056b3;
+    font-weight: 600;
+    border-left: 4px solid #007bff;
+}
+.gantt_row.task_green .gantt_cell_tree {
+    background-color: rgba(40, 167, 69, 0.15);
+    color: #1e7e34;
+    font-weight: 600;
+    border-left: 4px solid #28a745;
+}
+.gantt_row.task_purple .gantt_cell_tree {
+    background-color: rgba(111, 66, 193, 0.15);
+    color: #5a32a3;
+    font-weight: 600;
+    border-left: 4px solid #6f42c1;
+}
+.gantt_row.task_orange .gantt_cell_tree {
+    background-color: rgba(253, 126, 20, 0.15);
+    color: #d97706;
+    font-weight: 600;
+    border-left: 4px solid #fd7e14;
+}
+.gantt_row.task_teal .gantt_cell_tree {
+    background-color: rgba(32, 201, 151, 0.15);
+    color: #138d75;
+    font-weight: 600;
+    border-left: 4px solid #20c997;
+}
+.gantt_row.task_indigo .gantt_cell_tree {
+    background-color: rgba(102, 16, 242, 0.15);
+    color: #520dc2;
+    font-weight: 600;
+    border-left: 4px solid #6610f2;
+}
+.gantt_row.task_pink .gantt_cell_tree {
+    background-color: rgba(232, 62, 140, 0.15);
+    color: #c2185b;
+    font-weight: 600;
+    border-left: 4px solid #e83e8c;
+}
+.gantt_row.task_late .gantt_cell_tree {
+    background-color: rgba(220, 53, 69, 0.15);
+    color: #c82333;
+    font-weight: 600;
+    border-left: 4px solid #dc3545;
+}
+
+.gantt_link_control {
+    background-color: #4DA8DA !important;
+}
+.gantt_link_arrow {
+    stroke: #FF6600 !important;
+}
 </style>
 
 <script>
 let currentProjectId = {{ project.id }};
+let isDeletingAllTasks = false; // Flag to prevent onAfterTaskDelete during deleteAllTasks
+let isLoadingTasks = false; // Flag to prevent onAfterTaskAdd during loadTasks
 
 // Initialize Gantt
 function initGantt() {
+    // Check if gantt is loaded
+    if (typeof gantt === 'undefined') {
+        console.error('DHTMLX Gantt library is not loaded');
+        return;
+    }
+    
     gantt.init("gantt-chart");
+
+    // Configure scale
+    gantt.config.scale_unit = "month";
+    gantt.config.step = 1;
+    gantt.config.subscales = [
+        {unit:"week", step:1, date:"%d %M"}
+    ];
+
+    // Configure task template to add different colors
+    gantt.templates.task_class = function(start, end, task) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const taskEnd = new Date(task.end_date);
+        taskEnd.setHours(0, 0, 0, 0);
+
+        // Check if task is late (end date is before today and progress is less than 100%)
+        if (taskEnd < today && task.progress < 1) {
+            return "gantt_task_line task_late";
+        }
+
+        // Assign different colors based on task ID (to create variety)
+        const colors = [
+            "task_blue",
+            "task_green",
+            "task_purple",
+            "task_orange",
+            "task_teal",
+            "task_indigo",
+            "task_pink"
+        ];
+        const colorIndex = Math.abs(task.id) % colors.length;
+        return "gantt_task_line " + colors[colorIndex];
+    };
+
+    // Configure row class to apply colors to grid rows
+    gantt.templates.grid_row_class = function(start, end, task) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const taskEnd = new Date(task.end_date);
+        taskEnd.setHours(0, 0, 0, 0);
+
+        // Check if task is late
+        if (taskEnd < today && task.progress < 1) {
+            return "gantt_row task_late";
+        }
+
+        // Assign different colors based on task ID
+        const colors = [
+            "task_blue",
+            "task_green",
+            "task_purple",
+            "task_orange",
+            "task_teal",
+            "task_indigo",
+            "task_pink"
+        ];
+        const colorIndex = Math.abs(task.id) % colors.length;
+        return "gantt_row " + colors[colorIndex];
+    };
+
+    // Enable drag and drop
+    gantt.config.drag_links = true;
+    gantt.config.drag_progress = true;
+    gantt.config.drag_move = true;
+    gantt.config.drag_resize = true;
+    gantt.config.readonly = false;
+
+    // Enable inline editing
+    gantt.config.order_branch = true;
+    gantt.config.order_branch_free = true;
+
+    // Configure columns for inline editing
+    gantt.config.columns = [
+        {name: "text", label: "Nom", tree: true, width: 200, resize: true, editor: {type: "text", map_to: "text"}},
+        {name: "start_date", label: "Début", align: "center", width: 80, editor: {type: "date", map_to: "start_date"}},
+        {name: "duration", label: "Durée", align: "center", width: 60, editor: {type: "number", map_to: "duration"}},
+        {name: "add", label: "", width: 44}
+    ];
+
+    // Auto-save when task is updated (drag, resize, progress change)
+    gantt.attachEvent("onAfterTaskUpdate", function(id, task) {
+        saveTaskToServer({
+            id: task.id,
+            name: task.text,
+            start_date: task.start_date,
+            end_date: task.end_date,
+            progress: task.progress,
+            parent: task.parent === 0 ? null : task.parent
+        });
+        return true;
+    });
+
+    // Auto-save when task is dragged/moved in the timeline
+    gantt.attachEvent("onAfterTaskDrag", function(id, mode, task) {
+        saveTaskToServer({
+            id: task.id,
+            name: task.text,
+            start_date: task.start_date,
+            end_date: task.end_date,
+            progress: task.progress,
+            parent: task.parent === 0 ? null : task.parent
+        });
+        return true;
+    });
+
+    // Auto-save when inline editing is completed
+    gantt.attachEvent("onAfterTaskEdit", function(id, item) {
+        const task = gantt.getTask(id);
+        saveTaskToServer({
+            id: task.id,
+            name: task.text,
+            start_date: task.start_date,
+            end_date: task.end_date,
+            progress: task.progress,
+            parent: task.parent === 0 ? null : task.parent
+        });
+        return true;
+    });
+
+    // Auto-save when task is added
+    gantt.attachEvent("onAfterTaskAdd", function(id, task) {
+        // Skip server save if we're loading tasks from server
+        if (isLoadingTasks) return;
+
+        saveTaskToServer({
+            id: task.id,
+            name: task.text,
+            start_date: task.start_date,
+            end_date: task.end_date,
+            progress: task.progress,
+            parent: task.parent === 0 ? null : task.parent
+        });
+        return true;
+    });
+
+    // Delete task when removed
+    gantt.attachEvent("onAfterTaskDelete", function(id) {
+        // Skip server deletion if we're deleting all tasks
+        if (isDeletingAllTasks) return;
+
+        fetch('/api/project/' + currentProjectId + '/tasks', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ action: 'delete', id: id })
+        });
+    });
+
+    // Double-click to edit - disabled for inline editing
+    gantt.attachEvent("onTaskDblClick", function(id, e) {
+        // Inline editing is now enabled, no modal needed
+        return false;
+    });
+
     loadTasks();
 }
 
 // Load tasks from server
 function loadTasks() {
+    isLoadingTasks = true; // Set flag to prevent onAfterTaskAdd events
+
     fetch(`/api/project/${currentProjectId}/tasks`)
-    .then(r => r.json())
-    .then(tasks => {
-        const data = {
-            data: tasks.map(task => ({
+        .then(r => r.json())
+        .then(data => {
+            const tasks = data.map(task => ({
                 id: task.id,
                 text: task.name,
                 start_date: task.start_date,
                 end_date: task.end_date,
                 progress: task.progress / 100,
-                parent: task.parent || 0
-            })),
-            links: []
-        };
-        gantt.parse(data);
+                parent: task.parent || 0,
+                open: true
+            }));
+            gantt.parse({ data: tasks, links: [] });
+        })
+        .finally(() => {
+            isLoadingTasks = false; // Reset flag
+        });
+}
+
+// Save task to server
+function saveTaskToServer(task) {
+    // Format dates to YYYY-MM-DD strings
+    const formatDate = (date) => {
+        if (!date) return null;
+        const d = new Date(date);
+        return d.toISOString().split('T')[0];
+    };
+    
+    const taskData = {
+        name: task.name || task.text,
+        start_date: formatDate(task.start_date),
+        end_date: formatDate(task.end_date),
+        progress: Math.round((task.progress || 0) * 100),
+        parent_id: task.parent === 0 ? null : task.parent
+    };
+    
+    // Only include ID if it's a real database ID (not a temporary one)
+    if (task.id && !isNaN(task.id) && task.id < 1000000000) {
+        taskData.id = task.id;
+    }
+    
+    fetch('/api/project/' + currentProjectId + '/tasks', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            action: 'save',
+            task: taskData
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.task_id) {
+            // Update the task ID in the gantt chart with the real database ID
+            if (task.id && !isNaN(task.id) && task.id >= 1000000000) {
+                // This was a temporary ID, update it with the real database ID
+                const updatedTask = gantt.getTask(task.id);
+                if (updatedTask) {
+                    gantt.changeTaskId(task.id, data.task_id);
+                }
+            }
+        } else if (!data.success) {
+            console.error('Failed to save task:', data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error saving task:', error);
     });
 }
 
+// Open edit modal
+function openEditModal(task) {
+    document.getElementById('editTaskId').value = task.id;
+    document.getElementById('editTaskName').value = task.text;
+    document.getElementById('editTaskStart').value = task.start_date;
+    document.getElementById('editTaskEnd').value = task.end_date;
+    const progress = Math.round(task.progress * 100);
+    document.getElementById('editTaskProgress').value = progress;
+    document.getElementById('editProgressValue').innerText = progress + '%';
 
+    const modal = new bootstrap.Modal(document.getElementById('editTaskModal'));
+    modal.show();
+}
 
+// Add new task
+function addNewTask() {
+    const newId = Date.now();
+    const today = new Date();
+    const nextWeek = new Date(today);
+    nextWeek.setDate(today.getDate() + 7);
 
+    gantt.addTask({
+        id: newId,
+        text: "Nouvelle tâche",
+        start_date: today,
+        end_date: nextWeek,
+        progress: 0,
+        parent: 0,
+        open: true
+    });
+}
 
-// Initialize on page load
-window.addEventListener('load', initGantt);
+// Zoom controls
+function zoomIn() {
+    const scale = gantt.config.scale_unit;
+    if (scale === 'year') gantt.config.scale_unit = 'month';
+    else if (scale === 'month') gantt.config.scale_unit = 'week';
+    else if (scale === 'week') gantt.config.scale_unit = 'day';
+    gantt.render();
+}
+
+function zoomOut() {
+    const scale = gantt.config.scale_unit;
+    if (scale === 'day') gantt.config.scale_unit = 'week';
+    else if (scale === 'week') gantt.config.scale_unit = 'month';
+    else if (scale === 'month') gantt.config.scale_unit = 'year';
+    gantt.render();
+}
+
+function resetZoom() {
+    gantt.config.scale_unit = "month";
+    gantt.config.step = 1;
+    gantt.render();
+}
+
+function expandAll() {
+    gantt.eachTask(function(task) {
+        gantt.open(task.id);
+    });
+    gantt.render();
+}
+
+// Delete all tasks
+function deleteAllTasks() {
+    isDeletingAllTasks = true; // Set flag to prevent onAfterTaskDelete events
+
+    fetch(`/api/project/${currentProjectId}/tasks/all`, {
+        method: 'DELETE',
+        headers: {'Content-Type': 'application/json'}
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Clear the gantt chart
+            gantt.clearAll();
+            // Reload tasks from server to ensure sync
+            loadTasks();
+        } else {
+            console.error('Failed to delete all tasks:', data.error);
+            alert('Erreur lors de la suppression des tâches: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error deleting all tasks:', error);
+        alert('Erreur lors de la suppression des tâches');
+    })
+    .finally(() => {
+        isDeletingAllTasks = false; // Reset flag
+    });
+}
+
+// Handle edit form submit
+document.getElementById('editTaskForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const taskId = parseInt(document.getElementById('editTaskId').value);
+    const updatedTask = {
+        id: taskId,
+        name: document.getElementById('editTaskName').value,
+        start_date: document.getElementById('editTaskStart').value,
+        end_date: document.getElementById('editTaskEnd').value,
+        progress: parseInt(document.getElementById('editTaskProgress').value),
+        parent: gantt.getTask(taskId)?.parent || 0
+    };
+
+    gantt.updateTask(taskId, {
+        text: updatedTask.name,
+        start_date: updatedTask.start_date,
+        end_date: updatedTask.end_date,
+        progress: updatedTask.progress / 100
+    });
+
+    bootstrap.Modal.getInstance(document.getElementById('editTaskModal')).hide();
+});
+
+// Handle delete button
+document.getElementById('deleteTaskBtn')?.addEventListener('click', function() {
+    const taskId = parseInt(document.getElementById('editTaskId').value);
+    if (confirm('Supprimer cette tâche ?')) {
+        gantt.deleteTask(taskId);
+        bootstrap.Modal.getInstance(document.getElementById('editTaskModal')).hide();
+    }
+});
+
+// Handle add task button
+document.getElementById('gantt-add-task')?.addEventListener('click', addNewTask);
+
+// Handle delete all tasks button
+document.getElementById('gantt-delete-all-tasks')?.addEventListener('click', function() {
+    if (confirm('Êtes-vous sûr de vouloir supprimer toutes les tâches ? Cette action est irréversible.')) {
+        deleteAllTasks();
+    }
+});
+
+// Handle zoom buttons
+document.getElementById('gantt-zoom-in')?.addEventListener('click', zoomIn);
+document.getElementById('gantt-zoom-out')?.addEventListener('click', zoomOut);
+document.getElementById('gantt-reset')?.addEventListener('click', resetZoom);
+document.getElementById('gantt-expand-all')?.addEventListener('click', expandAll);
+
+// Initialize on page load - wait for gantt library to load
+document.addEventListener('DOMContentLoaded', function() {
+    // Wait for DHTMLX Gantt to be available
+    function checkGanttLoaded() {
+        if (typeof gantt !== 'undefined') {
+            initGantt();
+        } else {
+            console.log('Waiting for DHTMLX Gantt to load...');
+            setTimeout(checkGanttLoaded, 100);
+        }
+    }
+    checkGanttLoaded();
+});
 </script>
-
-
 {% endblock %}
