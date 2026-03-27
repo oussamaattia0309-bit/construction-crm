@@ -93,40 +93,6 @@
             </div>
         </div>
 
-        <!-- GANTT CHART SECTION -->
-        <div class="col-lg-12">
-            <div class="card dashboard-card mb-4 border-0 shadow-sm">
-                <div class="card-header bg-white py-3">
-                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        <div>
-                            <h5 class="mb-0">
-                                <i class="fas fa-chart-gantt me-2 text-primary"></i>
-                                Calendrier du projet
-                            </h5>
-                            <p class="text-muted small mb-0 mt-1">
-                                Visualisation des tâches, progression et dépendances
-                            </p>
-                        </div>
-                        <div class="btn-group">
-                            <button class="btn btn-sm btn-outline-secondary" id="gantt-reset" title="Réinitialiser">
-                                <i class="fas fa-home"></i> Zoom pour tout voir
-                            </button>
-                            <button class="btn btn-sm btn-primary" id="gantt-add-task">
-                                <i class="fas fa-plus me-1"></i>Ajouter une tâche
-                            </button>
-                            <button class="btn btn-sm btn-danger" id="gantt-delete-all-tasks" title="Supprimer toutes les tâches">
-                                <i class="fas fa-trash-alt me-1"></i>Supprimer tout
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <!-- Gantt Chart -->
-                    <div id="gantt-chart" style="height: 500px; width: 100%;"></div>
-                </div>
-            </div>
-        </div>
-
         <!-- Important Contacts (Right) -->
         <div class="col-lg-4">
             <div class="card dashboard-card border-0 shadow-sm mb-4">
@@ -177,6 +143,43 @@
                             </div>
                         {% endif %}
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GANTT CHART SECTION -->
+        <div class="col-lg-12">
+            <div class="card dashboard-card mb-4 border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <h5 class="mb-0">
+                                <i class="fas fa-chart-gantt me-2 text-primary"></i>
+                                Calendrier du projet
+                            </h5>
+                            <p class="text-muted small mb-0 mt-1">
+                                Visualisation des tâches, progression et dépendances
+                            </p>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-outline-secondary" id="gantt-reset" title="Réinitialiser">
+                                <i class="fas fa-home"></i> Zoom pour tout voir
+                            </button>
+                            <button class="btn btn-sm btn-primary" id="print-gantt">
+                                <i class="fas fa-print me-1"></i>Imprimer
+                            </button>
+                            <button class="btn btn-sm btn-primary" id="gantt-add-task">
+                                <i class="fas fa-plus me-1"></i>Ajouter une tâche
+                            </button>
+                            <button class="btn btn-sm btn-danger" id="gantt-delete-all-tasks" title="Supprimer toutes les tâches">
+                                <i class="fas fa-trash-alt me-1"></i>Supprimer tout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Gantt Chart -->
+                    <div id="gantt-chart" style="height: 500px; width: 100%;"></div>
                 </div>
             </div>
         </div>
@@ -582,6 +585,97 @@
 .gantt_cal_light .gantt_cancel_btn_set:hover {
     background: #e9ecef !important;
 }
+/* Increase Gantt chart scale row height to make day initials visible */
+.gantt_scale_line {
+    height: 40px !important;
+    line-height: 40px !important;
+}
+
+.gantt_scale_cell {
+    height: 40px !important;
+    line-height: 40px !important;
+    font-size: 14px !important;
+}
+
+.gantt_task_scale {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* Scale cell wrapper for multiple lines */
+.scale-cell-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    padding: 5px 0;
+}
+
+.scale-day-initial {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 2px;
+}
+
+.scale-date {
+    font-size: 12px;
+    color: #666;
+}
+
+/* Hover effect to show day initials */
+.gantt_scale_cell:hover::after {
+    content: attr(data-day-initial);
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 1000;
+}
+
+.gantt_scale_cell {
+    position: relative;
+}
+
+</style>
+
+<style>
+/* Print styles - hide everything except Gantt chart */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+
+    #gantt-chart, #gantt-chart * {
+        visibility: visible;
+    }
+
+    #gantt-chart {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* Hide scrollbars in print */
+    #gantt-chart ::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Ensure the Gantt chart is printed on a single page if possible */
+    @page {
+        size: landscape;
+        margin: 0.5cm;
+    }
+}
 </style>
 
 <script>
@@ -597,15 +691,79 @@ function initGantt() {
         return;
     }
     
+    // Configure scale with day initials BEFORE initialization
+    const days = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
+
+    // Custom date format for scale with multiple lines
+    gantt.config.scale_unit = "day";
+    gantt.config.step = 1;
+    gantt.config.date_scale = "%D";  // Top row: day name (Mon, Tue)
+
+    // Configure subscales for multiple lines
+    gantt.config.subscales = [
+        { unit: "day", step: 1, date: "%D" },      // Top row: Mon, Tue, Wed
+        { unit: "day", step: 1, date: "%d %M" }    // Bottom row: 27 Mar
+    ];
+
+    // Override scale cell template to show day initials
+    gantt.templates.scale_cell = function(date) {
+        const daysArray = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
+        const dayName = daysArray[date.getDay()];
+        const dayNum = gantt.date.date_to_str("%d")(date);
+        const monthName = gantt.date.date_to_str("%M")(date);
+        return `<div class="scale-cell-wrapper">
+            <div class="scale-day-initial">${dayName}</div>
+            <div class="scale-date">${dayNum} ${monthName}</div>
+        </div>`;
+    };
+
+    // Optional: Format for the grid's date columns
+    gantt.templates.grid_date_format = function(date) {
+        return gantt.date.date_to_str("%d/%m/%Y")(date);
+    };
+
+    // Format for the timeline scale headers
+    gantt.templates.task_date = function(date) {
+        return gantt.date.date_to_str("%d/%m/%Y")(date);
+    };
+
     gantt.init("gantt-chart");
 
-    // Configure scale
-    gantt.config.scale_unit = "month";
-    gantt.config.step = 1;
-    gantt.config.subscales = [
-        {unit:"week", step:1, date:"%d %M"},
-        {unit:"day", step:1, date:"%D"}
-    ];
+    // Add day initials as data attribute for hover effect
+    gantt.attachEvent("onAfterTaskDisplay", function(id, task){
+        var scaleCells = document.querySelectorAll(".gantt_scale_cell");
+        var daysArray = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
+
+        scaleCells.forEach(function(cell) {
+            var ariaLabel = cell.getAttribute("aria-label");
+            if (ariaLabel) {
+                var dateParts = ariaLabel.split(" ");
+                var dayNum = parseInt(dateParts[0]);
+                var monthStr = dateParts[1];
+                var year = new Date().getFullYear();
+                var date = new Date(year, getMonthNumber(monthStr), dayNum);
+                var dayInitial = daysArray[date.getDay()];
+                cell.setAttribute("data-day-initial", dayInitial);
+            }
+        });
+    });
+
+    function getMonthNumber(monthStr) {
+        var months = {
+            "Jan": 0, "Feb": 1, "Mar": 2, "Apr": 3, "May": 4, "Jun": 5,
+            "Jul": 6, "Aug": 7, "Sep": 8, "Oct": 9, "Nov": 10, "Dec": 11
+        };
+        return months[monthStr] || 0;
+    }
+
+    // Force day initials in scale cells
+    gantt.templates.scale_cell_class = function(date) {
+        return "";
+    };
+
+    gantt.templates.timeline_cell_class = function(task, date) {
+        return "";
+    };
 
     // Configure task template to add different colors
     gantt.templates.task_class = function(start, end, task) {
@@ -1097,6 +1255,38 @@ document.getElementById('gantt-zoom-in')?.addEventListener('click', zoomIn);
 document.getElementById('gantt-zoom-out')?.addEventListener('click', zoomOut);
 document.getElementById('gantt-reset')?.addEventListener('click', resetZoom);
 document.getElementById('gantt-expand-all')?.addEventListener('click', expandAll);
+
+// Handle print button
+document.getElementById('print-gantt')?.addEventListener('click', function() {
+    // Create a print-specific configuration
+    const originalHeight = document.getElementById('gantt-chart').style.height;
+    const originalConfig = {
+        scale_unit: gantt.config.scale_unit,
+        step: gantt.config.step,
+        subscales: [...gantt.config.subscales]
+    };
+
+    // Expand the chart to show all tasks
+    resetZoom();
+    expandAll();
+
+    // Adjust height for printing
+    const allTasks = gantt.getTaskByTime();
+    const taskCount = allTasks.length;
+    const newHeight = Math.max(500, taskCount * 50 + 200);
+    document.getElementById('gantt-chart').style.height = newHeight + 'px';
+    gantt.render();
+
+    // Print the chart
+    window.print();
+
+    // Restore original configuration
+    document.getElementById('gantt-chart').style.height = originalHeight;
+    gantt.config.scale_unit = originalConfig.scale_unit;
+    gantt.config.step = originalConfig.step;
+    gantt.config.subscales = originalConfig.subscales;
+    gantt.render();
+});
 
 // Initialize on page load - wait for gantt library to load
 document.addEventListener('DOMContentLoaded', function() {
