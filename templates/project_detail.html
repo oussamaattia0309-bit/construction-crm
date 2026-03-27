@@ -488,41 +488,38 @@ function initGantt() {
 
     // Auto-save when task is updated (drag, resize, progress change)
     gantt.attachEvent("onAfterTaskUpdate", function(id, task) {
-        saveTaskToServer({
-            id: task.id,
-            name: task.text,
-            start_date: task.start_date,
-            end_date: task.end_date,
-            progress: task.progress,
-            parent: task.parent === 0 ? null : task.parent
-        });
+        saveTaskToServer(task);
         return true;
     });
 
     // Auto-save when task is dragged/moved in the timeline
     gantt.attachEvent("onAfterTaskDrag", function(id, mode, task) {
-        saveTaskToServer({
-            id: task.id,
-            name: task.text,
-            start_date: task.start_date,
-            end_date: task.end_date,
-            progress: task.progress,
-            parent: task.parent === 0 ? null : task.parent
-        });
+        saveTaskToServer(task);
         return true;
     });
 
     // Auto-save when inline editing is completed
     gantt.attachEvent("onAfterTaskEdit", function(id, item) {
         const task = gantt.getTask(id);
-        saveTaskToServer({
-            id: task.id,
-            name: task.text,
-            start_date: task.start_date,
-            end_date: task.end_date,
-            progress: task.progress,
-            parent: task.parent === 0 ? null : task.parent
-        });
+        saveTaskToServer(task);
+        return true;
+    });
+
+    // Auto-save when a link is added
+    gantt.attachEvent("onAfterLinkAdd", function(id, link) {
+        saveDependenciesToServer();
+        return true;
+    });
+
+    // Auto-save when a link is updated
+    gantt.attachEvent("onAfterLinkUpdate", function(id, link) {
+        saveDependenciesToServer();
+        return true;
+    });
+
+    // Auto-save when a link is deleted
+    gantt.attachEvent("onAfterLinkDelete", function(id, link) {
+        saveDependenciesToServer();
         return true;
     });
 
@@ -567,10 +564,11 @@ function initGantt() {
 function loadTasks() {
     isLoadingTasks = true; // Set flag to prevent onAfterTaskAdd events
 
+    // Load tasks
     fetch(`/api/project/${currentProjectId}/tasks`)
         .then(r => r.json())
-        .then(data => {
-            const tasks = data.map(task => ({
+        .then(tasks => {
+            const taskData = tasks.map(task => ({
                 id: task.id,
                 text: task.name,
                 start_date: task.start_date,
@@ -579,7 +577,13 @@ function loadTasks() {
                 parent: task.parent || 0,
                 open: true
             }));
-            gantt.parse({ data: tasks, links: [] });
+
+            // Load dependencies
+            return fetch(`/api/project/${currentProjectId}/tasks/dependencies`)
+                .then(r => r.json())
+                .then(links => {
+                    gantt.parse({ data: taskData, links: links });
+                });
         })
         .finally(() => {
             isLoadingTasks = false; // Reset flag
@@ -588,6 +592,22 @@ function loadTasks() {
 
 // Save task to server
 function saveTaskToServer(task) {
+    // Validate required fields
+    if (!task.text && !task.name) {
+        console.error('Cannot save task: missing name');
+        return;
+    }
+
+    if (!task.start_date) {
+        console.error('Cannot save task: missing start_date');
+        return;
+    }
+
+    if (!task.end_date) {
+        console.error('Cannot save task: missing end_date');
+        return;
+    }
+
     // Format dates to YYYY-MM-DD strings
     const formatDate = (date) => {
         if (!date) return null;
@@ -634,6 +654,100 @@ function saveTaskToServer(task) {
     .catch(error => {
         console.error('Error saving task:', error);
     });
+}
+
+// Save dependencies to server
+function saveDependenciesToServer() {
+    const links = gantt.getLinks();
+
+    // Get all tasks to check their current dependencies
+    fetch(`/api/project/${currentProjectId}/tasks`)
+        .then(r => r.json())
+        .then(tasks => {
+            // Create a map of task IDs to their current dependencies
+            const taskDependencies = {};
+            tasks.forEach(task => {
+                if (task.parent_id && task.dependency_type) {
+                    taskDependencies[task.id] = {
+                        parent_id: task.parent_id,
+                        dependency_type: task.dependency_type
+                    };
+                }
+            });
+
+            // Process each link
+            const savePromises = links.map(link => {
+                const targetTaskId = link.target;
+                const sourceTaskId = link.source;
+                const linkType = link.type;
+
+                // Check if this dependency already exists
+                const existingDep = taskDependencies[targetTaskId];
+                if (existingDep && 
+                    existingDep.parent_id == sourceTaskId && 
+                    existingDep.dependency_type == linkType) {
+                    // Dependency already exists, skip
+                    return Promise.resolve();
+                }
+
+                // Save new dependency
+                return fetch('/api/project/' + currentProjectId + '/tasks/dependencies', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        action: 'save',
+                        link: {
+                            id: link.id,
+                            source: sourceTaskId,
+                            target: targetTaskId,
+                            type: linkType
+                        }
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        console.error('Failed to save link:', link.id, data.error);
+                    }
+                });
+            });
+
+            // Clear dependencies that are no longer in the Gantt chart
+            const clearPromises = tasks.map(task => {
+                if (task.parent_id && task.dependency_type) {
+                    // Check if this dependency still exists in the Gantt chart
+                    const stillExists = links.some(link => 
+                        link.target == task.id && 
+                        link.source == task.parent_id && 
+                        link.type == task.dependency_type
+                    );
+
+                    if (!stillExists) {
+                        // Dependency no longer exists, clear it
+                        return fetch('/api/project/' + currentProjectId + '/tasks/dependencies', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({
+                                action: 'delete',
+                                id: task.id
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (!data.success) {
+                                console.error('Failed to clear dependency for task:', task.id, data.error);
+                            }
+                        });
+                    }
+                }
+                return Promise.resolve();
+            });
+
+            return Promise.all([...savePromises, ...clearPromises]);
+        })
+        .catch(error => {
+            console.error('Error saving dependencies:', error);
+        });
 }
 
 // Open edit modal
