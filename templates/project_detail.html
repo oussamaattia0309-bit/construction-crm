@@ -9,6 +9,8 @@
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
 <!-- FullCalendar JS -->
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+<!-- Enhanced Calendar JS -->
+<script src="/static/calendar_enhanced.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -152,13 +154,75 @@
 
             <!-- Calendar Section -->
             <div class="card dashboard-card border-0 shadow-sm overflow-hidden">
+                <!-- Card Header with Gradient -->
                 <div class="card-header bg-gradient-primary py-3 border-0">
-                    <h5 class="mb-0 fw-bold text-white">
-                        <i class="fas fa-calendar-alt me-2"></i>Calendrier
-                    </h5>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold text-white">
+                            <i class="fas fa-calendar-alt me-2"></i>Calendrier des Projets
+                        </h5>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-light rounded-circle" type="button" data-bs-toggle="collapse" data-bs-target="#calendarBody" aria-expanded="false">
+                                <i class="fas fa-chevron-down" id="calendarArrow"></i>
+                            </button>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-light rounded-circle" type="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="#"><i class="fas fa-plus me-2"></i>Ajouter un événement</a></li>
+                                    <li><a class="dropdown-item" href="#"><i class="fas fa-download me-2"></i>Exporter</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Paramètres</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body p-3 bg-light">
-                    <div id="project-calendar" class="calendar-container rounded-3 overflow-hidden shadow-sm bg-white"></div>
+
+                <!-- Calendar Body -->
+                <div class="card-body p-0 collapse" id="calendarBody">
+                    <!-- Quick Actions Bar -->
+                    <div class="bg-light border-bottom p-3">
+                        <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button type="button" class="btn btn-outline-primary" id="calendar-today">
+                                    <i class="fas fa-calendar-day me-1"></i>Aujourd'hui
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" id="calendar-prev">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" id="calendar-next">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+
+                            <h6 class="mb-0 fw-semibold" id="calendar-month-year">mars 2026</h6>
+
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button type="button" class="btn btn-outline-primary active" data-view="dayGridMonth">Mois</button>
+                                <button type="button" class="btn btn-outline-primary" data-view="timeGridWeek">Semaine</button>
+                                <button type="button" class="btn btn-outline-primary" data-view="timeGridDay">Jour</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Calendar Container -->
+                    <div id="project-calendar" class="calendar-wrapper p-3" style="min-height: 350px;">
+                        <!-- FullCalendar will be initialized here -->
+                    </div>
+                </div>
+
+                <!-- Card Footer with Upcoming Events -->
+                <div class="card-footer bg-white border-top-0 px-3 py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <i class="fas fa-calendar-week me-1"></i>
+                            <span id="event-count">0</span> événements ce mois
+                        </small>
+                        <a href="#" class="text-decoration-none small">
+                            Voir tout <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
