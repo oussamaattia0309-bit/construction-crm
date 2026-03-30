@@ -5,6 +5,10 @@
 <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.css">
 <!-- DHTMLX Gantt JS -->
 <script src="https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.js"></script>
+<!-- FullCalendar CSS -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
+<!-- FullCalendar JS -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -145,6 +149,18 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Calendar Section -->
+            <div class="card dashboard-card border-0 shadow-sm overflow-hidden">
+                <div class="card-header bg-gradient-primary py-3 border-0">
+                    <h5 class="mb-0 fw-bold text-white">
+                        <i class="fas fa-calendar-alt me-2"></i>Calendrier
+                    </h5>
+                </div>
+                <div class="card-body p-3 bg-light">
+                    <div id="project-calendar" class="calendar-container rounded-3 overflow-hidden shadow-sm bg-white"></div>
+                </div>
+            </div>
         </div>
 
         <!-- GANTT CHART SECTION -->
@@ -179,7 +195,7 @@
                 </div>
                 <div class="card-body">
                     <!-- Gantt Chart -->
-                    <div id="gantt-chart" style="height: 500px; width: 100%;"></div>
+                    <div id="gantt-chart" style="height: auto; min-height: 400px; width: 100%;"></div>
                 </div>
             </div>
         </div>
@@ -301,6 +317,14 @@
     background-color: #dc3545 !important;
 }
 .gantt_task_line.task_late .gantt_task_progress {
+    background-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Completed tasks - GREEN */
+.gantt_task_line.task_completed {
+    background-color: #28a745 !important;
+}
+.gantt_task_line.task_completed .gantt_task_progress {
     background-color: rgba(0, 0, 0, 0.2) !important;
 }
 
@@ -727,7 +751,68 @@ function initGantt() {
         return gantt.date.date_to_str("%d/%m/%Y")(date);
     };
 
+    // Configure autosize to adjust height based on content
+    gantt.config.autosize = true;
+    gantt.config.autosize_min_height = 400;
+
     gantt.init("gantt-chart");
+
+    // Initialize FullCalendar with project tasks
+    const calendarEl = document.getElementById('project-calendar');
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'fr',
+        height: 300,
+        aspectRatio: 1.2,
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        buttonText: {
+            today: 'Aujourd\'hui',
+            month: 'Mois',
+            week: 'Semaine',
+            day: 'Jour'
+        },
+        dayHeaderFormat: { weekday: 'short', day: 'numeric' },
+        eventDisplay: 'block',
+        displayEventTime: false,
+        events: function(info, successCallback, failureCallback) {
+            // Get tasks from Gantt and convert to calendar events
+            const tasks = gantt.getTaskByTime();
+            const events = tasks.map(task => ({
+                id: task.id,
+                title: task.text,
+                start: task.start_date,
+                end: task.end_date,
+                backgroundColor: task.progress >= 1 ? '#28a745' : 
+                               (new Date(task.end_date) < new Date() ? '#dc3545' : '#007bff'),
+                borderColor: task.progress >= 1 ? '#28a745' : 
+                            (new Date(task.end_date) < new Date() ? '#dc3545' : '#007bff')
+            }));
+            successCallback(events);
+        },
+        editable: false,
+        selectable: true,
+        eventClick: function(info) {
+            // Navigate to the task in Gantt when clicked
+            const taskId = info.event.id;
+            gantt.showTask(taskId);
+        }
+    });
+    calendar.render();
+
+    // Update calendar when Gantt tasks change
+    gantt.attachEvent("onAfterTaskUpdate", function(id, item) {
+        calendar.refetchEvents();
+    });
+    gantt.attachEvent("onAfterTaskAdd", function(id, item) {
+        calendar.refetchEvents();
+    });
+    gantt.attachEvent("onAfterTaskDelete", function(id, item) {
+        calendar.refetchEvents();
+    });
 
     // Add day initials as data attribute for hover effect
     gantt.attachEvent("onAfterTaskDisplay", function(id, task){
@@ -773,8 +858,13 @@ function initGantt() {
         const taskEnd = new Date(task.end_date);
         taskEnd.setHours(0, 0, 0, 0);
 
+        // Check if task is finished (any finished task should be green)
+        if (task.progress >= 1) {
+            return "gantt_task_line task_completed";
+        }
+
         // Check if task is late (end date is before today and progress is less than 100%)
-        if (taskEnd < today && task.progress < 1) {
+        if (taskEnd < today) {
             return "gantt_task_line task_late";
         }
 
@@ -835,6 +925,14 @@ function initGantt() {
         {name: "text", label: "Nom", tree: true, width: 200, resize: true, editor: {type: "text", map_to: "text"}},
         {name: "start_date", label: "Début", align: "center", width: 80, editor: {type: "date", map_to: "start_date"}},
         {name: "duration", label: "Durée", align: "center", width: 60, editor: {type: "number", map_to: "duration"}},
+        {name: "status", label: "Statut", align: "center", width: 80, template: function(obj) {
+            const isFinished = obj.progress >= 1;
+            const icon = isFinished ? "fa-check-circle text-success" : "fa-circle text-muted";
+            const title = isFinished ? "Terminé" : "Non terminé";
+            return `<div class='status-toggle' onclick='toggleTaskStatus(${obj.id})' style='cursor: pointer;' title='${title}'>
+                <i class='fas ${icon}'></i>
+            </div>`;
+        }},
         {name: "add", label: "", width: 44},
         {name: "delete", label: "", width: 40, template: function(obj) {
             return "<div class='gantt_delete_icon' onclick='deleteTask(" + obj.id + ")'><i class='fas fa-trash-alt text-danger'></i></div>";
@@ -1146,6 +1244,25 @@ function addNewTask() {
 function deleteTask(taskId) {
     if (confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?')) {
         gantt.deleteTask(taskId);
+    }
+}
+
+// Toggle task status (finished/unfinished)
+function toggleTaskStatus(taskId) {
+    const task = gantt.getTask(taskId);
+    if (task) {
+        const newProgress = task.progress >= 1 ? 0 : 1;
+        gantt.updateTask(taskId, {
+            id: taskId,
+            text: task.text,
+            start_date: task.start_date,
+            end_date: task.end_date,
+            progress: newProgress,
+            parent: task.parent,
+            duration: task.duration,
+            $source: task.$source,
+            $target: task.$target
+        });
     }
 }
 
