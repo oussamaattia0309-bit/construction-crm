@@ -12,8 +12,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Initialize FullCalendar with project tasks
-    const calendarEl = document.getElementById('project-calendar');
+    // Wait for Gantt to be initialized before initializing calendar
+    function initCalendar() {
+        if (typeof gantt === 'undefined' || typeof gantt.getTaskByTime !== 'function') {
+            console.log('Waiting for Gantt to initialize...');
+            setTimeout(initCalendar, 100);
+            return;
+        }
+
+        // Initialize FullCalendar with project tasks
+        const calendarEl = document.getElementById('project-calendar');
     const calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         locale: 'fr',
@@ -61,7 +69,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update event count
     function updateEventCount() {
         const events = calendar.getEvents();
-        document.getElementById('event-count').textContent = events.length;
+        const eventCountEl = document.getElementById('event-count');
+        if (eventCountEl) {
+            eventCountEl.textContent = events.length;
+        }
     }
 
     // Custom toolbar controls
@@ -106,6 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initial update
     calendar.on('datesSet', updateMonthYear);
+    calendar.on('eventsSet', updateEventCount);
     calendar.on('eventAdd', updateEventCount);
     calendar.on('eventRemove', updateEventCount);
 
@@ -125,4 +137,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     updateMonthYear();
     updateEventCount();
+    }
+
+    // Start calendar initialization
+    initCalendar();
 });

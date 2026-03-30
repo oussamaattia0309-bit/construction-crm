@@ -732,6 +732,21 @@
     position: relative;
 }
 
+/* Fix empty white space in Gantt chart */
+#gantt-chart {
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+#gantt-chart .gantt_data_area {
+    height: 100% !important;
+}
+
+#gantt-chart .gantt_task_row {
+    height: 40px;
+    line-height: 40px;
+}
+
 </style>
 
 <style>
