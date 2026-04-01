@@ -505,17 +505,30 @@ function saveRow(tr, isDaily) {
 
 function recalcRow(tr) {
   const isDaily = tr.closest('table').id === 'dailyTable';
+  let total, paid;
+
   if (isDaily) {
     const days = parseFloat(tr.querySelector('td:nth-child(3)').textContent) || 0;
     const rate = parseFloat(tr.querySelector('td:nth-child(4)').textContent) || 0;
-    const total = (days * rate) || 0;
-    const paid = parseFloat(tr.querySelector('td:nth-child(6)').textContent) || 0;
+    total = (days * rate) || 0;
+    paid = parseFloat(tr.querySelector('td:nth-child(6)').textContent) || 0;
     tr.querySelector('td.total').textContent = total.toFixed(2);
     tr.querySelector('td.remaining').textContent = (total - paid).toFixed(2);
   } else {
-    const contract = parseFloat(tr.querySelector('td:nth-child(3)').textContent) || 0;
-    const paid = parseFloat(tr.querySelector('td:nth-child(4)').textContent) || 0;
-    tr.querySelector('td.remaining').textContent = (contract - paid).toFixed(2);
+    total = parseFloat(tr.querySelector('td:nth-child(3)').textContent) || 0;
+    paid = parseFloat(tr.querySelector('td:nth-child(4)').textContent) || 0;
+    tr.querySelector('td.remaining').textContent = (total - paid).toFixed(2);
+  }
+
+  // Apply color coding based on payment status
+  const remaining = total - paid;
+  tr.classList.remove('table-success', 'table-danger');
+  if (total > 0 && remaining <= 0.01) {
+    // Fully paid - green
+    tr.classList.add('table-success');
+  } else if (total > 0 && remaining > 0.01) {
+    // Not fully paid - red
+    tr.classList.add('table-danger');
   }
 }
 
