@@ -531,20 +531,29 @@
     <!-- Projects Section -->
     <div class="row mb-5 projects-section">
         <div class="col-12 d-flex justify-content-between align-items-center">
-            <h2 class="section-title mb-0">Recent Projects</h2>
-            <button type="button" class="btn btn-outline-secondary btn-sm toggle-completed-btn" id="toggleCompletedBtn">
-                <i class="fas fa-eye me-2"></i>Show Completed
-            </button>
+            <h2 class="section-title mb-0">Tous les Projets</h2>
         </div>
     </div>
-    <div class="row g-4" id="recent-projects-container">
-        <!-- Will be populated by JavaScript -->
+    <div class="row">
         <div class="col-12">
-            <div class="projects-loading">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading projects...</span>
-                </div>
-                <p class="mb-0">Loading recent projects...</p>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle" id="projects-table">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom du Projet</th>
+                            <th>Client</th>
+                            <th>Adresse</th>
+                            <th>Date Début</th>
+                            <th>Date Fin</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-projects-container">
+                        <!-- Will be populated by JavaScript -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -713,16 +722,15 @@ function loadDashboardData() {
             if (!projects || !Array.isArray(projects)) {
                 console.error('Projects is not an array:', projects);
                 container.innerHTML = `
-                    <div class="col-12">
-                        <div class="projects-empty">
-                            <i class="fas fa-exclamation-triangle text-warning"></i>
-                            <h4 class="text-warning">Data Error</h4>
-                            <p class="mb-3">Received invalid project data. Please contact support if this persists.</p>
-                            <button type="button" class="btn btn-outline-primary" onclick="loadRecentProjects()">
-                                <i class="fas fa-refresh me-2"></i>Retry
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-warning">
+                            <i class="fas fa-exclamation-triangle fa-2x mb-3 d-block"></i>
+                            <h5>Erreur de données</h5>
+                            <button type="button" class="btn btn-outline-primary" onclick="loadDashboardData()">
+                                <i class="fas fa-refresh me-2"></i>Réessayer
                             </button>
-                        </div>
-                    </div>
+                        </td>
+                    </tr>
                 `;
                 isLoadingData = false;
                 return;
@@ -730,16 +738,15 @@ function loadDashboardData() {
             
             if (projects.length === 0) {
                 container.innerHTML = `
-                    <div class="col-12">
-                        <div class="projects-empty">
-                            <i class="fas fa-folder-open text-muted"></i>
-                            <h4 class="text-muted">No Projects Yet</h4>
-                            <p class="mb-3">Start by creating your first project to see it here.</p>
+                    <tr>
+                        <td colspan="8" class="text-center py-4">
+                            <i class="fas fa-folder-open text-muted fa-2x mb-3 d-block"></i>
+                            <h5 class="text-muted">Aucun projet</h5>
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProjectModal">
-                                <i class="fas fa-plus me-2"></i>Create First Project
+                                <i class="fas fa-plus me-2"></i>Créer un projet
                             </button>
-                        </div>
-                    </div>
+                        </td>
+                    </tr>
                 `;
                 isLoadingData = false;
                 return;
@@ -749,7 +756,7 @@ function loadDashboardData() {
             const sortOrder = { 'in_progress': 0, 'planned': 1, 'completed': 2 };
             projects.sort((a, b) => sortOrder[a.status] - sortOrder[b.status]);
             
-            // Build all HTML at once, then insert once
+            // Build table rows
             const projectsHTML = projects.map(project => {
                 const statusClass = {
                     'planned': 'bg-warning',
@@ -757,76 +764,58 @@ function loadDashboardData() {
                     'completed': 'bg-success'
                 }[project.status] || 'bg-secondary';
                 
-                const statusText = project.status.replace('_', ' ').toUpperCase();
-                const isCompleted = project.status === 'completed';
+                const statusText = {
+                    'planned': 'Planifié',
+                    'in_progress': 'En cours',
+                    'completed': 'Terminé'
+                }[project.status] || project.status;
                 
-                // Get project icon based on status
-                const projectIcon = {
-                    'planned': 'fas fa-calendar-plus',
-                    'in_progress': 'fas fa-tools',
-                    'completed': 'fas fa-check-circle'
-                }[project.status] || 'fas fa-project-diagram';
-                
-                const iconBgClass = {
-                    'planned': 'bg-soft-warning',
-                    'in_progress': 'bg-soft-primary',
-                    'completed': 'bg-soft-success'
-                }[project.status] || 'bg-soft-secondary';
+                const formatDate = (dateStr) => {
+                    if (!dateStr) return '-';
+                    const date = new Date(dateStr);
+                    return date.toLocaleDateString('fr-FR');
+                };
                 
                 return `
-                    <div class="col-lg-4 col-md-6 project-item ${isCompleted ? 'completed-project' : ''}">
-                        <div class="project-card card h-100">
-                            <div class="card-body d-flex flex-column">
-                                <div class="project-status ${statusClass} text-white">${statusText}</div>
-                                
-                                <div class="project-icon ${iconBgClass} mx-auto">
-                                    <i class="${projectIcon} fa-lg text-${statusClass.split('-')[1]}"></i>
-                                </div>
-                                
-                                <h5 class="project-title text-center">${project.name}</h5>
-                                
-                                <div class="project-details text-center">
-                                    ${project.client_name ? `<div><i class="fas fa-user me-1"></i>${project.client_name}</div>` : ''}
-                                    ${project.address ? `<div><i class="fas fa-map-marker-alt me-1"></i>${project.address}</div>` : ''}
-                                </div>
-                                
-                                <div class="project-meta mt-auto">
-                                    <div class="project-action">
-                                        <i class="fas fa-arrow-right"></i>
-                                    </div>
-                                </div>
-                                
-                                <div class="d-grid gap-2 mt-3">
-                                    <a href="/projects/${project.id}" class="btn btn-primary btn-sm">
-                                        <i class="fas fa-eye me-1"></i>View Details
-                                    </a>
-                                    <div class="btn-group w-100">
-                                        <a href="/project/${project.id}/financial" class="btn btn-outline-info btn-sm">
-                                            <i class="fas fa-coins me-1"></i>Financial
-                                        </a>
-                                        <button type="button" class="btn btn-outline-secondary btn-sm edit-project-btn"
-                                                data-project-id="${project.id}"
-                                                data-project-name="${project.name}"
-                                                data-project-status="${project.status}"
-                                                data-project-client="${project.client_name || ''}"
-                                                data-project-address="${project.address || ''}">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-outline-danger btn-sm delete-project-btn" 
-                                                data-project-id="${project.id}"
-                                                data-project-name="${project.name}">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
+                    <tr>
+                        <td><strong>${project.id}</strong></td>
+                        <td><strong>${project.name}</strong></td>
+                        <td>${project.client_name || '-'}</td>
+                        <td>${project.address ? '<a href="https://www.google.com/maps/search/' + encodeURIComponent(project.address) + '" target="_blank" class="text-decoration-none text-primary"><i class="fas fa-map-marker-alt me-1"></i>Maps</a>' : '-'}</td>
+                        <td>${formatDate(project.start_date)}</td>
+                        <td>${formatDate(project.end_date)}</td>
+                        <td><span class="badge ${statusClass}">${statusText}</span></td>
+                        <td>
+                            <div class="btn-group btn-group-sm shadow-none">
+                                <a href="/projects/${project.id}" class="btn btn-primary" title="Voir">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="/project/${project.id}/financial" class="btn text-white" style="background: #17a2b8;" title="Financier">
+                                    <i class="fas fa-coins"></i>
+                                </a>
+                                <button type="button" class="btn btn-outline-secondary edit-project-btn"
+                                        data-project-id="${project.id}"
+                                        data-project-name="${project.name}"
+                                        data-project-status="${project.status}"
+                                        data-project-client="${project.client_name || ''}"
+                                        data-project-address="${project.address || ''}"
+                                        title="Modifier">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-danger delete-project-btn" 
+                                        data-project-id="${project.id}"
+                                        data-project-name="${project.name}"
+                                        title="Supprimer">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </div>
-                        </div>
-                    </div>
+                        </td>
+                    </tr>
                 `;
             }).join('');
             
             console.log('Inserting projects HTML');
-            // Insert all HTML at once
+            // Insert all HTML at once - table rows only (table already in HTML)
             container.innerHTML = projectsHTML;
             
             // Add delete event listeners after projects are loaded
@@ -845,16 +834,15 @@ function loadDashboardData() {
             isLoadingData = false;
             const container = document.getElementById('recent-projects-container');
             container.innerHTML = `
-                <div class="col-12">
-                    <div class="projects-empty">
-                        <i class="fas fa-exclamation-triangle text-warning"></i>
-                        <h4 class="text-warning">Failed to Load Projects</h4>
-                        <p class="mb-3">There was an error loading your projects. Please try refreshing the page.</p>
-                        <button type="button" class="btn btn-outline-primary" onclick="loadRecentProjects()">
-                            <i class="fas fa-refresh me-2"></i>Try Again
+                <tr>
+                    <td colspan="8" class="text-center py-4 text-warning">
+                        <i class="fas fa-exclamation-triangle fa-2x mb-3 d-block"></i>
+                        <h5>Erreur de chargement</h5>
+                        <button type="button" class="btn btn-outline-primary" onclick="loadDashboardData()">
+                            <i class="fas fa-refresh me-2"></i>Réessayer
                         </button>
-                    </div>
-                </div>
+                    </td>
+                </tr>
             `;
         });
 }
@@ -1199,9 +1187,143 @@ document.addEventListener('DOMContentLoaded', function() {
         gap: 0.5rem;
     }
     
+}
+
+/* Projects Table Styling */
+#projects-table {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: none;
+}
+
+#projects-table thead {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: white;
+}
+
+#projects-table thead th {
+    border: none;
+    padding: 14px 10px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+#projects-table thead th:nth-child(4),
+#projects-table thead th:nth-child(5),
+#projects-table thead th:nth-child(6) {
+    max-width: 120px;
+}
+
+#projects-table thead th:first-child {
+    border-top-left-radius: 12px;
+}
+
+#projects-table thead th:last-child {
+    border-top-right-radius: 12px;
+}
+
+#projects-table tbody tr {
+    transition: all 0.2s ease;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+#projects-table tbody tr:hover {
+    background-color: #f0f4ff;
+}
+
+#projects-table tbody td {
+    padding: 12px 10px;
+    vertical-align: middle;
+    font-size: 0.85rem;
+}
+
+#projects-table tbody td:nth-child(4) {
+    max-width: 120px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#projects-table .badge {
+    padding: 5px 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    border-radius: 15px;
+}
+
+#projects-table .btn-group {
+    box-shadow: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .project-card .card-body {
+        padding: 1rem;
+    }
+    
+    .project-card .card-title {
+        font-size: 1.1rem;
+    }
+    
+    .btn-group {
+        flex-wrap: wrap;
+    }
+    
+    .website-promo-card {
+        margin: 0 1rem;
+    }
+    
+    .website-promo-card .d-flex {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
     .website-promo-card .btn {
         width: 100%;
     }
+    #projects-table .btn-group .btn {
+        border-radius: 8px !important;
+        margin: 0 2px;
+        padding: 6px 10px;
+        transition: all 0.2s ease;
+    }
+
+    #projects-table .btn-group .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    #projects-table .btn-primary:hover {
+        background-color: #0a58ca;
+    }
+}
+
+#projects-table .btn-info:hover {
+    background-color: #0dcaf0;
+}
+
+#projects-table .btn-outline-secondary:hover {
+    background-color: #6c757d;
+    color: white;
+}
+
+#projects-table .btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Table responsive wrapper */
+#projects-table_wrapper {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
 }
 </style>
 {% endblock %}

@@ -389,6 +389,13 @@ def account_management():
                           current_session=current_session,
                           active_sessions=active_sessions)
 
+@app.route('/users')
+@login_required
+def list_users():
+    """Display all users with their IDs and login info"""
+    users = User.query.all()
+    return render_template('users.html', users=users)
+
 @app.route('/account/upload-avatar', methods=['POST'])
 @login_required
 def upload_avatar():
