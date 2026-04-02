@@ -463,8 +463,37 @@
                             </div>
                         </div>
                     </div>
-                    <a href="{{ url_for('projects') }}" class="btn btn-outline-warning btn-sm w-100 mt-4 stats-btn">View All Projects</a>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Projects Section -->
+    <div class="row mb-5 projects-section">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h2 class="section-title mb-0">Tous les Projets</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle" id="projects-table">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom du Projet</th>
+                            <th>Client</th>
+                            <th>Adresse</th>
+                            <th>Date Début</th>
+                            <th>Date Fin</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-projects-container">
+                        <!-- Will be populated by JavaScript -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -524,36 +553,6 @@
                         <p class="text-muted small mt-2 quick-action-desc">Manage inventory</p>
                     </div>
                 </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Projects Section -->
-    <div class="row mb-5 projects-section">
-        <div class="col-12 d-flex justify-content-between align-items-center">
-            <h2 class="section-title mb-0">Tous les Projets</h2>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-12">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle" id="projects-table">
-                    <thead class="table-light">
-                        <tr>
-                            <th>ID</th>
-                            <th>Nom du Projet</th>
-                            <th>Client</th>
-                            <th>Adresse</th>
-                            <th>Date Début</th>
-                            <th>Date Fin</th>
-                            <th>Statut</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="recent-projects-container">
-                        <!-- Will be populated by JavaScript -->
-                    </tbody>
-                </table>
             </div>
         </div>
     </div>
@@ -793,15 +792,6 @@ function loadDashboardData() {
                                 <a href="/project/${project.id}/financial" class="btn text-white" style="background: #17a2b8;" title="Financier">
                                     <i class="fas fa-coins"></i>
                                 </a>
-                                <button type="button" class="btn btn-outline-secondary edit-project-btn"
-                                        data-project-id="${project.id}"
-                                        data-project-name="${project.name}"
-                                        data-project-status="${project.status}"
-                                        data-project-client="${project.client_name || ''}"
-                                        data-project-address="${project.address || ''}"
-                                        title="Modifier">
-                                    <i class="fas fa-edit"></i>
-                                </button>
                                 <button type="button" class="btn btn-outline-danger delete-project-btn" 
                                         data-project-id="${project.id}"
                                         data-project-name="${project.name}"
