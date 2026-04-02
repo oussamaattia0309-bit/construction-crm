@@ -11,6 +11,98 @@
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 <!-- Enhanced Calendar JS -->
 <script src="/static/calendar_enhanced.js"></script>
+
+<!-- Initialize Full Calendar Modal -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize full calendar when modal is shown
+    document.getElementById('calendarModal').addEventListener('shown.bs.modal', function() {
+        const modalCalendarEl = document.getElementById('full-calendar');
+        
+        // Check if already initialized
+        if (modalCalendarEl.classList.contains('fc')) {
+            return;
+        }
+        
+        const modalCalendar = new FullCalendar.Calendar(modalCalendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'fr',
+            height: 'auto',
+            headerToolbar: false,
+            events: function(info, successCallback, failureCallback) {
+                try {
+                    const tasks = gantt.getTaskByTime();
+                    const events = tasks.map(task => ({
+                        id: task.id,
+                        title: task.text,
+                        start: task.start_date,
+                        end: task.end_date,
+                        backgroundColor: task.progress >= 1 ? '#28a745' : 
+                                       (new Date(task.end_date) < new Date() ? '#dc3545' : '#007bff'),
+                        borderColor: task.progress >= 1 ? '#28a745' : 
+                                    (new Date(task.end_date) < new Date() ? '#dc3545' : '#007bff')
+                    }));
+                    successCallback(events);
+                } catch(e) {
+                    failureCallback(e);
+                }
+            },
+            eventClick: function(info) {
+                gantt.showTask(info.event.id);
+                // Close modal and scroll to gantt
+                bootstrap.Modal.getInstance(document.getElementById('calendarModal')).hide();
+            }
+        });
+        
+        modalCalendar.render();
+        
+        // Update month/year display
+        function updateModalCalendarToolbar() {
+            const currentDate = modalCalendar.getDate();
+            const monthNames = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 
+                               'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+            const monthYearEl = document.getElementById('modal-calendar-month-year');
+            if (monthYearEl) {
+                monthYearEl.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+            }
+        }
+        
+        updateModalCalendarToolbar();
+        
+        // Button handlers
+        document.getElementById('modal-calendar-today')?.addEventListener('click', function() {
+            modalCalendar.today();
+            updateModalCalendarToolbar();
+        });
+        document.getElementById('modal-calendar-prev')?.addEventListener('click', function() {
+            modalCalendar.prev();
+            updateModalCalendarToolbar();
+        });
+        document.getElementById('modal-calendar-next')?.addEventListener('click', function() {
+            modalCalendar.next();
+            updateModalCalendarToolbar();
+        });
+        
+        // View switching
+        document.querySelectorAll('#calendarModal [data-view]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const view = this.getAttribute('data-view');
+                modalCalendar.changeView(view);
+                document.querySelectorAll('#calendarModal [data-view]').forEach(b => {
+                    b.classList.remove('active', 'btn-primary');
+                    b.classList.add('btn-outline-primary');
+                });
+                this.classList.remove('btn-outline-primary');
+                this.classList.add('active', 'btn-primary');
+            });
+        });
+        
+        // Store for access
+        window.modalCalendar = modalCalendar;
+    });
+});
+</script>
+
 {% endblock %}
 
 {% block content %}
@@ -180,7 +272,7 @@
                 </div>
 
                 <!-- Calendar Body -->
-                <div class="card-body p-0 collapse" id="calendarBody">
+                <div class="card-body p-0 collapse show" id="calendarBody">
                     <!-- Quick Actions Bar -->
                     <div class="bg-light border-bottom p-3">
                         <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
@@ -207,7 +299,7 @@
                     </div>
 
                     <!-- Calendar Container -->
-                    <div id="project-calendar" class="calendar-wrapper p-3" style="min-height: 350px;">
+                    <div id="project-calendar" class="calendar-wrapper p-3" style="min-height: 250px;">
                         <!-- FullCalendar will be initialized here -->
                     </div>
                 </div>
@@ -219,7 +311,7 @@
                             <i class="fas fa-calendar-week me-1"></i>
                             <span id="event-count">0</span> événements ce mois
                         </small>
-                        <a href="#" class="text-decoration-none small">
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#calendarModal" class="text-decoration-none small">
                             Voir tout <i class="fas fa-arrow-right ms-1"></i>
                         </a>
                     </div>
@@ -836,18 +928,31 @@ function initGantt() {
 
     gantt.init("gantt-chart");
 
-    // Initialize FullCalendar with project tasks
+    // Define toolbar update function FIRST
+    function updateCalendarToolbar(cal) {
+        const currentDate = cal.getDate();
+        const monthNames = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 
+                           'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+        const monthYearEl = document.getElementById('calendar-month-year');
+        if (monthYearEl) {
+            monthYearEl.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+        }
+        
+        const eventCountEl = document.getElementById('event-count');
+        if (eventCountEl) {
+            eventCountEl.textContent = cal.getEvents().length;
+        }
+    }
+
+    // Initialize FullCalendar
     const calendarEl = document.getElementById('project-calendar');
     const calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         locale: 'fr',
-        height: 300,
-        aspectRatio: 1.2,
-        headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay'
-        },
+        height: 'auto',
+        contentHeight: 'auto',
+        aspectRatio: 2,
+        headerToolbar: false,
         buttonText: {
             today: 'Aujourd\'hui',
             month: 'Mois',
@@ -858,31 +963,75 @@ function initGantt() {
         eventDisplay: 'block',
         displayEventTime: false,
         events: function(info, successCallback, failureCallback) {
-            // Get tasks from Gantt and convert to calendar events
-            const tasks = gantt.getTaskByTime();
-            const events = tasks.map(task => ({
-                id: task.id,
-                title: task.text,
-                start: task.start_date,
-                end: task.end_date,
-                backgroundColor: task.progress >= 1 ? '#28a745' : 
-                               (new Date(task.end_date) < new Date() ? '#dc3545' : '#007bff'),
-                borderColor: task.progress >= 1 ? '#28a745' : 
-                            (new Date(task.end_date) < new Date() ? '#dc3545' : '#007bff')
-            }));
-            successCallback(events);
+            console.log('Calendar events callback fired');
+            try {
+                const tasks = gantt.getTaskByTime();
+                console.log('Gantt tasks:', tasks.length);
+                const events = tasks.map(task => ({
+                    id: task.id,
+                    title: task.text,
+                    start: task.start_date,
+                    end: task.end_date,
+                    backgroundColor: task.progress >= 1 ? '#28a745' : 
+                                   (new Date(task.end_date) < new Date() ? '#dc3545' : '#007bff'),
+                    borderColor: task.progress >= 1 ? '#28a745' : 
+                                (new Date(task.end_date) < new Date() ? '#dc3545' : '#007bff')
+                }));
+                console.log('Calendar events:', events.length);
+                successCallback(events);
+            } catch(e) {
+                console.error('Error loading events:', e);
+                failureCallback(e);
+            }
         },
         editable: false,
         selectable: true,
         eventClick: function(info) {
-            // Navigate to the task in Gantt when clicked
             const taskId = info.event.id;
             gantt.showTask(taskId);
+        },
+        datesSet: function(info) {
+            updateCalendarToolbar(calendar);
         }
     });
+    
     calendar.render();
 
-    // Update calendar when Gantt tasks change
+    // Force events fetch after Gantt has time to load
+    setTimeout(function() {
+        calendar.refetchEvents();
+        updateCalendarToolbar(calendar);
+    }, 300);
+
+    // Custom toolbar button handlers
+    document.getElementById('calendar-today')?.addEventListener('click', function() {
+        calendar.today();
+    });
+    document.getElementById('calendar-prev')?.addEventListener('click', function() {
+        calendar.prev();
+    });
+    document.getElementById('calendar-next')?.addEventListener('click', function() {
+        calendar.next();
+    });
+
+    // View switching buttons
+    document.querySelectorAll('[data-view]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const view = this.getAttribute('data-view');
+            calendar.changeView(view);
+            document.querySelectorAll('[data-view]').forEach(b => {
+                b.classList.remove('active', 'btn-primary');
+                b.classList.add('btn-outline-primary');
+            });
+            this.classList.remove('btn-outline-primary');
+            this.classList.add('active', 'btn-primary');
+        });
+    });
+
+    // Initial toolbar update
+    updateCalendarToolbar(calendar);
+
+    // Refresh events when Gantt tasks change
     gantt.attachEvent("onAfterTaskUpdate", function(id, item) {
         calendar.refetchEvents();
     });
@@ -892,7 +1041,10 @@ function initGantt() {
     gantt.attachEvent("onAfterTaskDelete", function(id, item) {
         calendar.refetchEvents();
     });
-
+    
+    // Store globally for debugging
+    window.projectCalendar = calendar;
+    
     // Add day initials as data attribute for hover effect
     gantt.attachEvent("onAfterTaskDisplay", function(id, task){
         var scaleCells = document.querySelectorAll(".gantt_scale_cell");
@@ -1498,4 +1650,46 @@ document.addEventListener('DOMContentLoaded', function() {
     checkGanttLoaded();
 });
 </script>
+
+<!-- Calendar Full View Modal -->
+<div class="modal fade" id="calendarModal" tabindex="-1" aria-labelledby="calendarModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #0d6efd, #0a58ca); color: white;">
+                <h5 class="modal-title" id="calendarModalLabel">
+                    <i class="fas fa-calendar-alt me-2"></i>Calendrier des Projets
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-3">
+                <!-- Calendar Toolbar -->
+                <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-outline-primary" id="modal-calendar-today">
+                            <i class="fas fa-calendar-day me-1"></i>Aujourd'hui
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" id="modal-calendar-prev">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" id="modal-calendar-next">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <h5 class="mb-0 fw-semibold" id="modal-calendar-month-year">avril 2026</h5>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-outline-primary active" data-view="dayGridMonth">Mois</button>
+                        <button type="button" class="btn btn-outline-primary" data-view="timeGridWeek">Semaine</button>
+                        <button type="button" class="btn btn-outline-primary" data-view="timeGridDay">Jour</button>
+                    </div>
+                </div>
+                <!-- Full Calendar Container -->
+                <div id="full-calendar" style="min-height: 500px;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

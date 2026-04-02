@@ -1,134 +1,28 @@
+============================================
 QUICK ONE-LINE COMMANDS
 ============================================
 
 # LOCAL to GITHUB (one line)
-cd "C:\Users\user\Desktop\Travail\WEB\CRM CAE"; git add .; git commit -m "Update"; git push origin main
+cd "C:\Users\USER\Desktop\stuff\web\CRM CAE"; git add .; git commit -m "staff and stuff"; git push origin main
 
-# PYTHONANYWHERE from GITHUB (one line) 
-
-
-access   https://oussamaattia1994.pythonanywhere.com/
-
-
+# PYTHONANYWHERE from GITHUB (one line)
+https://oussamaattia1994.pythonanywhere.com/login
 https://www.pythonanywhere.com/user/Oussamaattia1994/consoles/45879458/
 cd ~/mysite && git pull origin main && source venv/bin/activate && pip install -r requirements.txt && python -c "from app import app, db; app.app_context().push(); db.create_all()" && touch /var/www/oussamaattia1994_pythonanywhere_com_wsgi.py
-touch /var/www/oussamaattia1994_pythonanywhere_com_wsgi.py
+
+============================================
+EMERGENCY RESET (if things break)
+============================================
+
+# Force reset PythonAnywhere to match GitHub
+cd ~/mysite && git fetch origin && git reset --hard origin/main && git clean -fd && source venv/bin/activate && pip install -r requirements.txt && touch /var/www/oussamaattia1994_pythonanywhere_com_wsgi.py
 
 
+BACKUP DATABASE BEFORE UPDATE
+============================================
 
-==============================#acess :
+# Backup PythonAnywhere database
+cd ~/mysite && cp instance/construction_crm.db instance/construction_crm.db.backup
 
-http://localhost:5000
-
-
-
-==============================#pull from github 
-
-cd "C:\Users\USER\Desktop\stuff\web\CRM CAE"; `
-git reset --hard HEAD; `
-git clean -fd; `
-git pull origin main; `     
-venv\Scripts\activate; `
-pip install -r requirements.txt; `
-Remove-Item -Path "construction_crm.db" -ErrorAction SilentlyContinue; `
-Remove-Item -Path "construction_crm.db-journal" -ErrorAction SilentlyContinue; `
-Remove-Item -Path "construction_crm.db-wal" -ErrorAction SilentlyContinue; `
-Remove-Item -Path "construction_crm.db-shm" -ErrorAction SilentlyContinue; `
-Remove-Item -Recurse -Force "instance" -ErrorAction SilentlyContinue; `
-Remove-Item -Recurse -Force "__pycache__" -ErrorAction SilentlyContinue; `
-Write-Host "✅ Database deleted. Starting Flask..." -ForegroundColor Green; `
-python app.py
-=====================================
-
-
-================================================================================
-                        DATA SYNC COMMANDS
-================================================================================
-
-CREATE SCRIPTS (RUN ONCE):
-
-On LOCAL (PowerShell):
-cd "C:\Users\USER\Desktop\stuff\web\CRM CAE"
-notepad export_local.py
-# Paste code below, save, close
-
-On PYTHONANYWHERE (Bash):
-cd ~/mysite
-nano export_pa.py
-# Paste code below, save (Ctrl+X, Y, Enter)
-
-
-================================================================================
-SCRIPT CODE:
-
-export_local.py (for LOCAL):
---------------------------------
-import sqlite3, json
-conn = sqlite3.connect('instance/construction_crm.db')
-conn.row_factory = sqlite3.Row
-c = conn.cursor()
-c.execute("SELECT name FROM sqlite_master WHERE type='table'")
-data = {}
-for t in [r[0] for r in c.fetchall()]:
-    data[t] = [dict(r) for r in c.execute(f'SELECT * FROM {t}')]
-json.dump(data, open('data.json','w'), default=str)
-print("Exported to data.json")
-conn.close()
-
-export_pa.py (for PYTHONANYWHERE):
---------------------------------
-import sqlite3, json
-conn = sqlite3.connect('instance/construction_crm.db')
-conn.row_factory = sqlite3.Row
-c = conn.cursor()
-c.execute("SELECT name FROM sqlite_master WHERE type='table'")
-data = {}
-for t in [r[0] for r in c.fetchall()]:
-    data[t] = [dict(r) for r in c.execute(f'SELECT * FROM {t}')]
-json.dump(data, open('data.json','w'), default=str)
-print("Exported to data.json")
-conn.close()
-
-import.py (for BOTH machines):
---------------------------------
-import sqlite3, json
-data = json.load(open('data.json'))
-conn = sqlite3.connect('instance/construction_crm.db')
-c = conn.cursor()
-for t, rows in data.items():
-    if rows:
-        cols = ','.join(rows[0].keys())
-        q = ','.join(['?' for _ in rows[0].keys()])
-        c.execute(f'DELETE FROM {t}')
-        for r in rows:
-            c.execute(f'INSERT INTO {t} ({cols}) VALUES ({q})', [r.get(k) for k in rows[0].keys()])
-        conn.commit()
-print("Import complete")
-conn.close()
-
-
-================================================================================
-HOW TO USE:
-
-SEND LOCAL DATA TO PYTHONANYWHERE:
-----------------------------------
-1. Local: python export_local.py
-2. Upload data.json to PythonAnywhere (Files tab)
-3. PythonAnywhere: python import.py
-4. PythonAnywhere: touch /var/www/oussamaattia1994_pythonanywhere_com_wsgi.py
-
-GET DATA FROM PYTHONANYWHERE TO LOCAL:
---------------------------------------
-1. PythonAnywhere: python export_pa.py
-2. Download data.json from PythonAnywhere (Files tab)
-3. Local: python import.py
-
-
-================================================================================
-ONE-LINE SUMMARY:
-
-Send Local → PythonAnywhere:
-Local: python export_local.py → Upload data.json → PythonAnywhere: python import.py
-
-Get PythonAnywhere → Local:
-PythonAnywhere: python export_pa.py → Download data.json → Local: python import.py
+# Restore backup if needed
+cd ~/mysite && cp instance/construction_crm.db.backup instance/construction_crm.db

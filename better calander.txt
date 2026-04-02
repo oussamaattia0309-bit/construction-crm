@@ -5,22 +5,27 @@
             <h5 class="mb-0 fw-bold text-white">
                 <i class="fas fa-calendar-alt me-2"></i>Calendrier des Projets
             </h5>
-            <div class="dropdown">
-                <button class="btn btn-sm btn-light rounded-circle" type="button" data-bs-toggle="dropdown">
-                    <i class="fas fa-ellipsis-v"></i>
+            <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-light rounded-circle" type="button" data-bs-toggle="collapse" data-bs-target="#calendarBody" aria-expanded="true" id="calendarToggleBtn">
+                    <i class="fas fa-chevron-down" id="calendarArrow" style="transition: transform 0.3s;"></i>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="#"><i class="fas fa-plus me-2"></i>Ajouter un événement</a></li>
-                    <li><a class="dropdown-item" href="#"><i class="fas fa-download me-2"></i>Exporter</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Paramètres</a></li>
-                </ul>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-light rounded-circle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#addEventModal"><i class="fas fa-plus me-2"></i>Ajouter un événement</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-download me-2"></i>Exporter</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Paramètres</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
-    
+
     <!-- Calendar Body -->
-    <div class="card-body p-0">
+    <div class="card-body p-0 collapse show" id="calendarBody">
         <!-- Quick Actions Bar -->
         <div class="bg-light border-bottom p-3">
             <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
@@ -35,29 +40,21 @@
                         <i class="fas fa-chevron-right"></i>
                     </button>
                 </div>
-                
-                <h6 class="mb-0 fw-semibold" id="calendar-month-year">mars 2026</h6>
-                
+
+                <h6 class="mb-0 fw-semibold" id="calendar-month-year">avril 2026</h6>
+
                 <div class="btn-group btn-group-sm" role="group">
-                    <button type="button" class="btn btn-outline-primary active" data-view="monthGrid">Mois</button>
+                    <button type="button" class="btn btn-outline-primary active" data-view="dayGridMonth">Mois</button>
                     <button type="button" class="btn btn-outline-primary" data-view="timeGridWeek">Semaine</button>
                     <button type="button" class="btn btn-outline-primary" data-view="timeGridDay">Jour</button>
                 </div>
             </div>
         </div>
-        
-        <!-- Calendar Container -->
-        <div id="project-calendar" class="calendar-wrapper p-3" style="min-height: 350px;">
-            <!-- FullCalendar will be initialized here -->
-            <div class="text-center py-5">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Chargement...</span>
-                </div>
-                <p class="mt-2 text-muted mb-0">Chargement du calendrier...</p>
-            </div>
-        </div>
+
+        <!-- Calendar Container - EMPTY div for FullCalendar to render into -->
+        <div id="project-calendar" class="calendar-wrapper p-3" style="min-height: 350px;"></div>
     </div>
-    
+
     <!-- Card Footer with Upcoming Events -->
     <div class="card-footer bg-white border-top-0 px-3 py-2">
         <div class="d-flex justify-content-between align-items-center">
@@ -93,44 +90,14 @@
     background: #ffffff;
 }
 
+/* Hide FullCalendar's default toolbar */
+.fc .fc-header-toolbar {
+    display: none !important;
+}
+
 /* FullCalendar Custom Overrides */
 .fc {
     font-family: inherit;
-}
-
-.fc .fc-toolbar-title {
-    font-size: 1rem;
-    font-weight: 600;
-}
-
-.fc .fc-button-primary {
-    background-color: #f8f9fa;
-    border-color: #dee2e6;
-    color: #212529;
-    text-transform: capitalize;
-    font-weight: 500;
-}
-
-.fc .fc-button-primary:hover {
-    background-color: #e9ecef;
-    border-color: #dee2e6;
-    color: #0d6efd;
-}
-
-.fc .fc-button-primary:focus {
-    box-shadow: none;
-}
-
-.fc .fc-button-primary:disabled {
-    background-color: #f8f9fa;
-    border-color: #dee2e6;
-    opacity: 0.5;
-}
-
-.fc .fc-button-primary.fc-button-active {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
-    color: white;
 }
 
 .fc .fc-daygrid-day.fc-day-today {
@@ -177,12 +144,6 @@
         gap: 0.5rem;
     }
     
-    .fc .fc-toolbar-chunk {
-        display: flex;
-        justify-content: center;
-        width: 100%;
-    }
-    
     .fc .fc-daygrid-day-number {
         font-size: 0.75rem;
         padding: 0.25rem;
@@ -193,47 +154,19 @@
         font-size: 0.75rem;
     }
 }
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-    .bg-gradient-primary {
-        background: linear-gradient(135deg, #0b5ed7 0%, #084298 100%);
-    }
-    
-    .calendar-wrapper {
-        background: #212529;
-    }
-    
-    .fc .fc-daygrid-day {
-        background-color: #212529;
-        border-color: #2c3034;
-    }
-    
-    .fc .fc-daygrid-day-number {
-        color: #f8f9fa;
-    }
-    
-    .fc .fc-col-header-cell-cushion {
-        color: #adb5bd;
-    }
-    
-    .card-footer {
-        background-color: #212529 !important;
-    }
-}
 </style>
 
 <script>
-// Enhanced calendar initialization script
 document.addEventListener('DOMContentLoaded', function() {
+    // Make sure the container is empty before initializing
     var calendarEl = document.getElementById('project-calendar');
     
-    if (calendarEl) {
+    if (calendarEl && !calendarEl.classList.contains('fc')) {
         var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             locale: 'fr',
             firstDay: 1, // Monday first day of week
-            headerToolbar: false, // We're using custom toolbar
+            headerToolbar: false, // Hide default toolbar completely
             height: 'auto',
             contentHeight: 'auto',
             aspectRatio: 1.5,
@@ -241,18 +174,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Example events - replace with your dynamic data
                 {
                     title: 'Réunion équipe',
-                    start: '2026-03-15',
+                    start: '2026-04-15',
                     color: '#0d6efd'
                 },
                 {
                     title: 'Deadline projet',
-                    start: '2026-03-25',
-                    end: '2026-03-26',
+                    start: '2026-04-25',
+                    end: '2026-04-26',
                     color: '#dc3545'
                 },
                 {
                     title: 'Formation',
-                    start: '2026-03-20T10:00:00',
+                    start: '2026-04-20T10:00:00',
                     color: '#198754'
                 }
             ],
@@ -260,42 +193,51 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Handle event click
                 alert('Événement: ' + info.event.title);
                 // You can open a modal with event details here
+                console.log('Event clicked:', info.event);
             },
             dateClick: function(info) {
                 // Handle date click - add new event
                 console.log('Date clicked: ' + info.dateStr);
                 // You can open a modal to add event here
+                alert('Ajouter un événement pour le ' + info.dateStr);
             },
-            dayCellDidMount: function(info) {
-                // Add custom tooltip or styling for specific dates
-                if (info.date.toDateString() === new Date().toDateString()) {
-                    info.el.style.backgroundColor = 'rgba(13, 110, 253, 0.05)';
-                }
+            datesSet: function(info) {
+                // Update custom toolbar when calendar changes view/date
+                updateMonthYear(calendar);
+                updateEventCount(calendar);
             }
         });
         
         calendar.render();
         
+        // Update month/year display
+        function updateMonthYear(cal) {
+            const currentDate = cal.getDate();
+            const monthNames = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 
+                               'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+            const monthYear = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+            const monthYearEl = document.getElementById('calendar-month-year');
+            if (monthYearEl) monthYearEl.textContent = monthYear;
+        }
+        
         // Update event count
-        function updateEventCount() {
-            var events = calendar.getEvents();
-            document.getElementById('event-count').textContent = events.length;
+        function updateEventCount(cal) {
+            const events = cal.getEvents();
+            const eventCountEl = document.getElementById('event-count');
+            if (eventCountEl) eventCountEl.textContent = events.length;
         }
         
         // Custom toolbar controls
         document.getElementById('calendar-today')?.addEventListener('click', function() {
             calendar.today();
-            updateMonthYear();
         });
         
         document.getElementById('calendar-prev')?.addEventListener('click', function() {
             calendar.prev();
-            updateMonthYear();
         });
         
         document.getElementById('calendar-next')?.addEventListener('click', function() {
             calendar.next();
-            updateMonthYear();
         });
         
         // View switching
@@ -306,39 +248,45 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Update active state
                 document.querySelectorAll('[data-view]').forEach(b => {
-                    b.classList.remove('active');
+                    b.classList.remove('active', 'btn-primary');
+                    b.classList.add('btn-outline-primary');
                 });
-                this.classList.add('active');
-                
-                updateMonthYear();
+                this.classList.remove('btn-outline-primary');
+                this.classList.add('active', 'btn-primary');
             });
         });
         
-        function updateMonthYear() {
-            const currentDate = calendar.getDate();
-            const monthNames = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 
-                               'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
-            const monthYear = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
-            document.getElementById('calendar-month-year').textContent = monthYear;
+        // Handle collapse/expand to resize calendar
+        const calendarBody = document.getElementById('calendarBody');
+        const calendarArrow = document.getElementById('calendarArrow');
+        
+        if (calendarBody) {
+            calendarBody.addEventListener('shown.bs.collapse', function() {
+                calendar.updateSize();
+                if (calendarArrow) calendarArrow.style.transform = 'rotate(180deg)';
+            });
+            
+            calendarBody.addEventListener('hidden.bs.collapse', function() {
+                if (calendarArrow) calendarArrow.style.transform = 'rotate(0deg)';
+            });
         }
         
         // Initial update
-        calendar.on('datesSet', updateMonthYear);
-        calendar.on('eventAdd', updateEventCount);
-        calendar.on('eventRemove', updateEventCount);
+        updateMonthYear(calendar);
+        updateEventCount(calendar);
         
-        updateMonthYear();
-        updateEventCount();
+        // Store calendar globally for debugging
+        window.projectCalendar = calendar;
+    } else {
+        console.error('Calendar container not found or already initialized');
     }
 });
 </script>
 
-
-
-
-Make sure you have FullCalendar CSS and JS included in your project:
-
-html
+Make sure you have the required scripts in your page:
+<!-- In your <head> or before closing </body> -->
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/fr.js"></script>
+
+
