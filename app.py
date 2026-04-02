@@ -1185,13 +1185,31 @@ def dashboard_data():
 @app.route('/api/projects/recent')
 @login_required
 def recent_projects():
-    projects = Project.query.order_by(Project.id.desc()).limit(5).all()
+    status = request.args.get('status', '')
+    search = request.args.get('search', '')
+    
+    query = Project.query
+    
+    if status and status != 'all':
+        query = query.filter(Project.status == status)
+    
+    if search:
+        query = query.filter(
+            (Project.name.ilike(f'%{search}%')) | 
+            (Project.client_name.ilike(f'%{search}%')) |
+            (Project.address.ilike(f'%{search}%'))
+        )
+    
+    projects = query.order_by(Project.id.desc()).all()
     return jsonify([{
         'id': p.id,
         'name': p.name,
         'status': p.status,
         'client_name': p.client_name,
-        'address': p.address
+        'address': p.address,
+        'start_date': p.start_date.strftime('%Y-%m-%d') if p.start_date else None,
+        'end_date': p.end_date.strftime('%Y-%m-%d') if p.end_date else None,
+        'selling_price': p.selling_price
     } for p in projects])
 
 @app.route('/api/projects/list')
