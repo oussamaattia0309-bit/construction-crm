@@ -2,52 +2,90 @@
 
 {% block content %}
 <style>
-    /* Enhanced Stats Cards Styling */
+    /* ====== DASHBOARD STRUCTURE ====== */
+    .dashboard { padding-top: 2rem; }
+    .dashboard-section { 
+        padding: 2.5rem 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    .dashboard-section:last-child { border-bottom: none; }
+
+    /* ====== HERO SECTION ====== */
+    .hero-section {
+        background: linear-gradient(135deg, var(--primary) 0%, #2C5282 100%);
+        color: white;
+        padding: 3rem 0;
+        border-radius: 16px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .hero-section img {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 16px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        display: inline-block;
+        max-height: 140px;
+        transition: all 0.3s ease;
+    }
+    
+    .hero-section img:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+    }
+    
+    .hero-section h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .hero-section .lead {
+        font-size: 1.1rem;
+        opacity: 0.95;
+        margin: 0;
+    }
+
+    /* ====== STATS SECTION ====== */
     .stats-card {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all 0.3s ease;
         position: relative;
         overflow: hidden;
         background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-    }
-    
-    .stats-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-        transition: left 0.5s ease;
-    }
-    
-    .stats-card:hover::before {
-        left: 100%;
+        border: none;
+        border-top: 3px solid transparent;
     }
     
     .stats-card:hover {
         transform: translateY(-8px);
-        box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+        box-shadow: 0 16px 32px rgba(0,0,0,0.12);
     }
+    
+    .stats-card.primary-stat { border-top-color: #0d6efd; }
+    .stats-card.success-stat { border-top-color: #28a745; }
+    .stats-card.info-stat { border-top-color: #17a2b8; }
     
     .stats-icon {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 60px;
-        height: 60px;
-        border-radius: 12px;
+        width: 70px;
+        height: 70px;
+        border-radius: 14px;
         margin-bottom: 1rem;
         transition: all 0.3s ease;
+        font-size: 2.5rem;
     }
     
-    .stats-card:hover .stats-icon {
-        transform: scale(1.1) rotateZ(5deg);
+    .stats-card:hover .stats-icon { 
+        transform: scale(1.15) rotate(5deg);
     }
     
     .stats-counter {
         font-size: 2.5rem;
-        font-weight: 700;
+        font-weight: 800;
         line-height: 1.2;
         margin: 0.5rem 0;
     }
@@ -58,57 +96,189 @@
         letter-spacing: 0.5px;
         text-transform: uppercase;
         color: #6c757d;
+        margin: 0;
     }
     
-    .stats-btn {
-        transition: all 0.3s ease;
+    .stats-btn { 
         margin-top: 1rem;
-    }
-    
-    .stats-btn:hover {
-        background-color: var(--primary);
-        color: white;
-        transform: translateX(4px);
-    }
-    
-    /* Project Status Card */
-    .project-status-card {
         transition: all 0.3s ease;
     }
-    
+
+    /* ====== PROJECT STATUS CARD ====== */
     .status-item {
-        padding: 1.25rem;
-        border-radius: 10px;
+        padding: 1.5rem;
+        border-radius: 12px;
         background: #f8f9fa;
         transition: all 0.3s ease;
-        position: relative;
+        text-align: center;
+        border: 2px solid transparent;
     }
     
     .status-item:hover {
-        background: #e7f2f8;
+        background: #ffffff;
         transform: translateY(-4px);
+        border-color: rgba(13, 110, 253, 0.2);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.08);
     }
     
     .status-item i {
-        font-size: 1.75rem;
+        font-size: 2rem;
         margin-bottom: 0.75rem;
+        transition: transform 0.3s ease;
+        display: block;
+    }
+    
+    .status-item:hover i { transform: scale(1.2) rotate(-5deg); }
+    
+    .status-number {
+        font-size: 2.2rem;
+        font-weight: 800;
+        margin: 0.5rem 0;
+    }
+
+    /* ====== SECTION TITLES ====== */
+    .section-title {
+        font-size: 1.6rem;
+        font-weight: 800;
+        margin-bottom: 2.5rem;
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        position: relative;
+        padding-bottom: 0.5rem;
+    }
+    
+    .section-title::after {
+        content: '';
+        flex: 1;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary) 0%, rgba(30, 58, 95, 0.1) 100%);
+        border-radius: 2px;
+        margin-left: 1rem;
+    }
+    
+    .section-title i {
+        font-size: 1.8rem;
+        color: var(--primary);
         transition: transform 0.3s ease;
     }
     
-    .status-item:hover i {
-        transform: scale(1.15);
+    .section-title:hover i {
+        transform: scale(1.1) rotate(10deg);
+    }
+
+    /* ====== FILTERS & SEARCH ====== */
+    .search-box { flex: 1; min-width: 200px; }
+    .search-box .input-group { 
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        border-radius: 8px;
+        overflow: hidden;
     }
     
-    .status-number {
-        font-size: 2rem;
+    .search-box .input-group-text {
+        border-right: none;
+    }
+    
+    .search-box .form-control {
+        border-left: none;
+        border-radius: 0;
+        transition: all 0.3s ease;
+    }
+    
+    .search-box .form-control:focus {
+        box-shadow: none;
+        border-color: var(--primary);
+    }
+    
+    #statusFilter { 
+        max-width: 180px;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+    }
+    
+    #statusFilter:hover,
+    #statusFilter:focus {
+        border-color: var(--primary);
+        box-shadow: 0 2px 8px rgba(30, 58, 95, 0.1);
+    }
+
+    /* ====== PROJECTS TABLE ====== */
+    #projects-table {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        border: none;
+        background: white;
+    }
+
+    #projects-table thead {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        color: white;
+    }
+
+    #projects-table thead th {
+        border: none;
+        padding: 16px 10px;
         font-weight: 700;
-        margin: 0.5rem 0;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        white-space: nowrap;
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.2s ease;
     }
-    
-    /* Quick Actions Card Enhancements */
+
+    #projects-table thead th:hover { 
+        background: rgba(255,255,255,0.12);
+        transform: translateY(-1px);
+    }
+
+    #projects-table thead th .sort-icon {
+        font-size: 0.7rem;
+        margin-left: 5px;
+        opacity: 0.5;
+        transition: opacity 0.2s ease;
+    }
+
+    #projects-table thead th.sort-asc .sort-icon,
+    #projects-table thead th.sort-desc .sort-icon { opacity: 1; }
+
+    #projects-table tbody tr {
+        transition: all 0.2s ease;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    #projects-table tbody tr:hover { 
+        background-color: rgba(13, 110, 253, 0.05);
+        box-shadow: inset 4px 0 0 var(--primary);
+    }
+
+    #projects-table tbody td {
+        padding: 14px 10px;
+        vertical-align: middle;
+        font-size: 0.85rem;
+    }
+
+    #projects-table .badge {
+        padding: 5px 10px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        border-radius: 15px;
+    }
+
+    #projects-table .btn-group { box-shadow: none; }
+
+    /* ====== QUICK ACTIONS ====== */
     .quick-action-btn {
         position: relative;
-        overflow: hidden;
         display: block;
         width: 100%;
         border: none;
@@ -124,488 +294,442 @@
         align-items: center;
         justify-content: center;
         border: 2px solid transparent;
-        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    
-    .quick-action-card::after {
-        content: '→';
-        position: absolute;
-        bottom: 1.5rem;
-        right: 1.5rem;
-        opacity: 0;
-        font-size: 1.5rem;
         transition: all 0.3s ease;
-        color: inherit;
+        background: white;
+        border-radius: 14px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        padding: 2.5rem 1.5rem;
+        height: 100%;
     }
     
     .quick-action-btn:hover .quick-action-card {
         border-color: currentColor;
-        box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
-    }
-    
-    .quick-action-btn:hover .quick-action-card::after {
-        opacity: 1;
-        right: 1rem;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
+        transform: translateY(-8px);
     }
     
     .quick-action-icon {
-        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        animation: slideInDown 0.6s ease-out backwards;
+        width: 70px;
+        height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+        font-size: 2.5rem;
+        border-radius: 14px;
     }
     
-    .quick-action-btn:hover .quick-action-icon {
-        transform: translateY(-8px) scale(1.15);
-        animation: bounce 0.6s ease-out infinite;
+    .quick-action-btn:hover .quick-action-icon { 
+        transform: translateY(-8px) scale(1.15) rotate(10deg);
+        filter: brightness(1.1);
     }
     
     .quick-action-title {
-        animation: slideInUp 0.6s ease-out 0.1s backwards;
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin: 0;
+        transition: all 0.3s ease;
+    }
+    
+    .quick-action-btn:hover .quick-action-title { 
+        font-size: 1.15rem;
     }
     
     .quick-action-desc {
-        animation: slideInUp 0.6s ease-out 0.2s backwards;
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+        margin-bottom: 0;
+        transition: all 0.3s ease;
     }
-    
-    .quick-action-btn:hover .quick-action-title {
-        font-weight: 700;
-        transform: scale(1.05);
-    }
-    
-    .quick-action-btn:hover .quick-action-desc {
-        color: rgba(0, 0, 0, 0.7) !important;
-        font-weight: 500;
-    }
-    
-    @keyframes slideInDown {
-        from {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    @keyframes slideInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    @keyframes bounce {
-        0%, 100% {
-            transform: translateY(0);
-        }
-        50% {
-            transform: translateY(-8px);
-        }
-    }
-    
-    .quick-actions-section {
-        position: relative;
-    }
-    
-    .quick-actions-section .section-title {
-        position: relative;
-        display: inline-block;
-    }
-    
-    .quick-actions-section .section-title::before {
-        content: '✨';
-        display: inline-block;
-        margin-right: 0.5rem;
-        font-size: 1.3rem;
-        animation: sparkle 1.5s ease-in-out infinite;
-    }
-    
-    @keyframes sparkle {
-        0%, 100% {
-            opacity: 1;
-            transform: scale(1);
-        }
-        50% {
-            opacity: 0.6;
-            transform: scale(1.1);
-        }
-    }
-    
-    /* Projects Section Enhancements */
-    .projects-section {
-        position: relative;
-    }
-    
-    .projects-section .section-title {
-        position: relative;
-        display: inline-block;
-    }
-    
-    .projects-section .section-title::before {
-        content: '🚧';
-        display: inline-block;
-        margin-right: 0.5rem;
-        font-size: 1.3rem;
-        animation: bounce 1.5s ease-in-out infinite;
-    }
-    
-    .project-card {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    .website-promo-card {
+        background: linear-gradient(135deg, var(--primary) 0%, #2C5282 100%);
+        color: white;
+        border-radius: 16px;
+        box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
         overflow: hidden;
-        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-        border: 1px solid rgba(0,0,0,0.05);
+        padding: 2.5rem;
+        border-left: 6px solid #FF6600;
     }
     
-    .project-card::before {
+    .website-promo-card::before {
         content: '';
         position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-        transition: left 0.6s ease;
+        top: -50%;
+        right: -50%;
+        width: 200px;
+        height: 200px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transition: all 0.6s ease;
     }
-    
-    .project-card:hover::before {
-        left: 100%;
-    }
-    
-    .project-card:hover {
+
+    .website-promo-card:hover {
         transform: translateY(-6px);
-        box-shadow: 0 12px 28px rgba(0,0,0,0.15);
-        border-color: rgba(0,0,0,0.1);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.2);
     }
     
-    .project-status {
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
-        padding: 0.25rem 0.75rem;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+    .website-promo-card:hover::before {
+        top: -30%;
+        right: -30%;
+    }
+
+    .website-promo-card h3 { 
+        font-weight: 800;
+        font-size: 1.8rem;
+        position: relative;
+        z-index: 1;
     }
     
-    .project-icon {
-        width: 50px;
-        height: 50px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 1rem;
+    .website-promo-card .lead { 
+        font-style: italic; 
+        opacity: 0.95;
+        position: relative;
+        z-index: 1;
+    }
+
+    .website-promo-card .btn-primary {
+        background: white;
+        color: var(--primary);
+        border: none;
+        font-weight: 700;
         transition: all 0.3s ease;
+        position: relative;
+        z-index: 1;
+        padding: 0.75rem 1.5rem;
     }
-    
-    .project-card:hover .project-icon {
-        transform: scale(1.1) rotateZ(5deg);
+
+    .website-promo-card .btn-primary:hover {
+        background: #FF6600;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
     }
-    
-    .project-title {
+
+    .website-promo-card .btn-outline-secondary {
+        border-color: rgba(255,255,255,0.8);
+        color: white;
+        font-weight: 700;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 1;
+        padding: 0.75rem 1.5rem;
+    }
+
+    .website-promo-card .btn-outline-secondary:hover {
+        background: rgba(255,255,255,0.15);
+        border-color: white;
+        transform: translateY(-2px);
+    }
+
+    /* ====== INFO LINE BUTTON ====== */
+    .info-line-btn {
+        padding: 1rem 2.5rem;
+        font-weight: 700;
         font-size: 1.1rem;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        color: var(--dark-text);
-        transition: color 0.3s ease;
-    }
-    
-    .project-card:hover .project-title {
-        color: var(--primary);
-    }
-    
-    .project-details {
-        font-size: 0.875rem;
-        color: #6c757d;
-        margin-bottom: 0.5rem;
-    }
-    
-    .project-meta {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-top: 1rem;
-        padding-top: 1rem;
-        border-top: 1px solid rgba(0,0,0,0.05);
-    }
-    
-    .project-date {
-        font-size: 0.75rem;
-        color: #adb5bd;
-        font-weight: 500;
-    }
-    
-    .project-action {
-        opacity: 0;
-        transform: translateX(10px);
         transition: all 0.3s ease;
-        font-size: 0.875rem;
-        font-weight: 500;
-        color: var(--primary);
-    }
-    
-    .project-card:hover .project-action {
-        opacity: 1;
-        transform: translateX(0);
-    }
-    
-    .projects-loading {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 3rem;
-        color: #6c757d;
-    }
-    
-    .projects-loading .spinner-border {
-        width: 3rem;
-        height: 3rem;
-        margin-bottom: 1rem;
-    }
-    
-    .projects-empty {
-        text-align: center;
-        padding: 3rem;
-        color: #6c757d;
-    }
-    
-    .projects-empty i {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-        opacity: 0.5;
-    }
-    
-    .toggle-completed-btn {
-        transition: all 0.3s ease;
-        border-radius: 20px;
-        padding: 0.5rem 1rem;
-    }
-    
-    .toggle-completed-btn:hover {
-        transform: scale(1.05);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        border: 2px solid var(--primary);
+        border-radius: 50px;
     }
 
+    .info-line-btn:hover {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(30, 58, 95, 0.3);
+    }
 
+    /* ====== CARDS BASE ====== */
+    .dashboard-card {
+        border: none;
+        border-radius: 14px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .dashboard-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+    }
+
+    /* ====== MODAL ====== */
+    .modal-content {
+        border: none;
+        border-radius: 16px;
+        border-top: 4px solid var(--primary);
+    }
+
+    .modal-header {
+        border-radius: 16px 16px 0 0;
+        font-weight: 700;
+    }
+    
+    .modal-header.bg-danger {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+    }
+    
+    .modal-header.bg-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%) !important;
+    }
+
+    .modal-header .btn-close-white {
+        filter: brightness(0) invert(1);
+    }
+    
+    .modal-title {
+        font-weight: 700;
+        font-size: 1.2rem;
+    }
+
+    /* ====== RESPONSIVE ====== */
+    @media (max-width: 768px) {
+        .section-title { font-size: 1.25rem; }
+        
+        .stats-counter { font-size: 1.75rem; }
+        
+        .search-box { min-width: 100%; }
+        
+        #statusFilter { max-width: 100%; }
+        
+        #projects-table thead th {
+            font-size: 0.7rem;
+            padding: 10px 6px;
+        }
+
+        #projects-table tbody td {
+            font-size: 0.75rem;
+            padding: 8px 6px;
+        }
+
+        .website-promo-card {
+            padding: 1.5rem;
+            margin: 0 1rem;
+        }
+
+        .website-promo-card .d-flex {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .website-promo-card .btn { width: 100%; }
+
+        #projects-table .btn-group .btn {
+            border-radius: 8px !important;
+            margin: 0 2px;
+            padding: 6px 10px;
+        }
+
+        #projects-table .btn-group .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+    }
 </style>
-<div class="container">
-    <!-- Hero Section (simplified) -->
-    <div class="row mb-5">
-        <div class="col-12 text-center">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="img-fluid mb-4" style="max-height: 150px;">
-            <h1 class="display-4" style="color: var(--primary);">Welcome to Your CRM</h1>
-            <p class="lead">Manage your construction projects, contacts, and budgets efficiently</p>
-        </div>
+
+<div class="container dashboard">
+    <!-- HERO SECTION -->
+    <div class="hero-section text-center">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="img-fluid">
+        <h1 class="mb-3"><i class="fas fa-chart-line me-3"></i>Welcome to Your CRM</h1>
+        <p class="lead mb-0">Manage your construction projects, contacts, and budgets efficiently</p>
     </div>
 
-    <!-- Stats Counters (like your website) -->
-    <div class="row g-4 mb-6 mt-4" id="stats-section">
-        <div class="col-lg-4">
-            <div class="dashboard-card stats-card h-100">
-                <div class="card-body text-center p-5">
-                    <div class="stats-icon bg-soft-primary">
-                        <i class="fas fa-address-book fa-2x text-primary"></i>
+    <!-- STATS SECTION -->
+    <div class="dashboard-section">
+        <h2 class="section-title"><i class="fas fa-chart-pie"></i> Dashboard Overview</h2>
+        <div class="row g-4" id="stats-section">
+            <div class="col-lg-4">
+                <div class="dashboard-card stats-card primary-stat h-100">
+                    <div class="card-body text-center p-5">
+                        <div class="stats-icon bg-soft-primary">
+                            <i class="fas fa-address-book text-primary"></i>
+                        </div>
+                        <h3 class="stats-counter text-primary" id="contacts-count">0</h3>
+                        <p class="stats-label">Total Contacts</p>
+                        <a href="{{ url_for('contacts') }}" class="btn btn-outline-primary btn-sm stats-btn">View All</a>
                     </div>
-                    <h3 class="stats-counter text-primary" id="contacts-count">0</h3>
-                    <p class="stats-label">Total Contacts</p>
-                    <a href="{{ url_for('contacts') }}" class="btn btn-outline-primary btn-sm stats-btn">View All</a>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="dashboard-card stats-card success-stat h-100">
+                    <div class="card-body text-center p-5">
+                        <div class="stats-icon bg-soft-success">
+                            <i class="fas fa-truck text-success"></i>
+                        </div>
+                        <h3 class="stats-counter text-success" id="providers-count">0</h3>
+                        <p class="stats-label">Providers</p>
+                        <a href="{{ url_for('providers') }}" class="btn btn-outline-success btn-sm stats-btn">View All</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="dashboard-card stats-card info-stat h-100">
+                    <div class="card-body p-5">
+                        <h5 class="fw-bold mb-4 text-center">
+                            <i class="fas fa-tasks me-2 text-info"></i>Project Status
+                        </h5>
+                        <div class="row g-3">
+                            <div class="col-md-6 col-12">
+                                <div class="status-item">
+                                    <i class="fas fa-spinner text-warning"></i>
+                                    <div class="status-number text-warning">{{ active_projects }}</div>
+                                    <p class="stats-label">Active</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-12">
+                                <div class="status-item">
+                                    <i class="fas fa-check-double text-success"></i>
+                                    <div class="status-number text-success">{{ completed_projects }}</div>
+                                    <p class="stats-label">Completed</p>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="status-item">
+                                    <i class="fas fa-calendar-alt text-info"></i>
+                                    <div class="status-number text-info">{{ planned_projects }}</div>
+                                    <p class="stats-label">Planned</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- PROJECTS SECTION -->
+    <div class="dashboard-section">
+        <h2 class="section-title"><i class="fas fa-hard-hat"></i> Projects Management</h2>
         
-        <div class="col-lg-4">
-            <div class="dashboard-card stats-card h-100">
-                <div class="card-body text-center p-5">
-                    <div class="stats-icon bg-soft-success">
-                        <i class="fas fa-truck fa-2x text-success"></i>
-                    </div>
-                    <h3 class="stats-counter text-success" id="providers-count">0</h3>
-                    <p class="stats-label">Providers</p>
-                    <a href="{{ url_for('providers') }}" class="btn btn-outline-success btn-sm stats-btn">View All</a>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-4">
-            <div class="dashboard-card stats-card project-status-card h-100">
-                <div class="card-body p-5">
-                    <h5 class="fw-bold mb-4 text-center">
-                        <i class="fas fa-chart-pie me-2" style="color: #ff8c00;"></i>Project Status
-                    </h5>
-                    <div class="row g-3">
-                        <div class="col-md-6 col-12">
-                            <div class="status-item">
-                                <i class="fas fa-hard-hat text-warning d-block"></i>
-                                <div class="status-number" style="color: #ff8c00;">{{ active_projects }}</div>
-                                <p class="stats-label">Active</p>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-12">
-                            <div class="status-item">
-                                <i class="fas fa-check-circle text-success d-block"></i>
-                                <div class="status-number" style="color: #28a745;">{{ completed_projects }}</div>
-                                <p class="stats-label">Completed</p>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="status-item">
-                                <i class="fas fa-tasks text-info d-block"></i>
-                                <div class="status-number" style="color: #17a2b8;">{{ planned_projects }}</div>
-                                <p class="stats-label">Planned</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Projects Section -->
-    <div class="row mb-5 projects-section">
-        <div class="col-12 d-flex justify-content-between align-items-center">
-            <h2 class="section-title mb-0">Tous les Projets</h2>
-        </div>
-    </div>
-    <div class="row mb-3">
-        <div class="col-12">
-            <div class="d-flex flex-wrap gap-3 align-items-center">
-                <div class="search-box" style="flex: 1; min-width: 200px; max-width: 400px;">
-                    <div class="input-group">
-                        <span class="input-group-text bg-white border-end-0">
-                            <i class="fas fa-search text-muted"></i>
-                        </span>
-                        <input type="text" class="form-control border-start-0" id="projectSearch" placeholder="Rechercher un projet...">
-                    </div>
-                </div>
-                <select class="form-select" id="statusFilter" style="width: auto; min-width: 180px;">
-                    <option value="all">Tous les statuts</option>
-                    <option value="planned">Planifié</option>
-                    <option value="in_progress">En cours</option>
-                    <option value="completed">Terminé</option>
-                </select>
-                <span class="text-muted" id="projectCount">0 projet(s)</span>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-12">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle" id="projects-table">
-                    <thead class="table-light">
-                        <tr>
-                            <th class="sortable" data-sort="id">ID <i class="fas fa-sort sort-icon"></i></th>
-                            <th class="sortable" data-sort="name">Nom du Projet <i class="fas fa-sort sort-icon"></i></th>
-                            <th class="sortable" data-sort="client_name">Client <i class="fas fa-sort sort-icon"></i></th>
-                            <th class="sortable" data-sort="address">Adresse <i class="fas fa-sort sort-icon"></i></th>
-                            <th class="sortable" data-sort="start_date">Date Début <i class="fas fa-sort sort-icon"></i></th>
-                            <th class="sortable" data-sort="end_date">Date Fin <i class="fas fa-sort sort-icon"></i></th>
-                            <th class="sortable" data-sort="status">Statut <i class="fas fa-sort sort-icon"></i></th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="recent-projects-container">
-                        <!-- Will be populated by JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="quick-actions-section mt-6 mb-4">
-        <div class="row">
+        <!-- Search & Filter -->
+        <div class="row mb-4">
             <div class="col-12">
-                <h2 class="section-title fw-bold mb-4">Quick Actions</h2>
+                <div class="d-flex flex-wrap gap-3 align-items-center">
+                    <div class="search-box">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="fas fa-search text-muted"></i>
+                            </span>
+                            <input type="text" class="form-control border-start-0" id="projectSearch" placeholder="Rechercher un projet...">
+                        </div>
+                    </div>
+                    <select class="form-select" id="statusFilter">
+                        <option value="all">Tous les statuts</option>
+                        <option value="planned">Planifié</option>
+                        <option value="in_progress">En cours</option>
+                        <option value="completed">Terminé</option>
+                    </select>
+                    <span class="text-muted text-nowrap" id="projectCount">0 projet(s)</span>
+                </div>
             </div>
         </div>
 
-        <div class="row g-4 mb-5">
+        <!-- Projects Table -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle" id="projects-table">
+                <thead>
+                    <tr>
+                        <th class="sortable" data-sort="id">ID <i class="fas fa-sort sort-icon"></i></th>
+                        <th class="sortable" data-sort="name">Nom du Projet <i class="fas fa-sort sort-icon"></i></th>
+                        <th class="sortable" data-sort="client_name">Client <i class="fas fa-sort sort-icon"></i></th>
+                        <th class="sortable" data-sort="address">Adresse <i class="fas fa-sort sort-icon"></i></th>
+                        <th class="sortable" data-sort="start_date">Date Début <i class="fas fa-sort sort-icon"></i></th>
+                        <th class="sortable" data-sort="end_date">Date Fin <i class="fas fa-sort sort-icon"></i></th>
+                        <th class="sortable" data-sort="status">Statut <i class="fas fa-sort sort-icon"></i></th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="recent-projects-container"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- QUICK ACTIONS SECTION -->
+    <div class="dashboard-section">
+        <h2 class="section-title"><i class="fas fa-thunderbolt"></i> Quick Actions</h2>
+        <div class="row g-4">
             <div class="col-lg-3 col-md-6">
                 <button type="button" class="quick-action-btn" data-bs-toggle="modal" data-bs-target="#addContactModal">
-                    <div class="dashboard-card quick-action-card h-100 p-5">
-                        <div class="quick-action-icon stats-icon bg-soft-primary m-auto mb-4">
-                            <i class="fas fa-user-plus fa-2x text-primary"></i>
+                    <div class="quick-action-card">
+                        <div class="quick-action-icon bg-soft-primary">
+                            <i class="fas fa-user-plus text-primary"></i>
                         </div>
-                        <h5 class="fw-bold quick-action-title text-primary">Add Contact</h5>
-                        <p class="text-muted small mt-2 quick-action-desc">Create new contact</p>
+                        <h5 class="quick-action-title text-primary">Add Contact</h5>
+                        <p class="text-muted small mt-2 mb-0">Create new contact</p>
                     </div>
                 </button>
             </div>
             
             <div class="col-lg-3 col-md-6">
                 <button type="button" class="quick-action-btn" data-bs-toggle="modal" data-bs-target="#addProjectModal">
-                    <div class="dashboard-card quick-action-card h-100 p-5">
-                        <div class="quick-action-icon stats-icon bg-soft-warning m-auto mb-4">
-                            <i class="fas fa-hard-hat fa-2x text-warning"></i>
+                    <div class="quick-action-card">
+                        <div class="quick-action-icon bg-soft-warning">
+                            <i class="fas fa-plus-square text-warning"></i>
                         </div>
-                        <h5 class="fw-bold quick-action-title" style="color: #ff8c00;">New Project</h5>
-                        <p class="text-muted small mt-2 quick-action-desc">Start new project</p>
+                        <h5 class="quick-action-title text-warning">New Project</h5>
+                        <p class="text-muted small mt-2 mb-0">Start new project</p>
                     </div>
                 </button>
             </div>
             
             <div class="col-lg-3 col-md-6">
                 <a href="{{ url_for('providers') }}" class="quick-action-btn">
-                    <div class="dashboard-card quick-action-card h-100 p-5">
-                        <div class="quick-action-icon stats-icon bg-soft-success m-auto mb-4">
-                            <i class="fas fa-truck fa-2x text-success"></i>
+                    <div class="quick-action-card">
+                        <div class="quick-action-icon bg-soft-success">
+                            <i class="fas fa-building text-success"></i>
                         </div>
-                        <h5 class="fw-bold quick-action-title text-success">Add Provider</h5>
-                        <p class="text-muted small mt-2 quick-action-desc">Add new provider</p>
+                        <h5 class="quick-action-title text-success">Add Provider</h5>
+                        <p class="text-muted small mt-2 mb-0">Add new provider</p>
                     </div>
                 </a>
             </div>
             
             <div class="col-lg-3 col-md-6">
                 <a href="{{ url_for('budgets') }}" class="quick-action-btn">
-                    <div class="dashboard-card quick-action-card h-100 p-5">
-                        <div class="quick-action-icon stats-icon bg-soft-info m-auto mb-4">
-                            <i class="fas fa-tools fa-2x text-info"></i>
+                    <div class="quick-action-card">
+                        <div class="quick-action-icon bg-soft-info">
+                            <i class="fas fa-box text-info"></i>
                         </div>
-                        <h5 class="fw-bold quick-action-title text-info">Magazin</h5>
-                        <p class="text-muted small mt-2 quick-action-desc">Manage inventory</p>
+                        <h5 class="quick-action-title text-info">Inventory</h5>
+                        <p class="text-muted small mt-2 mb-0">Manage inventory</p>
                     </div>
                 </a>
             </div>
         </div>
     </div>
 
-    <!-- CivilArchEngineering Website Section -->
-    <div class="row mt-5 mb-4">
-        <div class="col-12">
-            <div class="website-promo-card text-center p-4">
-                <div class="d-flex align-items-center justify-content-center mb-3">
-                    <i class="fas fa-building fa-2x text-primary me-3"></i>
-                    <h3 class="mb-0" style="color: var(--secondary);">CivilArchEngineering</h3>
-                </div>
-                <p class="lead mb-3">"Building Tomorrow's Infrastructure Today"</p>
-                <div class="d-flex justify-content-center gap-3">
-                    <button type="button" class="btn btn-primary" onclick="window.open('https://oussamaattia0309-bit.github.io/CivilArchEngineering/', '_blank')">
-                        <i class="fas fa-globe me-2"></i>Visit Our Website
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary" onclick="showWebsiteInfo()">
-                        <i class="fas fa-info-circle me-2"></i>Learn More
-                    </button>
-                </div>
+    <!-- WEBSITE PROMO SECTION -->
+    <div class="dashboard-section">
+        <h2 class="section-title"><i class="fas fa-globe"></i> Our Website</h2>
+        <div class="website-promo-card text-center">
+            <div class="d-flex align-items-center justify-content-center mb-3">
+                <i class="fas fa-building fa-3x me-3"></i>
+                <h3 class="mb-0">CivilArchEngineering</h3>
+            </div>
+            <p class="lead mb-3">"Building Tomorrow's Infrastructure Today"</p>
+            <div class="d-flex justify-content-center gap-3">
+                <button type="button" class="btn btn-primary" onclick="window.open('https://oussamaattia0309-bit.github.io/CivilArchEngineering/', '_blank')">
+                    <i class="fas fa-globe me-2"></i>Visit Our Website
+                </button>
+                <button type="button" class="btn btn-outline-secondary" onclick="showWebsiteInfo()">
+                    <i class="fas fa-info-circle me-2"></i>Learn More
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Info Line - Call button (tel: link triggers phone dialer on mobile) -->
-    <div class="row mt-5 mb-4">
-        <div class="col-12 text-center">
-            <a href="tel:+21622488665" class="btn btn-outline-primary btn-lg info-line-btn">
-                <i class="fas fa-phone-alt me-2"></i>Info line +216 22 488 665
-            </a>
-        </div>
+    <!-- INFO LINE SECTION -->
+    <div class="dashboard-section text-center">
+        <h2 class="section-title mb-4"><i class="fas fa-headset"></i> Support Center</h2>
+        <a href="tel:+21622488665" class="btn btn-outline-primary btn-lg info-line-btn">
+            <i class="fas fa-phone-alt me-2"></i>Info line +216 22 488 665
+        </a>
     </div>
 </div>
 
@@ -672,263 +796,77 @@
 </div>
 
 <script>
-// Counter animation from your website
 function animateCounter(element, target) {
     if (!element) return;
-    
     let count = 0;
     const increment = target / 50;
     const updateCount = () => {
         if (count < target) {
             count += increment;
-            element.innerText = Math.ceil(count) + (element.id === 'budget-total' ? '' : '+');
+            element.innerText = Math.ceil(count);
             requestAnimationFrame(updateCount);
         } else {
-            element.innerText = target + (element.id === 'budget-total' ? '' : '+');
+            element.innerText = target;
         }
     };
     updateCount();
 }
 
-// Website info function (define outside DOMContentLoaded for inline handlers)
 function showWebsiteInfo() {
-    alert('🏗️ CivilArchEngineering Website\n\nVisit our website to explore:\n\n• 📐 Innovative architectural designs\n• 🏗️ Expert civil engineering solutions\n• 📊 Professional project management\n• 🎯 Cutting-edge construction technology\n\n🌐 Click "Visit Our Website" to discover more!');
+    alert('🏗️ CivilArchEngineering Website\n\n• 📐 Innovative architectural designs\n• 🏗️ Expert civil engineering solutions\n• 📊 Professional project management\n• 🎯 Cutting-edge construction technology');
 }
 
-// Global toggle state for completed projects
-let showCompleted = false;
 let isLoadingData = false;
 let currentSort = { column: 'id', direction: 'desc' };
 let allProjects = [];
 
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting && !isLoadingData) {
-            isLoadingData = true;
-            loadDashboardData();
-        }
-    });
-}, { threshold: 0.5 });
-
 function loadDashboardData() {
-    console.log('loadDashboardData called');
+    console.log('Loading dashboard data...');
     
     fetch('/api/dashboard')
         .then(response => response.json())
         .then(data => {
-            console.log('Dashboard data:', data);
             const contactsCount = document.getElementById('contacts-count');
             const providersCount = document.getElementById('providers-count');
-            const projectsCount = document.getElementById('projects-count');
-            const budgetTotal = document.getElementById('budget-total');
-            
             if (contactsCount) animateCounter(contactsCount, data.contacts);
             if (providersCount) animateCounter(providersCount, data.providers);
-            if (projectsCount) animateCounter(projectsCount, data.active_projects);
-            if (budgetTotal) budgetTotal.innerText = 'TND ' + data.total_budget.toLocaleString();
-        })
-        .catch(error => {
-            console.error('Dashboard fetch error:', error);
-            isLoadingData = false;
         });
     
-    // Get filter values
     const searchTerm = document.getElementById('projectSearch')?.value || '';
     const statusFilter = document.getElementById('statusFilter')?.value || 'all';
     
-    // Build URL with query params
     const params = new URLSearchParams();
     if (searchTerm) params.append('search', searchTerm);
     if (statusFilter && statusFilter !== 'all') params.append('status', statusFilter);
     
-    const queryString = params.toString();
-    const url = '/api/projects/recent' + (queryString ? '?' + queryString : '');
+    const url = '/api/projects/recent' + (params.toString() ? '?' + params.toString() : '');
     
     fetch(url)
-        .then(response => {
-            console.log('Projects response status:', response.status);
-            return response.json();
-        })
+        .then(response => response.json())
         .then(projects => {
-            console.log('Projects data:', projects);
-            const container = document.getElementById('recent-projects-container');
-            
-            if (!projects || !Array.isArray(projects)) {
-                console.error('Projects is not an array:', projects);
-                container.innerHTML = `
-                    <tr>
-                        <td colspan="8" class="text-center py-4 text-warning">
-                            <i class="fas fa-exclamation-triangle fa-2x mb-3 d-block"></i>
-                            <h5>Erreur de données</h5>
-                            <button type="button" class="btn btn-outline-primary" onclick="loadDashboardData()">
-                                <i class="fas fa-refresh me-2"></i>Réessayer
-                            </button>
-                        </td>
-                    </tr>
-                `;
-                isLoadingData = false;
-                return;
-            }
-            
-            if (projects.length === 0) {
-                container.innerHTML = `
-                    <tr>
-                        <td colspan="8" class="text-center py-4">
-                            <i class="fas fa-folder-open text-muted fa-2x mb-3 d-block"></i>
-                            <h5 class="text-muted">Aucun projet</h5>
-                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProjectModal">
-                                <i class="fas fa-plus me-2"></i>Créer un projet
-                            </button>
-                        </td>
-                    </tr>
-                `;
-                isLoadingData = false;
-                return;
-            }
-            
-            // Store all projects for client-side sorting
-            allProjects = [...projects];
-            
-            // Apply current sort
-            projects = sortProjects(projects);
-            
-            // Build table rows
-            const projectsHTML = projects.map(project => {
-                const statusClass = {
-                    'planned': 'bg-warning',
-                    'in_progress': 'bg-primary',
-                    'completed': 'bg-success'
-                }[project.status] || 'bg-secondary';
-                
-                const statusText = {
-                    'planned': 'Planifié',
-                    'in_progress': 'En cours',
-                    'completed': 'Terminé'
-                }[project.status] || project.status;
-                
-                const formatDate = (dateStr) => {
-                    if (!dateStr) return '-';
-                    const date = new Date(dateStr);
-                    return date.toLocaleDateString('fr-FR');
-                };
-                
-                return `
-                    <tr>
-                        <td><strong>${project.id}</strong></td>
-                        <td><strong>${project.name}</strong></td>
-                        <td>${project.client_name || '-'}</td>
-                        <td>${project.address ? '<a href="https://www.google.com/maps/search/' + encodeURIComponent(project.address) + '" target="_blank" class="text-decoration-none text-primary"><i class="fas fa-map-marker-alt me-1"></i>Maps</a>' : '-'}</td>
-                        <td>${formatDate(project.start_date)}</td>
-                        <td>${formatDate(project.end_date)}</td>
-                        <td><span class="badge ${statusClass}">${statusText}</span></td>
-                        <td>
-                            <div class="btn-group btn-group-sm shadow-none">
-                                <a href="/projects/${project.id}" class="btn btn-primary" title="Voir">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                                <a href="/project/${project.id}/financial" class="btn text-white" style="background: #17a2b8;" title="Financier">
-                                    <i class="fas fa-coins"></i>
-                                </a>
-                                <button type="button" class="btn btn-outline-danger delete-project-btn" 
-                                        data-project-id="${project.id}"
-                                        data-project-name="${project.name}"
-                                        title="Supprimer">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-            
-            console.log('Inserting projects HTML');
-            // Insert all HTML at once - table rows only (table already in HTML)
-            container.innerHTML = projectsHTML;
-            
-            // Update project count
-            const countEl = document.getElementById('projectCount');
-            if (countEl) {
-                countEl.textContent = projects.length + ' projet(s)';
-            }
-            
-            // Add delete event listeners after projects are loaded
-            attachDeleteListeners();
-            attachEditListeners();
-            
-            // Hide completed projects by default (reset toggle state)
-            showCompleted = false;
-            updateToggleButton();
-            hideAllCompleted();
-            
+            renderProjects(projects && Array.isArray(projects) ? projects : []);
             isLoadingData = false;
         })
         .catch(error => {
-            console.error('Projects fetch error:', error);
+            console.error('Error:', error);
             isLoadingData = false;
-            const container = document.getElementById('recent-projects-container');
-            container.innerHTML = `
-                <tr>
-                    <td colspan="8" class="text-center py-4 text-warning">
-                        <i class="fas fa-exclamation-triangle fa-2x mb-3 d-block"></i>
-                        <h5>Erreur de chargement</h5>
-                        <button type="button" class="btn btn-outline-primary" onclick="loadDashboardData()">
-                            <i class="fas fa-refresh me-2"></i>Réessayer
-                        </button>
-                    </td>
-                </tr>
-            `;
         });
 }
 
-// Helper functions for completed projects toggle
-function hideAllCompleted() {
-    const completedProjects = document.querySelectorAll('.completed-project');
-    completedProjects.forEach(project => {
-        project.style.display = 'none';
-    });
-}
-
-function updateToggleButton() {
-    const toggleBtn = document.getElementById('toggleCompletedBtn');
-    if (!toggleBtn) return;
-    
-    if (showCompleted) {
-        toggleBtn.innerHTML = '<i class="fas fa-eye-slash me-2"></i>Hide Completed';
-        toggleBtn.classList.remove('btn-outline-secondary');
-        toggleBtn.classList.add('btn-secondary');
-    } else {
-        toggleBtn.innerHTML = '<i class="fas fa-eye me-2"></i>Show Completed';
-        toggleBtn.classList.remove('btn-secondary');
-        toggleBtn.classList.add('btn-outline-secondary');
-    }
-}
-
-// Sorting function
 function sortProjects(projects) {
     const { column, direction } = currentSort;
-    
     return [...projects].sort((a, b) => {
-        let valA = a[column];
-        let valB = b[column];
-        
-        // Handle null/undefined
-        if (valA == null) valA = '';
-        if (valB == null) valB = '';
-        
-        // For dates
-        if (column === 'start_date' || column === 'end_date') {
+        let valA = a[column] || '';
+        let valB = b[column] || '';
+        if (column.includes('date')) {
             valA = valA ? new Date(valA) : new Date(0);
             valB = valB ? new Date(valB) : new Date(0);
         }
-        
-        // For status, use custom order
         if (column === 'status') {
-            const statusOrder = { 'in_progress': 0, 'planned': 1, 'completed': 2 };
-            valA = statusOrder[valA] ?? 3;
-            valB = statusOrder[valB] ?? 3;
+            const order = { 'in_progress': 0, 'planned': 1, 'completed': 2 };
+            valA = order[valA] ?? 3;
+            valB = order[valB] ?? 3;
         }
-        
-        // Compare
         if (valA < valB) return direction === 'asc' ? -1 : 1;
         if (valA > valB) return direction === 'asc' ? 1 : -1;
         return 0;
@@ -938,8 +876,7 @@ function sortProjects(projects) {
 function updateSortIcons() {
     document.querySelectorAll('#projects-table thead th.sortable').forEach(th => {
         th.classList.remove('sort-asc', 'sort-desc');
-        const sortCol = th.dataset.sort;
-        if (sortCol === currentSort.column) {
+        if (th.dataset.sort === currentSort.column) {
             th.classList.add(currentSort.direction === 'asc' ? 'sort-asc' : 'sort-desc');
         }
     });
@@ -952,144 +889,72 @@ function handleTableSort(column) {
         currentSort.column = column;
         currentSort.direction = 'asc';
     }
-    
     updateSortIcons();
-    
-    // Re-sort and re-render
-    if (allProjects.length > 0) {
-        const sortedProjects = sortProjects(allProjects);
-        renderProjects(sortedProjects);
-    }
+    if (allProjects.length > 0) renderProjects(sortProjects(allProjects));
 }
 
 function renderProjects(projects) {
     const container = document.getElementById('recent-projects-container');
     
-    const projectsHTML = projects.map(project => {
-        const statusClass = {
-            'planned': 'bg-warning',
-            'in_progress': 'bg-primary',
-            'completed': 'bg-success'
-        }[project.status] || 'bg-secondary';
+    if (!Array.isArray(projects) || projects.length === 0) {
+        container.innerHTML = `<tr><td colspan="8" class="text-center py-4"><i class="fas fa-folder-open text-muted fa-2x mb-3 d-block"></i><h5 class="text-muted">Aucun projet</h5><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProjectModal"><i class="fas fa-plus me-2"></i>Créer un projet</button></td></tr>`;
+        return;
+    }
+    
+    allProjects = [...projects];
+    projects = sortProjects(projects);
+    
+    const formatDate = (dateStr) => {
+        if (!dateStr) return '-';
+        return new Date(dateStr).toLocaleDateString('fr-FR');
+    };
+    
+    container.innerHTML = projects.map(project => {
+        const statusClass = { 'planned': 'bg-warning', 'in_progress': 'bg-primary', 'completed': 'bg-success' }[project.status] || 'bg-secondary';
+        const statusText = { 'planned': 'Planifié', 'in_progress': 'En cours', 'completed': 'Terminé' }[project.status] || project.status;
         
-        const statusText = {
-            'planned': 'Planifié',
-            'in_progress': 'En cours',
-            'completed': 'Terminé'
-        }[project.status] || project.status;
-        
-        const formatDate = (dateStr) => {
-            if (!dateStr) return '-';
-            const date = new Date(dateStr);
-            return date.toLocaleDateString('fr-FR');
-        };
-        
-        return `
-            <tr>
-                <td><strong>${project.id}</strong></td>
-                <td><strong>${project.name}</strong></td>
-                <td>${project.client_name || '-'}</td>
-                <td>${project.address ? '<a href="https://www.google.com/maps/search/' + encodeURIComponent(project.address) + '" target="_blank" class="text-decoration-none text-primary"><i class="fas fa-map-marker-alt me-1"></i>Maps</a>' : '-'}</td>
-                <td>${formatDate(project.start_date)}</td>
-                <td>${formatDate(project.end_date)}</td>
-                <td><span class="badge ${statusClass}">${statusText}</span></td>
-                <td>
-                    <div class="btn-group btn-group-sm shadow-none">
-                        <a href="/projects/${project.id}" class="btn btn-primary" title="Voir">
-                            <i class="fas fa-eye"></i>
-                        </a>
-                        <a href="/project/${project.id}/financial" class="btn text-white" style="background: #17a2b8;" title="Financier">
-                            <i class="fas fa-coins"></i>
-                        </a>
-                        <button type="button" class="btn btn-outline-danger delete-project-btn" 
-                                data-project-id="${project.id}"
-                                data-project-name="${project.name}"
-                                title="Supprimer">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        `;
+        return `<tr>
+            <td><strong>${project.id}</strong></td>
+            <td><strong>${project.name}</strong></td>
+            <td>${project.client_name || '-'}</td>
+            <td>${project.address ? `<a href="https://www.google.com/maps/search/${encodeURIComponent(project.address)}" target="_blank" class="text-decoration-none text-primary"><i class="fas fa-map-marker-alt me-1"></i>Maps</a>` : '-'}</td>
+            <td>${formatDate(project.start_date)}</td>
+            <td>${formatDate(project.end_date)}</td>
+            <td><span class="badge ${statusClass}">${statusText}</span></td>
+            <td>
+                <div class="btn-group btn-group-sm shadow-none">
+                    <a href="/projects/${project.id}" class="btn btn-primary" title="Voir"><i class="fas fa-eye"></i></a>
+                    <a href="/project/${project.id}/financial" class="btn text-white" style="background: #17a2b8;" title="Financier"><i class="fas fa-coins"></i></a>
+                    <button type="button" class="btn btn-outline-danger delete-project-btn" data-project-id="${project.id}" data-project-name="${project.name}" title="Supprimer"><i class="fas fa-trash"></i></button>
+                </div>
+            </td>
+        </tr>`;
     }).join('');
     
-    container.innerHTML = projectsHTML;
-    
-    // Update count
     const countEl = document.getElementById('projectCount');
-    if (countEl) {
-        countEl.textContent = projects.length + ' projet(s)';
-    }
+    if (countEl) countEl.textContent = projects.length + ' projet(s)';
     
     attachDeleteListeners();
-    attachEditListeners();
 }
 
-// Delete confirmation handling
 function attachDeleteListeners() {
-    const deleteButtons = document.querySelectorAll('.delete-project-btn');
-    
-    deleteButtons.forEach(btn => {
+    document.querySelectorAll('.delete-project-btn').forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
-            const projectId = this.dataset.projectId;
-            const projectName = this.dataset.projectName;
-            
-            document.getElementById('deleteProjectName').textContent = projectName;
-            document.getElementById('confirmDeleteBtn').href = `/projects/delete/${projectId}`;
-            
-            const deleteModal = new bootstrap.Modal(document.getElementById('deleteProjectModal'));
-            deleteModal.show();
+            document.getElementById('deleteProjectName').textContent = this.dataset.projectName;
+            document.getElementById('confirmDeleteBtn').href = `/projects/delete/${this.dataset.projectId}`;
+            new bootstrap.Modal(document.getElementById('deleteProjectModal')).show();
         });
     });
 }
 
-// Edit project listeners
-function attachEditListeners() {
-    const editButtons = document.querySelectorAll('.edit-project-btn');
-    
-    editButtons.forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const projectId = this.dataset.projectId;
-            const projectName = this.dataset.projectName;
-            const projectStatus = this.dataset.projectStatus;
-            const projectClient = this.dataset.projectClient;
-            const projectAddress = this.dataset.projectAddress;
-            
-            // Populate modal
-            document.getElementById('editProjectTitle').textContent = projectName;
-            document.getElementById('editProjectName').value = projectName;
-            document.getElementById('editProjectStatus').value = projectStatus;
-            document.getElementById('editProjectClient').value = projectClient;
-            document.getElementById('editProjectAddress').value = projectAddress;
-            
-            // Store project ID for save
-            document.getElementById('editProjectForm').dataset.projectId = projectId;
-            
-            const editModal = new bootstrap.Modal(document.getElementById('editProjectModal'));
-            editModal.show();
-        });
-    });
-}
-
-// Start observing when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOMContentLoaded event fired');
-    
-    // Load data immediately instead of waiting for intersection
     loadDashboardData();
     
-    const statsSection = document.getElementById('stats-section');
-    if (statsSection) {
-        observer.observe(statsSection);
-    }
-    
-    // Search and filter event listeners
     const searchInput = document.getElementById('projectSearch');
     const statusFilter = document.getElementById('statusFilter');
-    
     let searchTimeout;
+    
     if (searchInput) {
         searchInput.addEventListener('input', function() {
             clearTimeout(searchTimeout);
@@ -1101,440 +966,39 @@ document.addEventListener('DOMContentLoaded', function() {
         statusFilter.addEventListener('change', loadDashboardData);
     }
     
-    // Table header sorting
     document.querySelectorAll('#projects-table thead th.sortable').forEach(th => {
         th.addEventListener('click', function() {
-            const column = this.dataset.sort;
-            handleTableSort(column);
+            handleTableSort(this.dataset.sort);
         });
     });
     
-    // Toggle completed projects functionality
-    const toggleBtn = document.getElementById('toggleCompletedBtn');
-    
-    hideAllCompleted();
-    
-    toggleBtn.addEventListener('click', function() {
-        showCompleted = !showCompleted;
-        const completedProjects = document.querySelectorAll('.completed-project');
-        
-        completedProjects.forEach(project => {
-            if (showCompleted) {
-                project.style.display = '';
-            } else {
-                project.style.display = 'none';
-            }
-        });
-        
-        updateToggleButton();
-    });
-    
-    // Setup save button handler for edit modal
     const editProjectModal = document.getElementById('editProjectModal');
     const saveProjectBtn = document.getElementById('saveProjectBtn');
-    
-    // Handle modal cleanup when hidden
-    editProjectModal.addEventListener('hidden.bs.modal', function() {
-        // Remove backdrop if it exists
-        document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
-            backdrop.remove();
-        });
-        // Remove modal-open class from body
-        document.body.classList.remove('modal-open');
-        // Remove inline styles from body
-        document.body.removeAttribute('style');
-    });
     
     if (saveProjectBtn) {
         saveProjectBtn.addEventListener('click', function() {
             const form = document.getElementById('editProjectForm');
             const projectId = form.dataset.projectId;
-            const projectName = document.getElementById('editProjectName').value;
-            const projectStatus = document.getElementById('editProjectStatus').value;
-            const clientName = document.getElementById('editProjectClient').value;
-            const address = document.getElementById('editProjectAddress').value;
             
-            // Send update to server
             fetch(`/projects/${projectId}`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({
-                    name: projectName,
-                    status: projectStatus,
-                    client_name: clientName,
-                    address: address
+                    name: document.getElementById('editProjectName').value,
+                    status: document.getElementById('editProjectStatus').value,
+                    client_name:document.getElementById('editProjectClient').value,
+                    address: document.getElementById('editProjectAddress').value
                 })
             })
             .then(response => {
                 if (response.ok || response.status === 302) {
-                    // Close modal
                     const modal = bootstrap.Modal.getInstance(editProjectModal);
-                    if (modal) {
-                        modal.hide();
-                    }
-                    // Reload projects
+                    if (modal) modal.hide();
                     loadDashboardData();
-                } else {
-                    alert('Failed to save project');
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error saving project');
             });
         });
     }
 });
 </script>
-
-<style>
-/* Project and Dashboard Cards */
-.project-card,
-.dashboard-card {
-    border: none;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
-    background: white;
-}
-
-.project-card,
-.dashboard-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-}
-
-.project-card {
-    height: 100%;
-}
-
-.project-card .card-body {
-    padding: 1.5rem;
-}
-
-.project-card .card-title {
-    color: var(--primary);
-    font-weight: 600;
-    font-size: 1.25rem;
-}
-
-.project-card .btn-outline-danger {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.875rem;
-}
-
-.project-card .btn-outline-danger:hover {
-    background-color: #dc3545;
-    color: white;
-}
-
-.project-card .badge {
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-}
-
-.dashboard-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-}
-
-.counter {
-    color: var(--primary);
-    margin-bottom: 0.5rem;
-}
-
-/* Modal */
-.modal-content {
-    border: none;
-    border-radius: 16px;
-}
-
-.modal-header {
-    border-radius: 16px 16px 0 0;
-}
-
-.modal-header .btn-close-white {
-    filter: brightness(0) invert(1);
-}
-
-/* Info Line Button */
-.info-line-btn {
-    padding: 0.75rem 1.5rem;
-    font-weight: 500;
-}
-
-.info-line-btn:hover {
-    background: var(--primary);
-    color: white;
-    border-color: var(--primary);
-}
-
-/* Website Promo Card */
-.website-promo-card {
-    background: var(--primary);
-    color: white;
-    border-radius: 16px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.website-promo-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    transition: left 0.5s ease;
-}
-
-.website-promo-card:hover::before {
-    left: 100%;
-}
-
-.website-promo-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 35px rgba(0,0,0,0.2);
-}
-
-.website-promo-card h3 {
-    font-weight: 700;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.website-promo-card .lead {
-    font-style: italic;
-    opacity: 0.95;
-}
-
-.website-promo-card .text-muted {
-    color: rgba(255,255,255,0.85) !important;
-}
-
-.website-promo-card .btn-primary {
-    background: white;
-    color: var(--primary);
-    border: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-
-.website-promo-card .btn-primary:hover {
-    background: var(--primary);
-    color: white;
-    transform: translateY(-1px);
-}
-
-.website-promo-card .btn-outline-secondary {
-    border-color: rgba(255,255,255,0.7);
-    color: white;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-
-.website-promo-card .btn-outline-secondary:hover {
-    background: rgba(255,255,255,0.2);
-    border-color: white;
-    transform: translateY(-1px);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .project-card .card-body {
-        padding: 1rem;
-    }
-    
-    .project-card .card-title {
-        font-size: 1.1rem;
-    }
-    
-    .btn-group {
-        flex-wrap: wrap;
-    }
-    
-    .website-promo-card {
-        margin: 0 1rem;
-    }
-    
-    .website-promo-card .d-flex {
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-    
-}
-
-/* Projects Table Styling */
-#projects-table {
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    border: none;
-}
-
-#projects-table thead {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    color: white;
-}
-
-#projects-table thead th {
-    border: none;
-    padding: 14px 10px;
-    font-weight: 600;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    white-space: nowrap;
-}
-
-#projects-table thead th:nth-child(4),
-#projects-table thead th:nth-child(5),
-#projects-table thead th:nth-child(6) {
-    max-width: 120px;
-}
-
-#projects-table thead th.sortable {
-    cursor: pointer;
-    user-select: none;
-    transition: background 0.2s ease;
-}
-
-#projects-table thead th.sortable:hover {
-    background: rgba(255,255,255,0.1);
-}
-
-#projects-table thead th.sortable .sort-icon {
-    font-size: 0.75rem;
-    margin-left: 5px;
-    opacity: 0.7;
-}
-
-#projects-table thead th.sort-asc .sort-icon {
-    opacity: 1;
-}
-
-#projects-table thead th.sort-desc .sort-icon {
-    opacity: 1;
-}
-
-#projects-table thead th.sort-asc .sort-icon::before {
-    content: "\f0de";
-}
-
-#projects-table thead th.sort-desc .sort-icon::before {
-    content: "\f0dd";
-}
-
-#projects-table thead th:first-child {
-    border-top-left-radius: 12px;
-}
-
-#projects-table thead th:last-child {
-    border-top-right-radius: 12px;
-}
-
-#projects-table tbody tr {
-    transition: all 0.2s ease;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-#projects-table tbody tr:hover {
-    background-color: #f0f4ff;
-}
-
-#projects-table tbody td {
-    padding: 12px 10px;
-    vertical-align: middle;
-    font-size: 0.85rem;
-}
-
-#projects-table tbody td:nth-child(4) {
-    max-width: 120px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-#projects-table .badge {
-    padding: 5px 10px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    border-radius: 15px;
-}
-
-#projects-table .btn-group {
-    box-shadow: none;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .project-card .card-body {
-        padding: 1rem;
-    }
-    
-    .project-card .card-title {
-        font-size: 1.1rem;
-    }
-    
-    .btn-group {
-        flex-wrap: wrap;
-    }
-    
-    .website-promo-card {
-        margin: 0 1rem;
-    }
-    
-    .website-promo-card .d-flex {
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-    
-    .website-promo-card .btn {
-        width: 100%;
-    }
-    #projects-table .btn-group .btn {
-        border-radius: 8px !important;
-        margin: 0 2px;
-        padding: 6px 10px;
-        transition: all 0.2s ease;
-    }
-
-    #projects-table .btn-group .btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-    }
-
-    #projects-table .btn-primary:hover {
-        background-color: #0a58ca;
-    }
-}
-
-#projects-table .btn-info:hover {
-    background-color: #0dcaf0;
-}
-
-#projects-table .btn-outline-secondary:hover {
-    background-color: #6c757d;
-    color: white;
-}
-
-#projects-table .btn-outline-danger:hover {
-    background-color: #dc3545;
-    color: white;
-}
-
-/* Table responsive wrapper */
-#projects-table_wrapper {
-    background: white;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-}
-</style>
 {% endblock %}

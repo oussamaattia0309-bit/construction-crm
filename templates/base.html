@@ -52,30 +52,38 @@
                                 <i class="fas fa-address-book me-1"></i>Contacts
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.endpoint == 'providers' %}active{% endif %}" href="{{ url_for('providers') }}">
-                                <i class="fas fa-truck me-1"></i>Providers
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle {% if request.endpoint in ['providers', 'projects', 'staff_management', 'stuff_management', 'budgets'] %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-cogs me-1"></i>Management
                             </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.endpoint == 'projects' %}active{% endif %}" href="{{ url_for('projects') }}">
-                                <i class="fas fa-hard-hat me-1"></i>Projects
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.endpoint == 'staff_management' %}active{% endif %}" href="{{ url_for('staff_management') }}">
-                                <i class="fas fa-hard-hat me-1"></i>Workers
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.endpoint == 'stuff_management' %}active{% endif %}" href="{{ url_for('stuff_management') }}">
-                                <i class="fas fa-tools me-1"></i>Stuff
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.endpoint == 'budgets' %}active{% endif %}" href="{{ url_for('budgets') }}">
-                                <i class="fas fa-tools me-1"></i>Magazin
-                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item {% if request.endpoint == 'providers' %}active{% endif %}" href="{{ url_for('providers') }}">
+                                        <i class="fas fa-truck me-2"></i>Providers
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item {% if request.endpoint == 'projects' %}active{% endif %}" href="{{ url_for('projects') }}">
+                                        <i class="fas fa-hard-hat me-2"></i>Projects
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item {% if request.endpoint == 'staff_management' %}active{% endif %}" href="{{ url_for('staff_management') }}">
+                                        <i class="fas fa-users me-2"></i>Workers
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item {% if request.endpoint == 'stuff_management' %}active{% endif %}" href="{{ url_for('stuff_management') }}">
+                                        <i class="fas fa-tools me-2"></i>Materials
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item {% if request.endpoint == 'budgets' %}active{% endif %}" href="{{ url_for('budgets') }}">
+                                        <i class="fas fa-box me-2"></i>Inventory
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                         
                         {% if current_user.is_authenticated %}
