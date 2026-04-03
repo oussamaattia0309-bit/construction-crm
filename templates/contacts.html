@@ -11,70 +11,88 @@
 
 <!-- Action Buttons - Primary -->
 <div class="row mb-3">
-    <div class="col-12">
-        <div class="btn-group" role="group">
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addContactModal" title="Add a new contact">
+    <div class="col-12 d-flex justify-content-end">
+        <div class="btn-group shadow-sm" role="group" style="border-radius: 10px; overflow: hidden;">
+            <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#addContactModal" title="Add a new contact" style="padding: 12px 24px; font-weight: 500; border: none; background: linear-gradient(135deg, #1E3A5F 0%, #2C5282 100%); color: white;">
                 <i class="fas fa-plus-circle me-2"></i>Add New Contact
             </button>
-            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#uploadContactsModal" title="Import contacts from Excel or CSV">
+            <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#uploadContactsModal" title="Import contacts from Excel or CSV" style="padding: 12px 24px; font-weight: 500; border: none; background: linear-gradient(135deg, #4DA8DA 0%, #2C5282 100%); color: white;">
                 <i class="fas fa-upload me-2"></i>Upload
             </button>
-            <a href="{{ url_for('download_all_contacts') }}" class="btn btn-info" title="Export all contacts to Excel">
+            <a href="{{ url_for('download_all_contacts') }}" class="btn" title="Export all contacts to Excel" style="padding: 12px 24px; font-weight: 500; border: none; background: linear-gradient(135deg, #2C5282 0%, #1E3A5F 100%); color: white;">
                 <i class="fas fa-download me-2"></i>Download All
             </a>
-            <a href="{{ url_for('download_contacts_template') }}" class="btn btn-warning" title="Get the import template">
+            <a href="{{ url_for('download_contacts_template') }}" class="btn" title="Get the import template" style="padding: 12px 24px; font-weight: 500; border: none; background: linear-gradient(135deg, #FF6600 0%, #ff8533 100%); color: white;">
                 <i class="fas fa-file-excel me-2"></i>Template
             </a>
-            <button class="btn btn-secondary" id="downloadSelectedBtn" style="display: none;" title="Export selected contacts">
+            <button class="btn" id="downloadSelectedBtn" style="display: none; padding: 12px 24px; font-weight: 500; border: none; background: linear-gradient(135deg, #1E3A5F 0%, #2C5282 100%); color: white;" title="Export selected contacts">
                 <i class="fas fa-download me-2"></i>Download Selected
             </button>
         </div>
     </div>
 </div>
 
+<style>
+.btn-group .btn {
+    transition: all 0.2s ease;
+}
+.btn-group .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.btn-group .btn:active {
+    transform: translateY(0);
+}
+</style>
+
 <!-- Search, Filters & Bulk Actions (only when contacts exist) -->
 {% if contacts %}
-<div class="row mb-3 align-items-center">
-    <div class="col-lg-4 col-md-6 mb-2 mb-md-0">
-        <div class="input-group">
-            <span class="input-group-text bg-primary text-white">
+<div class="row g-3 mb-4 align-items-center">
+    <div class="col-lg-4 col-md-6">
+        <div class="input-group" style="border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+            <span class="input-group-text bg-primary text-white border-0">
                 <i class="fas fa-search"></i>
             </span>
-            <input type="text" id="searchInput" class="form-control" placeholder="Search by name, email, phone, company..." aria-label="Search contacts">
-            <button class="btn btn-outline-secondary" type="button" id="clearSearchBtn" style="display: none;" title="Clear search">
+            <input type="text" id="searchInput" class="form-control border-0 shadow-none" placeholder="Search by name, email, phone, company..." aria-label="Search contacts">
+            <button class="btn btn-outline-secondary border-0" type="button" id="clearSearchBtn" style="display: none;" title="Clear search">
                 <i class="fas fa-times"></i>
             </button>
         </div>
-        <small class="text-muted">Press <kbd>/</kbd> to focus search</small>
+        <small class="text-muted ms-1" style="font-size: 0.75rem;">Press <kbd style="padding: 2px 6px; background: hwb(0 2% 44%); border-radius: 3px; font-size: 0.7rem;">/</kbd> to focus search</small>
     </div>
-    <div class="col-lg-4 col-md-6 mb-2 mb-md-0">
-        <div class="d-flex flex-wrap gap-2 align-items-center">
-            <span class="text-muted small">Filter by type:</span>
-            <div class="btn-group btn-group-sm" role="group">
-                <button type="button" class="btn btn-outline-primary filter-type-btn active" data-type="">All</button>
-                <button type="button" class="btn btn-outline-primary filter-type-btn" data-type="client">Client</button>
-                <button type="button" class="btn btn-outline-primary filter-type-btn" data-type="fournisseur">Fourn.</button>
-                <button type="button" class="btn btn-outline-primary filter-type-btn" data-type="ingenieur">Ingén.</button>
-                <button type="button" class="btn btn-outline-primary filter-type-btn" data-type="architecte">Arch.</button>
-                <button type="button" class="btn btn-outline-primary filter-type-btn" data-type="sous-traitant">Sous-tr.</button>
-                <button type="button" class="btn btn-outline-primary filter-type-btn" data-type="autre">Autre</button>
+    <div class="col-lg-4 col-md-6">
+        <div class="d-flex align-items-center gap-2">
+            <span class="text-muted small">Filter:</span>
+            <div class="dropdown">
+                <button class="btn btn-outline-primary btn-sm" type="button" id="filterTypeDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 6px; font-weight: 500; min-width: 160px;">
+                    <i class="fas fa-filter me-1"></i>All Types <i class="fas fa-chevron-down ms-2" style="font-size: 0.7rem;"></i>
+                </button>
+                <ul class="dropdown-menu shadow" aria-labelledby="filterTypeDropdown">
+                    <li><a class="dropdown-item filter-type-btn active" href="#" data-type="">All</a></li>
+                    <li><a class="dropdown-item filter-type-btn" href="#" data-type="client">Client</a></li>
+                    <li><a class="dropdown-item filter-type-btn" href="#" data-type="fournisseur">Fournisseur</a></li>
+                    <li><a class="dropdown-item filter-type-btn" href="#" data-type="ingenieur">Ingénieur</a></li>
+                    <li><a class="dropdown-item filter-type-btn" href="#" data-type="architecte">Architecte</a></li>
+                    <li><a class="dropdown-item filter-type-btn" href="#" data-type="sous-traitant">Sous-traitant</a></li>
+                    <li><a class="dropdown-item filter-type-btn" href="#" data-type="autre">Autre</a></li>
+                </ul>
             </div>
         </div>
     </div>
     <div class="col-lg-4 col-md-12">
-        <div class="d-flex flex-wrap justify-content-lg-end gap-2 align-items-center">
-            <div class="btn-group btn-group-sm" role="group">
-                <button class="btn btn-outline-secondary" id="selectAllBtn" title="Select all visible contacts">
-                    <i class="fas fa-check-double me-1"></i>Select All
+        <div class="d-flex flex-wrap justify-content-lg-end align-items-center gap-2">
+            <div class="btn-group btn-group-sm" role="group" style="border-radius: 6px; overflow: hidden;">
+                <button class="btn btn-outline-secondary" id="selectAllBtn" title="Select all visible contacts" style="border-radius: 0;">
+                    <i class="fas fa-check-double me-1"></i>Select
                 </button>
-                <button class="btn btn-outline-secondary" id="deselectAllBtn" title="Clear selection">
-                    <i class="fas fa-times me-1"></i>Deselect All
+                <button class="btn btn-outline-secondary" id="deselectAllBtn" title="Clear selection" style="border-radius: 0;">
+                    <i class="fas fa-times me-1"></i>Deselect
                 </button>
             </div>
-            <button class="btn btn-danger btn-sm" id="bulkDeleteBtn" style="display: none;" title="Delete selected contacts">
-                <i class="fas fa-trash-alt me-1"></i>Delete Selected
+            <button class="btn btn-danger btn-sm" id="bulkDeleteBtn" style="display: none; border-radius: 6px;" title="Delete selected contacts">
+                <i class="fas fa-trash-alt me-1"></i>Delete
             </button>
-            <span id="resultCount" class="text-muted small ms-2">Loading...</span>
+            <span id="resultCount" class="text-muted small ms-2" style="font-size: 0.8rem;">Loading...</span>
         </div>
     </div>
 </div>
