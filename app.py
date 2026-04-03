@@ -1,3 +1,12 @@
+import importlib.util
+import pkgutil
+
+if not hasattr(pkgutil, 'get_loader'):
+    def get_loader(name):
+        spec = importlib.util.find_spec(name)
+        return None if spec is None else spec.loader
+    pkgutil.get_loader = get_loader
+
 from flask import Flask, render_template, redirect, url_for, request, flash, jsonify, send_file, send_from_directory
 from sqlalchemy import text
 from flask_sqlalchemy import SQLAlchemy
@@ -5,10 +14,11 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import os
-import pandas as pd
 import io
 import csv
 import json
+import math
+from openpyxl import Workbook, load_workbook
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
@@ -27,6 +37,68 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def is_na(val):
+    if val is None:
+        return True
+    if isinstance(val, str) and val.strip() == '':
+        return True
+    if isinstance(val, float) and math.isnan(val):
+        return True
+    return False
+
+
+def clean_value(val):
+    if is_na(val):
+        return ''
+    return str(val).strip()
+
+
+def read_spreadsheet(file, sheet_name=None):
+    filename = file.filename.lower()
+    if filename.endswith('.csv'):
+        payload = file.read().decode('utf-8-sig')
+        file.seek(0)
+        reader = csv.DictReader(io.StringIO(payload))
+        return [row for row in reader]
+
+    if not filename.endswith(('.xlsx', '.xls')):
+        raise ValueError('Unsupported file type')
+
+    file.seek(0)
+    wb = load_workbook(file, data_only=True)
+    if sheet_name and sheet_name in wb.sheetnames:
+        ws = wb[sheet_name]
+    else:
+        ws = wb.active
+
+    rows = list(ws.iter_rows(values_only=True))
+    if not rows:
+        return []
+
+    headers = [str(h).strip() if h is not None else '' for h in rows[0]]
+    data = []
+    for row in rows[1:]:
+        data.append({headers[i]: row[i] for i in range(len(headers))})
+    return data
+
+
+def write_to_excel_buffer(data, sheet_name='Sheet1'):
+    wb = Workbook()
+    ws = wb.active
+    ws.title = sheet_name
+
+    if data:
+        headers = list(data[0].keys())
+        ws.append(headers)
+        for item in data:
+            ws.append([item.get(k, '') for k in headers])
+
+    output = io.BytesIO()
+    wb.save(output)
+    output.seek(0)
+    return output
 
 # Database Models
 project_contacts = db.Table('project_contacts',
@@ -1830,23 +1902,17 @@ def upload_contacts():
         return redirect(url_for('contacts'))
     
     try:
-        if file.filename.endswith('.csv'):
-            df = pd.read_csv(file)
-        elif file.filename.endswith(('.xlsx', '.xls')):
-            df = pd.read_excel(file)
+        if file.filename.lower().endswith(('.csv', '.xlsx', '.xls')):
+            rows = read_spreadsheet(file)
         else:
             flash('Please upload CSV or Excel file')
             return redirect(url_for('contacts'))
-        
+
         success_count = 0
         error_count = 0
         errors = []
-        
-        def clean(val):
-            s = str(val).strip()
-            return '' if s.lower() == 'nan' else s
-        
-        for index, row in df.iterrows():
+
+        for index, row in enumerate(rows):
             try:
                 contact = Contact(
                     name=clean(row.get('Name', '')),
@@ -1897,23 +1963,17 @@ def upload_providers():
         return redirect(url_for('providers'))
     
     try:
-        if file.filename.endswith('.csv'):
-            df = pd.read_csv(file)
-        elif file.filename.endswith(('.xlsx', '.xls')):
-            df = pd.read_excel(file)
+        if file.filename.lower().endswith(('.csv', '.xlsx', '.xls')):
+            rows = read_spreadsheet(file)
         else:
             flash('Please upload CSV or Excel file')
             return redirect(url_for('providers'))
-        
+
         success_count = 0
         error_count = 0
         errors = []
-        
-        def clean(val):
-            s = str(val).strip()
-            return '' if s.lower() == 'nan' else s
-        
-        for index, row in df.iterrows():
+
+        for index, row in enumerate(rows):
             try:
                 provider = Provider(
                     name=clean(row.get('Company Name', '')),
@@ -1955,22 +2015,12 @@ def upload_providers():
 @app.route('/contacts/template')
 @login_required
 def download_contacts_template():
-    template = pd.DataFrame({
-        'Name': ['Ahmed Ben Ali', 'Sarra Mansour'],
-        'Phone': ['+216 22 123 456', '+216 55 789 012'],
-        'Email': ['ahmed@email.com', 'sarra@email.com'],
-        'Company': ['ABC Construction', 'XYZ Materials'],
-        'Speciality': ['Project Management', 'Electrical Engineering'],
-        'Comments': ['Good client, multiple projects', 'Reliable supplier'],
-        'Address': ['Tunis, Centre Ville', 'Sousse, Rue de la Liberté']
-    })
-    
-    output = io.BytesIO()
-    with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        template.to_excel(writer, index=False, sheet_name='Contacts')
-    
-    output.seek(0)
-    
+    data = [
+        {'Name': 'Ahmed Ben Ali', 'Phone': '+216 22 123 456', 'Email': 'ahmed@email.com', 'Company': 'ABC Construction', 'Speciality': 'Project Management', 'Comments': 'Good client, multiple projects', 'Address': 'Tunis, Centre Ville'},
+        {'Name': 'Sarra Mansour', 'Phone': '+216 55 789 012', 'Email': 'sarra@email.com', 'Company': 'XYZ Materials', 'Speciality': 'Electrical Engineering', 'Comments': 'Reliable supplier', 'Address': 'Sousse, Rue de la Liberté'}
+    ]
+    output = write_to_excel_buffer(data, sheet_name='Contacts')
+
     return send_file(
         output,
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -1981,22 +2031,12 @@ def download_contacts_template():
 @app.route('/providers/template')
 @login_required
 def download_providers_template():
-    template = pd.DataFrame({
-        'Company Name': ['Matériaux Tunisie', 'Électro Plus'],
-        'Contact Person': ['Karim Ben Salem', 'Leila Mansour'],
-        'Phone': ['+216 71 123 456', '+216 72 789 012'],
-        'Email': ['karim@materiaux.tn', 'leila@electroplus.tn'],
-        'Speciality': ['Construction Materials', 'Electrical Supplies'],
-        'Comments': ['Good prices, fast delivery', 'Certified products'],
-        'Address': ['Tunis, Zone Industrielle', 'Sousse, Route de la Plage']
-    })
-    
-    output = io.BytesIO()
-    with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        template.to_excel(writer, index=False, sheet_name='Providers')
-    
-    output.seek(0)
-    
+    data = [
+        {'Company Name': 'Matériaux Tunisie', 'Contact Person': 'Karim Ben Salem', 'Phone': '+216 71 123 456', 'Email': 'karim@materiaux.tn', 'Speciality': 'Construction Materials', 'Comments': 'Good prices, fast delivery', 'Address': 'Tunis, Zone Industrielle'},
+        {'Company Name': 'Électro Plus', 'Contact Person': 'Leila Mansour', 'Phone': '+216 72 789 012', 'Email': 'leila@electroplus.tn', 'Speciality': 'Electrical Supplies', 'Comments': 'Certified products', 'Address': 'Sousse, Route de la Plage'}
+    ]
+    output = write_to_excel_buffer(data, sheet_name='Providers')
+
     return send_file(
         output,
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -2045,14 +2085,8 @@ def download_all_contacts():
                 'Type': contact.type or '',
                 'Notes': notes
             })
-        
-        df = pd.DataFrame(data)
-        
-        output = io.BytesIO()
-        with pd.ExcelWriter(output, engine='openpyxl') as writer:
-            df.to_excel(writer, index=False, sheet_name='All Contacts')
-        
-        output.seek(0)
+
+        output = write_to_excel_buffer(data, sheet_name='All Contacts')
         
         from datetime import datetime
         filename = f"all_contacts_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
@@ -2090,14 +2124,8 @@ def download_selected_contacts():
                 'Type': contact.type or '',
                 'Notes': contact.notes or ''
             })
-        
-        df = pd.DataFrame(data)
-        
-        output = io.BytesIO()
-        with pd.ExcelWriter(output, engine='openpyxl') as writer:
-            df.to_excel(writer, index=False, sheet_name='Selected Contacts')
-        
-        output.seek(0)
+
+        output = write_to_excel_buffer(data, sheet_name='Selected Contacts')
         
         from datetime import datetime
         filename = f"selected_contacts_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
@@ -2277,7 +2305,7 @@ def export_project_financial(project_id):
         project = Project.query.get_or_404(project_id)
         expenses = ProjectExpense.query.filter_by(project_id=project_id).all()
         
-        # Create DataFrame from expenses
+        # Build data from expenses
         data = []
         for expense in expenses:
             data.append({
@@ -2287,15 +2315,8 @@ def export_project_financial(project_id):
                 'Commentaire': expense.comment or '',
                 'Catégorie': expense.category
             })
-        
-        df = pd.DataFrame(data)
-        
-        # Create Excel file
-        output = io.BytesIO()
-        with pd.ExcelWriter(output, engine='openpyxl') as writer:
-            df.to_excel(writer, index=False, sheet_name='Dépenses')
-        
-        output.seek(0)
+
+        output = write_to_excel_buffer(data, sheet_name='Dépenses')
         
         filename = f"expenses_{project.name.replace(' ', '_')}_{datetime.now().strftime('%Y%m%d')}.xlsx"
         
@@ -2324,33 +2345,32 @@ def import_project_financial(project_id):
         return redirect(url_for('project_financial', project_id=project_id))
     
     try:
-        # Read the Excel file - use sheet 'suivi chantier' if present (template format)
-        if file.filename.endswith('.csv'):
-            df = pd.read_csv(file)
+        # Read the file as rows of dict
+        if file.filename.lower().endswith('.csv'):
+            rows = read_spreadsheet(file)
         else:
-            xlsx = pd.ExcelFile(file)
-            if 'suivi chantier' in xlsx.sheet_names:
-                df = pd.read_excel(xlsx, sheet_name='suivi chantier')
-            else:
-                df = pd.read_excel(xlsx, sheet_name=0)  # first sheet
-        
+            # Excel file may have a specific sheet
+            try:
+                rows = read_spreadsheet(file, sheet_name='suivi chantier')
+            except Exception:
+                rows = read_spreadsheet(file)
+
         # Track success/failure
         success_count = 0
         error_count = 0
         errors = []
-        
-        # Define clean function
+
         def clean(val):
-            if pd.isna(val):
+            if is_na(val):
                 return ''
             return str(val).strip()
-        
+
         # Process each row - ADD to expenses (never replace)
-        for index, row in df.iterrows():
+        for index, row in enumerate(rows):
             try:
                 # Parse date (Excel may return datetime, or string)
                 val = row.get('Date')
-                if pd.isna(val):
+                if is_na(val):
                     date = datetime.now().date()
                 elif hasattr(val, 'date'):
                     date = val.date()
@@ -2366,7 +2386,7 @@ def import_project_financial(project_id):
                                 date = datetime.now().date()
                     else:
                         date = datetime.now().date()
-                
+
                 amount_str = clean(row.get('Montant', '0'))
                 try:
                     amount = float(str(amount_str).replace(',', '.'))

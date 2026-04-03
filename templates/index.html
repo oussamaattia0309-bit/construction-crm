@@ -597,6 +597,9 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="text-center mt-4">
+                            <a href="{{ url_for('projects') }}" class="btn btn-outline-info btn-sm">View All Projects</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -817,7 +820,7 @@ function showWebsiteInfo() {
 }
 
 let isLoadingData = false;
-let currentSort = { column: 'id', direction: 'desc' };
+let currentSort = { column: 'id', direction: 'asc' };
 let allProjects = [];
 
 function loadDashboardData() {
