@@ -282,7 +282,7 @@
                 <i class="fas fa-edit me-2" style="color: var(--accent);"></i>Montants fixes
                 <small class="d-block fw-normal fs-6 opacity-90 mt-1">Prix de vente, budget, montant reçu</small>
             </h5>
-            <div>
+            <div class="d-flex align-items-center gap-2">
                 <button class="btn btn-sm btn-light" id="editSummaryBtn" onclick="enableSummaryEdit()">
                     <i class="fas fa-pen me-1"></i>Modifier
                 </button>
@@ -297,7 +297,10 @@
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-md-4">
-                    <div class="financial-card financial-card-primary">
+                    <div class="financial-card financial-card-primary" style="position: relative;">
+                        <button type="button" class="btn btn-sm btn-link text-muted position-absolute top-0 end-0 p-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Prix de vente: Le prix total du projet convenu avec le client" style="text-decoration: none; font-size: 0.8rem;">
+                            <i class="fas fa-info-circle"></i>
+                        </button>
                         <div class="financial-card-icon"><i class="fas fa-tag"></i></div>
                         <div class="financial-card-content">
                             <span class="financial-card-label">Prix de vente</span>
@@ -309,7 +312,10 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="financial-card financial-card-primary">
+                    <div class="financial-card financial-card-primary" style="position: relative;">
+                        <button type="button" class="btn btn-sm btn-link text-muted position-absolute top-0 end-0 p-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Budget prévisionnel: Estimation des coûts totaux du projet" style="text-decoration: none; font-size: 0.8rem;">
+                            <i class="fas fa-info-circle"></i>
+                        </button>
                         <div class="financial-card-icon"><i class="fas fa-chart-line"></i></div>
                         <div class="financial-card-content">
                             <span class="financial-card-label">Budget prévisionnel</span>
@@ -321,7 +327,10 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="financial-card financial-card-accent">
+                    <div class="financial-card financial-card-accent" style="position: relative;">
+                        <button type="button" class="btn btn-sm btn-link text-muted position-absolute top-0 end-0 p-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Montant reçu: Somme déjà payée par le client" style="text-decoration: none; font-size: 0.8rem;">
+                            <i class="fas fa-info-circle"></i>
+                        </button>
                         <div class="financial-card-icon"><i class="fas fa-hand-holding-usd"></i></div>
                         <div class="financial-card-content">
                             <span class="financial-card-label">Montant reçu</span>
@@ -360,7 +369,10 @@
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-md-3 col-6">
-                    <div class="financial-card financial-card-success">
+                    <div class="financial-card financial-card-success" style="position: relative;">
+                        <button type="button" class="btn btn-sm btn-link text-muted position-absolute top-0 end-0 p-0" data-bs-toggle="tooltip" data-bs-placement="top" title="Marge prévisionnelle: Différence entre le prix de vente et le budget" style="text-decoration: none; font-size: 0.75rem; line-height: 1;">
+                            <i class="fas fa-info-circle"></i>
+                        </button>
                         <i class="fas fa-percent me-2" style="color: var(--primary);"></i>
                         <div>
                             <span class="financial-card-label">Marge prévisionnelle</span>
@@ -369,7 +381,10 @@
                     </div>
                 </div>
                 <div class="col-md-3 col-6">
-                    <div class="financial-card financial-card-danger">
+                    <div class="financial-card financial-card-danger" style="position: relative;">
+                        <button type="button" class="btn btn-sm btn-link text-muted position-absolute top-0 end-0 p-0" data-bs-toggle="tooltip" data-bs-placement="top" title="Dépenses réelles: Somme totale des dépenses effectuées" style="text-decoration: none; font-size: 0.75rem; line-height: 1;">
+                            <i class="fas fa-info-circle"></i>
+                        </button>
                         <i class="fas fa-receipt me-2" style="color: #dc3545;"></i>
                         <div>
                             <span class="financial-card-label">Dépenses réelles</span>
@@ -378,7 +393,10 @@
                     </div>
                 </div>
                 <div class="col-md-3 col-6">
-                    <div class="financial-card {% if (financial.current_result or 0) >= 0 %}financial-card-success{% else %}financial-card-danger{% endif %}">
+                    <div class="financial-card {% if (financial.current_result or 0) >= 0 %}financial-card-success{% else %}financial-card-danger{% endif %}" style="position: relative;">
+                        <button type="button" class="btn btn-sm btn-link text-muted position-absolute top-0 end-0 p-0" data-bs-toggle="tooltip" data-bs-placement="top" title="Gain actuel: Profit actuel du projet (Prix de vente - Dépenses)" style="text-decoration: none; font-size: 0.75rem; line-height: 1;">
+                            <i class="fas fa-info-circle"></i>
+                        </button>
                         <i class="fas fa-chart-line me-2" style="color: var(--primary);"></i>
                         <div>
                             <span class="financial-card-label">Gain actuel</span>
@@ -387,7 +405,10 @@
                     </div>
                 </div>
                 <div class="col-md-3 col-6">
-                    <div class="financial-card financial-card-info">
+                    <div class="financial-card financial-card-info" style="position: relative;">
+                        <button type="button" class="btn btn-sm btn-link text-muted position-absolute top-0 end-0 p-0" data-bs-toggle="tooltip" data-bs-placement="top" title="Solde restant: Montant restant à payer par le client" style="text-decoration: none; font-size: 0.75rem; line-height: 1;">
+                            <i class="fas fa-info-circle"></i>
+                        </button>
                         <i class="fas fa-wallet me-2" style="color: var(--primary-mid);"></i>
                         <div>
                             <span class="financial-card-label">Solde restant</span>
@@ -396,7 +417,10 @@
                     </div>
                 </div>
                 <div class="col-md-3 col-6">
-                    <div class="financial-card {% if (financial.current_cash or 0) >= 0 %}financial-card-success{% else %}financial-card-danger{% endif %}">
+                    <div class="financial-card {% if (financial.current_cash or 0) >= 0 %}financial-card-success{% else %}financial-card-danger{% endif %}" style="position: relative;">
+                        <button type="button" class="btn btn-sm btn-link text-muted position-absolute top-0 end-0 p-0" data-bs-toggle="tooltip" data-bs-placement="top" title="Caisse actuellement: Argent disponible en main (Montant reçu - Dépenses)" style="text-decoration: none; font-size: 0.75rem; line-height: 1;">
+                            <i class="fas fa-info-circle"></i>
+                        </button>
                         <i class="fas fa-cash-register me-2" style="color: var(--primary);"></i>
                         <div>
                             <span class="financial-card-label">Caisse actuellement</span>
