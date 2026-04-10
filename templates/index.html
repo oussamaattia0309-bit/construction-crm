@@ -747,7 +747,6 @@
             <div class="modal-body">
                 <p>Are you sure you want to delete <strong id="deleteProjectName"></strong>?</p>
                 <p class="text-danger"><small>This action cannot be undone. All associated budgets and financial data will also be deleted.</small></p>
-                <form id="deleteProjectForm" method="POST" style="display:none;"></form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -825,6 +824,8 @@ let currentSort = { column: 'id', direction: 'asc' };
 let allProjects = [];
 
 function loadDashboardData() {
+    if (isLoadingData) return;
+    isLoadingData = true;
     console.log('Loading dashboard data...');
     
     fetch('/api/dashboard')
@@ -946,9 +947,9 @@ function attachDeleteListeners() {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
             document.getElementById('deleteProjectName').textContent = this.dataset.projectName;
-            const deleteProjectForm = document.getElementById('deleteProjectForm');
-            if (deleteProjectForm) {
-                deleteProjectForm.action = `/projects/delete/${this.dataset.projectId}`;
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            if (confirmDeleteBtn) {
+                confirmDeleteBtn.dataset.projectId = this.dataset.projectId;
             }
             new bootstrap.Modal(document.getElementById('deleteProjectModal')).show();
         });
@@ -982,7 +983,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const editProjectModal = document.getElementById('editProjectModal');
     const saveProjectBtn = document.getElementById('saveProjectBtn');
     const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-    const deleteProjectForm = document.getElementById('deleteProjectForm');
     
     if (saveProjectBtn) {
         saveProjectBtn.addEventListener('click', function() {
@@ -995,7 +995,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: new URLSearchParams({
                     name: document.getElementById('editProjectName').value,
                     status: document.getElementById('editProjectStatus').value,
-                    client_name:document.getElementById('editProjectClient').value,
+                    client_name: document.getElementById('editProjectClient').value,
                     address: document.getElementById('editProjectAddress').value
                 })
             })
@@ -1009,9 +1009,33 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    if (confirmDeleteBtn && deleteProjectForm) {
+    if (confirmDeleteBtn) {
         confirmDeleteBtn.addEventListener('click', function() {
-            deleteProjectForm.submit();
+            this.blur(); // Remove focus to prevent aria-hidden issues
+            const projectId = this.dataset.projectId;
+            if (!projectId) {
+                return;
+            }
+
+            fetch(`/projects/delete/${projectId}`, {
+                method: 'POST'
+            })
+            .then(response => {
+                if (response.ok) {
+                    loadDashboardData();
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteProjectModal'));
+                    if (modal) {
+                        modal.hide();
+                    }
+                } else {
+                    console.error('Failed to delete project', response.statusText);
+                    alert('Unable to delete project. Please try again or refresh the page.');
+                }
+            })
+            .catch(error => {
+                console.error('Delete request failed', error);
+                alert('Unable to delete project. See console for details.');
+            });
         });
     }
 });
