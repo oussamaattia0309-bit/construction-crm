@@ -485,6 +485,37 @@
         font-size: 1.2rem;
     }
 
+    /* ====== SUCCESS MESSAGE ====== */
+    .alert-success {
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+        color: #155724;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+        from {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .alert-success .btn-close {
+        filter: brightness(0) invert(1);
+        opacity: 0.7;
+    }
+
+    .alert-success .btn-close:hover {
+        opacity: 1;
+    }
+
     /* ====== RESPONSIVE ====== */
     @media (max-width: 768px) {
         .section-title { font-size: 1.25rem; }
@@ -930,7 +961,7 @@ function renderProjects(projects) {
                 <div class="btn-group btn-group-sm shadow-none">
                     <a href="/projects/${project.id}" class="btn btn-primary" title="Voir"><i class="fas fa-eye"></i></a>
                     <a href="/project/${project.id}/financial" class="btn text-white" style="background: #17a2b8;" title="Financier"><i class="fas fa-coins"></i></a>
-                    <button type="button" class="btn btn-outline-danger delete-project-btn" data-project-id="${project.id}" data-project-name="${project.name}" title="Supprimer"><i class="fas fa-trash"></i></button>
+                    <button type="button" class="btn btn-outline-danger delete-project-btn" data-project-id="${project.id}" data-project-name="${project.name || 'Unnamed Project'}" title="Supprimer"><i class="fas fa-trash"></i></button>
                 </div>
             </td>
         </tr>`;
@@ -946,12 +977,29 @@ function attachDeleteListeners() {
     document.querySelectorAll('.delete-project-btn').forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
-            document.getElementById('deleteProjectName').textContent = this.dataset.projectName;
+
+            // Store the button data for the confirm button
+            const projectName = this.dataset.projectName || 'Unnamed Project';
+            const projectId = this.dataset.projectId;
+
+            document.getElementById('deleteProjectName').textContent = projectName;
             const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
             if (confirmDeleteBtn) {
-                confirmDeleteBtn.dataset.projectId = this.dataset.projectId;
+                confirmDeleteBtn.dataset.projectId = projectId;
+                confirmDeleteBtn.disabled = false;
+                confirmDeleteBtn.innerHTML = '<i class="fas fa-trash me-2"></i>Delete Project';
             }
-            new bootstrap.Modal(document.getElementById('deleteProjectModal')).show();
+
+            // Show the modal
+            const modal = new bootstrap.Modal(document.getElementById('deleteProjectModal'));
+            modal.show();
+
+            // Reset button when modal is hidden
+            document.getElementById('deleteProjectModal').addEventListener('hidden.bs.modal', function() {
+                if (confirmDeleteBtn) {
+                    confirmDeleteBtn.disabled = false;
+                }
+            }, { once: true });
         });
     });
 }
@@ -1012,29 +1060,66 @@ document.addEventListener('DOMContentLoaded', function() {
     if (confirmDeleteBtn) {
         confirmDeleteBtn.addEventListener('click', function() {
             this.blur(); // Remove focus to prevent aria-hidden issues
-            const projectId = this.dataset.projectId;
-            if (!projectId) {
+            const projectId = parseInt(this.dataset.projectId);
+
+            // Validate project ID
+            if (!projectId || isNaN(projectId)) {
+                console.error('Invalid project ID');
+                alert('Invalid project ID. Please refresh the page and try again.');
                 return;
             }
 
+            // Show loading state
+            const originalText = this.innerHTML;
+            this.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Deleting...';
+            this.disabled = true;
+
             fetch(`/projects/delete/${projectId}`, {
-                method: 'POST'
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
             })
             .then(response => {
-                if (response.ok) {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.error || 'Failed to delete project');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3';
+                    alertDiv.style.zIndex = '9999';
+                    alertDiv.innerHTML = `
+                        <i class="fas fa-check-circle me-2"></i>${data.message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    `;
+                    document.body.appendChild(alertDiv);
+
+                    // Auto-remove after 5 seconds
+                    setTimeout(() => {
+                        alertDiv.remove();
+                    }, 5000);
+
                     loadDashboardData();
                     const modal = bootstrap.Modal.getInstance(document.getElementById('deleteProjectModal'));
                     if (modal) {
                         modal.hide();
                     }
-                } else {
-                    console.error('Failed to delete project', response.statusText);
-                    alert('Unable to delete project. Please try again or refresh the page.');
                 }
             })
             .catch(error => {
                 console.error('Delete request failed', error);
-                alert('Unable to delete project. See console for details.');
+                alert(`Error: ${error.message}. Please try again or refresh the page.`);
+            })
+            .finally(() => {
+                // Reset button state
+                this.innerHTML = originalText;
+                this.disabled = false;
             });
         });
     }

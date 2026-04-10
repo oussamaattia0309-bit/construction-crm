@@ -887,31 +887,46 @@ def update_project_status(id):
 @app.route('/projects/delete/<int:id>', methods=['POST'])
 @login_required
 def delete_project(id):
-    project = Project.query.get_or_404(id)
     try:
+        # First check if project exists
+        project = Project.query.get(id)
+        if not project:
+            return jsonify({'error': 'Project not found. It may have been deleted already.'}), 404
+
+        # Store project name for success message before deletion
+        project_name = project.name
+
+        # Delete related records first
         db.session.execute(project_contacts.delete().where(project_contacts.c.project_id == id))
         ProjectExpense.query.filter_by(project_id=id).delete(synchronize_session=False)
         ProjectReceipt.query.filter_by(project_id=id).delete(synchronize_session=False)
         ProjectFinancialParams.query.filter_by(project_id=id).delete(synchronize_session=False)
         ProjectMemo.query.filter_by(project_id=id).delete(synchronize_session=False)
         ProjectPlan.query.filter_by(project_id=id).delete(synchronize_session=False)
-        Contract.query.filter_by(project_id=id).delete(synchronize_session=False)
-        Invoice.query.filter_by(project_id=id).delete(synchronize_session=False)
 
+        # Check if Contract and Invoice models exist before trying to delete them
+        try:
+            Contract.query.filter_by(project_id=id).delete(synchronize_session=False)
+            Invoice.query.filter_by(project_id=id).delete(synchronize_session=False)
+        except Exception:
+            # These models might not exist in the database schema, just continue
+            app.logger.warning('Contract or Invoice model not found during deletion')
+
+        # Handle workers and their related records
         worker_ids = [worker.id for worker in ProjectWorker.query.filter_by(project_id=id).all()]
         if worker_ids:
             Attendance.query.filter(Attendance.project_worker_id.in_(worker_ids)).delete(synchronize_session=False)
             Payment.query.filter(Payment.project_worker_id.in_(worker_ids)).delete(synchronize_session=False)
         ProjectWorker.query.filter_by(project_id=id).delete(synchronize_session=False)
 
+        # Finally delete the project
         db.session.delete(project)
         db.session.commit()
-        flash(f'✅ Project "{project.name}" deleted successfully')
+        return jsonify({'success': True, 'message': f'Project "{project_name}" deleted successfully'})
     except Exception as e:
         db.session.rollback()
-        app.logger.exception('Failed to delete project %s', project.name)
-        flash(f'❌ Error deleting project: {str(e)}')
-    return redirect(url_for('index'))
+        app.logger.exception('Failed to delete project %s', id)
+        return jsonify({'error': f'Failed to delete project: {str(e)}'}), 500
 
 # ==================== TOOLS MANAGEMENT ROUTES ====================
 @app.route('/budgets')
