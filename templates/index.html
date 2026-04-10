@@ -747,10 +747,11 @@
             <div class="modal-body">
                 <p>Are you sure you want to delete <strong id="deleteProjectName"></strong>?</p>
                 <p class="text-danger"><small>This action cannot be undone. All associated budgets and financial data will also be deleted.</small></p>
+                <form id="deleteProjectForm" method="POST" style="display:none;"></form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <a href="#" id="confirmDeleteBtn" class="btn btn-danger">Delete Project</a>
+                <button type="button" id="confirmDeleteBtn" class="btn btn-danger">Delete Project</button>
             </div>
         </div>
     </div>
@@ -945,7 +946,10 @@ function attachDeleteListeners() {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
             document.getElementById('deleteProjectName').textContent = this.dataset.projectName;
-            document.getElementById('confirmDeleteBtn').href = `/projects/delete/${this.dataset.projectId}`;
+            const deleteProjectForm = document.getElementById('deleteProjectForm');
+            if (deleteProjectForm) {
+                deleteProjectForm.action = `/projects/delete/${this.dataset.projectId}`;
+            }
             new bootstrap.Modal(document.getElementById('deleteProjectModal')).show();
         });
     });
@@ -977,6 +981,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const editProjectModal = document.getElementById('editProjectModal');
     const saveProjectBtn = document.getElementById('saveProjectBtn');
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    const deleteProjectForm = document.getElementById('deleteProjectForm');
     
     if (saveProjectBtn) {
         saveProjectBtn.addEventListener('click', function() {
@@ -1000,6 +1006,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     loadDashboardData();
                 }
             });
+        });
+    }
+
+    if (confirmDeleteBtn && deleteProjectForm) {
+        confirmDeleteBtn.addEventListener('click', function() {
+            deleteProjectForm.submit();
         });
     }
 });
