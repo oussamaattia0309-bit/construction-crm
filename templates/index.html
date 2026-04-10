@@ -1081,6 +1081,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             })
             .then(response => {
+                // Check if response is HTML (error page)
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('text/html')) {
+                    return response.text().then(html => {
+                        throw new Error('Server error. Please try again later.');
+                    });
+                }
+
                 if (!response.ok) {
                     return response.json().then(data => {
                         throw new Error(data.error || 'Failed to delete project');

@@ -8,6 +8,7 @@ if not hasattr(pkgutil, 'get_loader'):
     pkgutil.get_loader = get_loader
 
 from flask import Flask, render_template, redirect, url_for, request, flash, jsonify, send_file, send_from_directory
+from functools import wraps
 from sqlalchemy import text
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -39,6 +40,16 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def handle_errors(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except Exception as e:
+            app.logger.error(f"Error in {f.__name__}: {str(e)}")
+            return jsonify({'error': str(e)}), 500
+    return wrapper
 
 
 def is_na(val):
@@ -886,6 +897,7 @@ def update_project_status(id):
 
 @app.route('/projects/delete/<int:id>', methods=['POST'])
 @login_required
+@handle_errors
 def delete_project(id):
     try:
         # First check if project exists
