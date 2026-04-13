@@ -2433,7 +2433,7 @@ def import_project_financial(project_id):
                     amount = 0.0
                 
                 cat_val = 'Divers'
-                for c in df.columns:
+                for c in row.keys():
                     if 'cat' in c.lower():
                         cv = clean(row.get(c, 'Divers'))
                         if cv in ('Ouvrier', 'Matériau', 'Divers'):
