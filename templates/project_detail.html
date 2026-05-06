@@ -138,6 +138,15 @@ function changeProjectStatus(newStatus) {
     <div class="row">
         <!-- Main Project Details (Left) -->
         <div class="col-lg-8">
+            <!-- Top Action Bar -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <a href="{{ url_for('projects') }}" class="btn btn-outline-secondary rounded-pill px-4">
+                    <i class="fas fa-list me-2"></i>Projects List
+                </a>
+                <a href="{{ url_for('project_financial', project_id=project.id) }}" class="btn btn-lg rounded-pill px-5" style="background-color: #FF6B35; border-color: #FF6B35; color: white; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    <i class="fas fa-coins me-2"></i>Financial
+                </a>
+            </div>
             <div class="card dashboard-card mb-4 border-0 shadow-sm">
                 <div class="card-header bg-white py-3 border-0">
                     <h4 class="mb-0 fw-bold text-dark">
@@ -207,12 +216,6 @@ function changeProjectStatus(newStatus) {
                             <button type="submit" class="btn btn-primary rounded-pill px-4">
                                 <i class="fas fa-save me-2"></i>Enregistrer
                             </button>
-                            <a href="{{ url_for('projects') }}" class="btn btn-outline-secondary rounded-pill px-4">
-                                <i class="fas fa-list me-2"></i>Projects List
-                            </a>
-                            <a href="{{ url_for('project_financial', project_id=project.id) }}" class="btn btn-outline-info">
-                                <i class="fas fa-coins me-1"></i>Financial
-                            </a>
                         </div>
                     </form>
 
@@ -316,7 +319,7 @@ function changeProjectStatus(newStatus) {
                 </div>
 
                 <!-- Calendar Body -->
-                <div class="card-body p-0 collapse show" id="calendarBody">
+                <div class="card-body p-0 collapse" id="calendarBody">
                     <!-- Quick Actions Bar -->
                     <div class="bg-light border-bottom p-3">
                         <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">

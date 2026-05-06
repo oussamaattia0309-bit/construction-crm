@@ -217,6 +217,138 @@
     </div>
 </div>
 
+<!-- All Users Table -->
+<div class="container mt-5 pb-5">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3 border-0">
+            <h5 class="mb-0 fw-bold"><i class="fas fa-users me-2 text-primary"></i>All Site Users</h5>
+        </div>
+        <div class="card-body">
+            {% if current_user.id == 1 %}
+            <button class="btn btn-primary mb-3" onclick="openAddUserModal()">
+                <i class="fas fa-plus me-2"></i>Add New User
+            </button>
+            {% endif %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>ID</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Member Since</th>
+                            <th>Last Login</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in all_users %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center me-3" 
+                                         style="width: 40px; height: 40px; background: var(--light-bg);">
+                                        {% if user.avatar and user.avatar != "default.png" %}
+                                        <img src="{{ url_for('static', filename='uploads/avatars/' + user.avatar) }}" 
+                                             class="rounded-circle" style="width: 100%; height: 100%; object-fit: cover;">
+                                        {% else %}
+                                        <span class="fw-bold text-primary">{{ user.username[:1].upper() }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <div class="fw-semibold">{{ user.username }}</div>
+                                        <small class="text-muted">{{ user.email or "No email" }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>#{{ user.id }}</td>
+                            <td>
+                                {% if user.role == 'admin' %}
+                                <span class="badge bg-danger">Admin</span>
+                                {% elif user.role == 'manager' %}
+                                <span class="badge bg-warning text-dark">Manager</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Staff</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user.is_active %}
+                                <span class="badge bg-success">Active</span>
+                                {% else %}
+                                <span class="badge bg-danger">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ user.created_at.strftime('%d/%m/%Y') if user.created_at else "—" }}</td>
+                            <td>{{ user.last_login.strftime('%d/%m/%Y %H:%M') if user.last_login else "Never" }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ url_for('user_profile', user_id=user.id) }}" class="btn btn-outline-primary" title="View profile">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    {% if user.id != current_user.id %}
+                                    <button class="btn btn-outline-warning" title="Edit user" onclick="editUser({{ user.id }})">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-outline-danger" title="Delete user" onclick="deleteUser({{ user.id }})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editUserForm">
+                <div class="modal-body">
+                    <input type="hidden" id="editUserId">
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-control" id="editUsername" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="editEmail">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Role</label>
+                        <select class="form-select" id="editRole">
+                            <option value="staff">Staff</option>
+                            <option value="manager">Manager</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <select class="form-select" id="editStatus">
+                            <option value="true">Active</option>
+                            <option value="false">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- Photo Upload Modal -->
 <div class="modal fade" id="photoUploadModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
@@ -242,6 +374,63 @@
     </div>
 </div>
 
+<!-- Add User Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addUserForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-control" id="addUsername" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" id="addPassword" name="password" autocomplete="new-password" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function openAddUserModal() {
+    const modal = new bootstrap.Modal(document.getElementById('addUserModal'));
+    modal.show();
+}
+
+document.getElementById('addUserForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const username = document.getElementById('addUsername').value;
+    const password = document.getElementById('addPassword').value;
+    
+    fetch('{{ url_for('add_user') }}', {
+        method: 'POST',
+        body: new FormData(this)
+    })
+    .then(r => r.json())
+    .then(res => {
+        if (res.success) {
+            location.reload();
+        } else {
+            alert(res.error || 'Failed to add user');
+        }
+    })
+    .catch(() => alert('Error adding user'));
+});
+
+{% endblock %}
+
+{% block scripts %}
 <script>
 function openPhotoUpload() {
     const modal = new bootstrap.Modal(document.getElementById('photoUploadModal'));
@@ -293,8 +482,12 @@ function toggleNotification(type) {
     fetch('{{ url_for('update_notifications') }}', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: type, enabled: document.getElementById(type + 'Notifications')?.checked })
+        body: JSON.stringify({ type: type, enabled: document.getElementById('emailNotifications').checked })
     });
+}
+
+function setup2FA() {
+    alert('Two-factor authentication setup will be available soon');
 }
 
 function toggleLoginAlert() {
@@ -303,10 +496,6 @@ function toggleLoginAlert() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ enabled: document.getElementById('loginAlerts').checked })
     });
-}
-
-function setup2FA() {
-    alert('Two-factor authentication setup will be available soon');
 }
 
 function revokeSession(sessionId) {
@@ -348,6 +537,30 @@ function confirmDeleteAccount() {
         }
     }
 }
-</script>
 
+function openAddUserModal() {
+    const modal = new bootstrap.Modal(document.getElementById('addUserModal'));
+    modal.show();
+}
+
+document.getElementById('addUserForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const username = document.getElementById('addUsername').value;
+    const password = document.getElementById('addPassword').value;
+    
+    fetch('{{ url_for('add_user') }}', {
+        method: 'POST',
+        body: new FormData(this)
+    })
+    .then(r => r.json())
+    .then(res => {
+        if (res.success) {
+            location.reload();
+        } else {
+            alert(res.error || 'Failed to add user');
+        }
+    })
+    .catch(() => alert('Error adding user'));
+});
+</script>
 {% endblock %}

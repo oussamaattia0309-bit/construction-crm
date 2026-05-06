@@ -453,13 +453,26 @@ def account_management():
         'browser': 'Chrome',
         'os': 'Windows'
     }
-    
+
     # Mock active sessions (replace with actual session tracking)
     active_sessions = []
-    
-    return render_template('account_management.html', 
+
+    # Get all users from the database
+    all_users = User.query.order_by(User.created_at.desc()).all()
+
+    return render_template('account_management.html',
                           current_session=current_session,
-                          active_sessions=active_sessions)
+                          active_sessions=active_sessions,
+                          all_users=all_users)
+
+@app.route('/user/<int:user_id>')
+@login_required
+def user_profile(user_id):
+    user = User.query.get_or_404(user_id)
+    return render_template('account_management.html',  # For now, redirect to account management
+                          current_session={'browser': 'Chrome', 'os': 'Windows'},
+                          active_sessions=[],
+                          all_users=User.query.order_by(User.created_at.desc()).all())
 
 @app.route('/users')
 @login_required
@@ -494,6 +507,30 @@ def upload_avatar():
     
     # Update user avatar
     current_user.avatar = filename
+    db.session.commit()
+    
+    return jsonify({'success': True})
+
+@app.route('/account/add-user', methods=['POST'])
+@login_required
+def add_user():
+    if current_user.id != 1:
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+    
+    username = request.form.get('username')
+    password = request.form.get('password')
+    
+    if not username or not password:
+        return jsonify({'success': False, 'error': 'Username and password required'})
+    
+    # Check if exists
+    existing = User.query.filter(User.username.ilike(username)).first()
+    if existing:
+        return jsonify({'success': False, 'error': 'User already exists'})
+    
+    new_user = User(username=username.lower())
+    new_user.set_password(password)
+    db.session.add(new_user)
     db.session.commit()
     
     return jsonify({'success': True})
