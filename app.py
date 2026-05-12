@@ -8,6 +8,7 @@ if not hasattr(pkgutil, 'get_loader'):
     pkgutil.get_loader = get_loader
 
 from flask import Flask, render_template, redirect, url_for, request, flash, jsonify, send_file, send_from_directory
+from functools import wraps
 from sqlalchemy import text
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -26,7 +27,9 @@ if __name__ != '__main__':
 else:
     app = Flask('app')
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'fallback-dev-key')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///construction_crm.db'
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+DATABASE_PATH = os.path.join(BASE_DIR, 'instance', 'construction_crm.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or f'sqlite:///{DATABASE_PATH}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -40,6 +43,16 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def handle_errors(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except Exception as e:
+            app.logger.error(f"Error in {f.__name__}: {str(e)}")
+            return jsonify({'error': str(e)}), 500
+    return wrapper
 
 
 def is_na(val):
@@ -193,7 +206,7 @@ class Tool(db.Model):
 class ProjectWorker(db.Model):
     """Model for tracking workers (subcontractors and daily workers) assigned to projects"""
     id = db.Column(db.Integer, primary_key=True)
-    project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id', ondelete='CASCADE'), nullable=False)
     contact_id = db.Column(db.Integer, db.ForeignKey('contact.id'), nullable=False)
     worker_type = db.Column(db.String(50), nullable=False)  # 'subcontractor' or 'daily_worker'
     role = db.Column(db.String(200))  # Role/task for this project
@@ -207,8 +220,9 @@ class ProjectWorker(db.Model):
     
     # Relationships
     contact = db.relationship('Contact', backref='project_assignments')
-    project = db.relationship('Project', backref='workers')
-    attendances = db.relationship('Attendance', backref='project_worker', lazy=True)
+    project = db.relationship('Project', backref=db.backref('workers', lazy=True, cascade='all, delete-orphan', passive_deletes=True))
+    attendances = db.relationship('Attendance', backref='project_worker', lazy=True, cascade='all, delete-orphan', passive_deletes=True)
+    payments = db.relationship('Payment', backref='project_worker', lazy=True, cascade='all, delete-orphan', passive_deletes=True)
     
     @property
     def remaining_balance(self):
@@ -309,7 +323,7 @@ class ProjectInvoice(db.Model):
 
 class Attendance(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    project_worker_id = db.Column(db.Integer, db.ForeignKey('project_worker.id'), nullable=False)
+    project_worker_id = db.Column(db.Integer, db.ForeignKey('project_worker.id', ondelete='CASCADE'), nullable=False)
     date = db.Column(db.Date, nullable=False)
     days = db.Column(db.Float, default=0.0)
     notes = db.Column(db.Text)
@@ -321,7 +335,7 @@ class Attendance(db.Model):
 
 class Payment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    project_worker_id = db.Column(db.Integer, db.ForeignKey('project_worker.id'), nullable=False)
+    project_worker_id = db.Column(db.Integer, db.ForeignKey('project_worker.id', ondelete='CASCADE'), nullable=False)
     date = db.Column(db.Date, nullable=False)
     amount = db.Column(db.Float, default=0.0)
     method = db.Column(db.String(50))
@@ -921,25 +935,50 @@ def update_project_status(id):
     
     return jsonify({'success': True, 'status': project.status}), 200
 
-@app.route('/projects/delete/<int:id>')
+@app.route('/projects/delete/<int:id>', methods=['POST'])
 @login_required
+@handle_errors
 def delete_project(id):
-    project = Project.query.get_or_404(id)
     try:
-        # Delete associated project expenses
-        ProjectExpense.query.filter_by(project_id=id).delete()
-        # Delete associated project receipts
-        ProjectReceipt.query.filter_by(project_id=id).delete()
-        # Delete associated financial params
-        ProjectFinancialParams.query.filter_by(project_id=id).delete()
-        # Delete the project
+        # First check if project exists
+        project = Project.query.get(id)
+        if not project:
+            return jsonify({'error': 'Project not found. It may have been deleted already.'}), 404
+
+        # Store project name for success message before deletion
+        project_name = project.name
+
+        # Delete related records first
+        db.session.execute(project_contacts.delete().where(project_contacts.c.project_id == id))
+        ProjectExpense.query.filter_by(project_id=id).delete(synchronize_session=False)
+        ProjectReceipt.query.filter_by(project_id=id).delete(synchronize_session=False)
+        ProjectFinancialParams.query.filter_by(project_id=id).delete(synchronize_session=False)
+        ProjectMemo.query.filter_by(project_id=id).delete(synchronize_session=False)
+        ProjectPlan.query.filter_by(project_id=id).delete(synchronize_session=False)
+
+        # Check if Contract and Invoice models exist before trying to delete them
+        try:
+            Contract.query.filter_by(project_id=id).delete(synchronize_session=False)
+            Invoice.query.filter_by(project_id=id).delete(synchronize_session=False)
+        except Exception:
+            # These models might not exist in the database schema, just continue
+            app.logger.warning('Contract or Invoice model not found during deletion')
+
+        # Handle workers and their related records
+        worker_ids = [worker.id for worker in ProjectWorker.query.filter_by(project_id=id).all()]
+        if worker_ids:
+            Attendance.query.filter(Attendance.project_worker_id.in_(worker_ids)).delete(synchronize_session=False)
+            Payment.query.filter(Payment.project_worker_id.in_(worker_ids)).delete(synchronize_session=False)
+        ProjectWorker.query.filter_by(project_id=id).delete(synchronize_session=False)
+
+        # Finally delete the project
         db.session.delete(project)
         db.session.commit()
-        flash(f'✅ Project "{project.name}" deleted successfully')
+        return jsonify({'success': True, 'message': f'Project "{project_name}" deleted successfully'})
     except Exception as e:
         db.session.rollback()
-        flash(f'❌ Error deleting project: {str(e)}')
-    return redirect(url_for('index'))
+        app.logger.exception('Failed to delete project %s', id)
+        return jsonify({'error': f'Failed to delete project: {str(e)}'}), 500
 
 # ==================== TOOLS MANAGEMENT ROUTES ====================
 @app.route('/budgets')
@@ -2441,7 +2480,7 @@ def import_project_financial(project_id):
                     amount = 0.0
                 
                 cat_val = 'Divers'
-                for c in df.columns:
+                for c in row.keys():
                     if 'cat' in c.lower():
                         cv = clean(row.get(c, 'Divers'))
                         if cv in ('Ouvrier', 'Matériau', 'Divers'):
