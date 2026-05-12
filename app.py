@@ -21,7 +21,10 @@ import math
 from openpyxl import Workbook, load_workbook
 from werkzeug.utils import secure_filename
 
-app = Flask(__name__)
+if __name__ != '__main__':
+    app = Flask(__name__)
+else:
+    app = Flask('app')
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'fallback-dev-key')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///construction_crm.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -1284,11 +1287,18 @@ def dashboard_data():
     active_projects = Project.query.filter_by(status='in_progress').count()
     total_tools_value = db.session.query(db.func.sum(Tool.current_value)).scalar() or 0
     
+    # Count invoices
+    import os
+    import glob
+    invoices_dir = os.path.join(app.root_path, 'uploads', 'invoices')
+    total_invoices = len(glob.glob(os.path.join(invoices_dir, '*.pdf')))
+    
     return jsonify({
         'contacts': total_contacts,
         'providers': total_providers,
         'active_projects': active_projects,
-        'total_budget': total_tools_value
+        'total_budget': total_tools_value,
+        'invoices': total_invoices
     })
 
 @app.route('/api/projects/recent')
@@ -2649,6 +2659,147 @@ def project_invoices(project_id):
     project = Project.query.get_or_404(project_id)
     invoices = ProjectInvoice.query.filter_by(project_id=project_id).order_by(ProjectInvoice.date.desc()).all()
     return render_template('project_docs/invoices.html', project=project, invoices=invoices)
+
+# ==================== PDF GENERATION ====================
+import os
+from datetime import datetime
+
+# Configuration for PDF generation
+INVOICES_DIR = os.path.join('uploads', 'invoices')
+LOGOS_DIR = os.path.join('uploads', 'logos')
+
+# Ensure directories exist
+os.makedirs(INVOICES_DIR, exist_ok=True)
+os.makedirs(LOGOS_DIR, exist_ok=True)
+
+@app.route('/generate-invoice-pdf', methods=['POST'])
+@login_required
+def generate_invoice_pdf():
+    """Generate PDF invoice from web facturation app"""
+    try:
+        # Import the PDF generation function
+        import sys
+        sys.path.append(os.path.join(os.path.dirname(__file__), 'Logiciel Facturation'))
+        from pdf_generator import generate_invoice
+        
+        # Get invoice data from request
+        invoice_data = request.get_json()
+        
+        if not invoice_data:
+            return jsonify({'error': 'No invoice data received'}), 400
+        
+        # Extract and validate data
+        invoice_number = invoice_data.get('invoice_number', '')
+        
+        # Extract numeric part from invoice number (e.g., "F123456" -> 123456)
+        numeric_invoice_number = 0
+        if invoice_number:
+            import re
+            match = re.search(r'\d+', invoice_number)
+            if match:
+                numeric_invoice_number = int(match.group())
+            else:
+                numeric_invoice_number = int(invoice_number.replace('F', '').replace('f', ''))
+        else:
+            numeric_invoice_number = int(datetime.now().timestamp())
+        company_data = invoice_data.get('company', [])
+        client_data = invoice_data.get('client', [])
+        lines_data = invoice_data.get('lines', [])
+        totals_data = invoice_data.get('totals', {})
+        date = invoice_data.get('date', '')
+        
+        # Map company data: [name, address, tax_id, email, phone, logo_path]
+        company = [
+            company_data[0] if len(company_data) > 0 else '',  # name
+            company_data[1] if len(company_data) > 1 else '',  # address
+            company_data[2] if len(company_data) > 2 else '',  # tax_id
+            company_data[3] if len(company_data) > 3 else '',  # email
+            company_data[4] if len(company_data) > 4 else '',  # phone
+            ''  # logo_path (not provided by frontend)
+        ]
+        
+        # Map client data: [id, name, address, tax_id, email, phone]
+        client = [
+            1,  # default id
+            client_data[0] if len(client_data) > 0 else '',  # name
+            client_data[1] if len(client_data) > 1 else '',  # address
+            client_data[2] if len(client_data) > 2 else '',  # tax_id
+            client_data[3] if len(client_data) > 3 else '',  # email
+            client_data[4] if len(client_data) > 4 else ''   # phone
+        ]
+        
+        # Map lines data: convert frontend format to expected format
+        lines = []
+        for line in lines_data:
+            # Calculate line total before tax (unit_price * quantity)
+            unit_price = float(line.get('unitPrice', 0))
+            quantity = float(line.get('quantity', 0))
+            tax_rate = float(line.get('tva', 0))
+            
+            line_total = unit_price * quantity  # Total before tax
+            
+            mapped_line = {
+                'task': line.get('prestation', ''),
+                'quantity': quantity,
+                'unit_price': unit_price,
+                'tax_rate': tax_rate,
+                'total': line_total
+            }
+            lines.append(mapped_line)
+        
+        # Map totals data
+        totals = {
+            'subtotal': float(totals_data.get('subtotal', 0)),
+            'grand_total': float(totals_data.get('total', 0))
+        }
+        
+        # Create tax breakdown from lines
+        tax_breakdown = {}
+        for line in lines:
+            tax_rate = line['tax_rate']
+            line_total = line['total']
+            tax_amount = line_total * (tax_rate / 100)
+            
+            if tax_rate in tax_breakdown:
+                tax_breakdown[tax_rate] += tax_amount
+            else:
+                tax_breakdown[tax_rate] = tax_amount
+        
+        # Set timbre amount (default 0 for now)
+        timbre_amount = 0.0
+        
+        # Generate PDF using existing function
+        pdf_filepath = generate_invoice(
+            invoice_number=numeric_invoice_number,
+            company=company,
+            client=client,
+            lines=lines,
+            totals=totals,
+            tax_breakdown=tax_breakdown,
+            timbre_amount=timbre_amount
+        )
+        
+        # Return PDF as download
+        return send_file(
+            pdf_filepath,
+            mimetype='application/pdf',
+            as_attachment=True,
+            download_name=f'Facture_{invoice_number}.pdf'
+        )
+        
+    except ImportError as e:
+        return jsonify({'error': f'PDF generation module not found: {str(e)}'}), 500
+    except Exception as e:
+        import traceback
+        print(f"PDF generation error: {str(e)}")
+        print(f"Traceback: {traceback.format_exc()}")
+        return jsonify({'error': str(e), 'details': traceback.format_exc()}), 500
+
+@app.route('/invoices/app')
+@login_required
+def facturation_app():
+    """Open the facturation app"""
+    return render_template('facturation_app.html')
 
 @app.route('/project/<int:project_id>/invoices/add', methods=['POST'])
 @login_required

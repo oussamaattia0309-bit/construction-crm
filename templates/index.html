@@ -442,6 +442,23 @@
         box-shadow: 0 8px 20px rgba(30, 58, 95, 0.3);
     }
 
+    .stats-btn {
+        padding: 0.75rem 1.5rem;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        border: 2px solid var(--primary);
+        border-radius: 50px;
+    }
+    
+    .stats-btn:hover {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(30, 58, 95, 0.3);
+    }
+    
     /* ====== CARDS BASE ====== */
     .dashboard-card {
         border: none;
@@ -541,8 +558,8 @@
     <!-- STATS SECTION -->
     <div class="dashboard-section">
         <h2 class="section-title"><i class="fas fa-chart-pie"></i> Dashboard Overview</h2>
-        <div class="row g-4" id="stats-section">
-            <div class="col-lg-4">
+        <div class="row g-4" id="stats-section" style="flex-wrap: nowrap; overflow-x: auto;">
+            <div class="col-auto" style="flex: 0 0 300px;">
                 <div class="dashboard-card stats-card primary-stat h-100">
                     <div class="card-body text-center p-5">
                         <div class="stats-icon bg-soft-primary">
@@ -555,7 +572,7 @@
                 </div>
             </div>
             
-            <div class="col-lg-4">
+            <div class="col-auto" style="flex: 0 0 300px;">
                 <div class="dashboard-card stats-card success-stat h-100">
                     <div class="card-body text-center p-5">
                         <div class="stats-icon bg-soft-success">
@@ -568,7 +585,7 @@
                 </div>
             </div>
             
-            <div class="col-lg-4">
+            <div class="col-auto" style="flex: 0 0 300px;">
                 <div class="dashboard-card stats-card info-stat h-100">
                     <div class="card-body p-5">
                         <h5 class="fw-bold mb-4 text-center">
@@ -599,6 +616,27 @@
                         </div>
                         <div class="text-center mt-4">
                             <a href="{{ url_for('projects') }}" class="btn btn-outline-info btn-sm">View All Projects</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-auto" style="flex: 0 0 300px;">
+                <div class="dashboard-card stats-card info-stat h-100">
+                    <div class="card-body p-5">
+                        <h5 class="fw-bold mb-4 text-center">
+                            <i class="fas fa-file-invoice me-2 text-info"></i>Invoices
+                        </h5>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="status-item">
+                                    <i class="fas fa-file-invoice text-info"></i>
+                                    <div class="status-number text-info">0</div>
+                                    <p class="stats-label">Total Invoices</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center mt-4">
+                            <a href="{{ url_for('facturation_app') }}" class="btn btn-outline-info btn-sm">Facturation</a>
                         </div>
                     </div>
                 </div>

@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logiciel de Facturation - Mega Pascal Engineering</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1E3A5F;
+            --primary-mid: #2C5282;
+            --accent-glow: #4DA8DA;
+            --accent: #FF6600;
+            --dark-text: #0A1F35;
+            --light-bg: #E8EEF4;
+            --white: #FFFFFF;
+            --sidebar-width: 250px;
+        }
+        
+        /* ====== DASHBOARD STRUCTURE ====== */
+        .dashboard { padding-top: 2rem; }
+        .dashboard-section { 
+            padding: 2.5rem 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .dashboard-section:last-child { border-bottom: none; }
+
+        /* ====== HERO SECTION ====== */
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-mid) 100%);
+            color: white;
+            padding: 3rem 0;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .hero-section img {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            display: inline-block;
+            max-height: 140px;
+            transition: all 0.3s ease;
+        }
+        
+        .hero-section img:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+        }
+        
+        .hero-section h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .hero-section .lead {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            margin: 0;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .main-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 0;
+            overflow: hidden;
+            margin: 20px auto;
+            max-width: 1400px;
+        }
+        .app-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-mid) 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .app-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+        }
+        .theme-toggle {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .theme-toggle:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .nav-tabs {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-bottom: 2px solid #dee2e6;
+            padding: 0 30px;
+        }
+        .nav-tabs .nav-link {
+            background: transparent;
+            border: none;
+            color: #212529 !important;
+            padding: 15px 25px;
+            font-weight: 500;
+            border-radius: 0;
+            transition: all 0.3s ease;
+        }
+        .nav-tabs .nav-link:hover {
+            background: rgba(31,78,121,0.1);
+            color: var(--primary);
+        }
+        .nav-tabs .nav-link.active {
+            background: white;
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+            font-weight: 600;
+        }
+        .tab-content {
+            padding: 30px;
+            background: white;
+            min-height: 600px;
+        }
+        .tab-pane.active .totals-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+            border-left: 4px solid var(--accent);
+        }
+        .form-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(31,78,121,0.25);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-mid) 100%);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(31,78,121,0.3);
+        }
+        .btn-secondary {
+            background: #6c757d;
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        .invoice-table {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .table-header {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+        .table-header th {
+            padding: 15px;
+            border: none;
+            font-weight: 600;
+        }
+        .invoice-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: middle;
+        }
+        .invoice-table tr:hover td {
+            background: #f8f9fa;
+        }
+        .add-line-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        .remove-line-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+        .totals-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+        .total-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .total-item:last-child {
+            border-bottom: none;
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--primary);
+        }
+        .info-tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .info-tooltip .tooltip-text {
+            visibility: hidden;
+            background: #333;
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px 12px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -80px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .info-tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        /* Dark mode styles */
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a2e 0%, #2d3748 100%);
+        }
+        body.dark-mode .main-container {
+            background: #2d3748;
+            color: white;
+        }
+        body.dark-mode .nav-tabs {
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+            border-bottom: 2px solid #718096;
+        }
+        body.dark-mode .nav-tabs .nav-link {
+            color: #e9ecef;
+        }
+        body.dark-mode .nav-tabs .nav-link:hover {
+            background: rgba(31,78,121,0.2);
+            color: var(--primary);
+        }
+        body.dark-mode .nav-tabs .nav-link.active {
+            background: #4a5568;
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+        body.dark-mode .form-section {
+            background: #4a5568;
+        }
+        body.dark-mode .form-control {
+            background: #4a5568;
+            border-color: #718096;
+            color: white;
+        }
+        body.dark-mode .invoice-table {
+            background: #4a5568;
+        }
+        body.dark-mode .invoice-table tr:hover td {
+            background: #2d3748;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid p-4">
+        <div class="main-container">
+            <!-- Hero Section -->
+            <div class="hero-section text-center">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="img-fluid">
+                <h1 class="mb-3"><i class="fas fa-file-invoice me-3"></i>Logiciel de Facturation</h1>
+                <p class="lead mb-0">Créez et gérez vos factures professionnelles</p>
+            </div>
+            
+            <!-- Header -->
+            <div class="app-header">
+                <h1 class="app-title">
+                    <i class="fas fa-hard-hat me-3"></i>
+                    MEGA PASCAL ENGINEERING
+                </h1>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <ul class="nav nav-tabs" id="mainTabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#company-tab" style="color: #212529 !important;">
+                        <i class="fas fa-building me-2"></i>Paramètres de l'entreprise
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#invoice-tab" style="color: #212529 !important;">
+                        <i class="fas fa-file-invoice me-2"></i>Créer une facture
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#clients-tab" style="color: #212529 !important;">
+                        <i class="fas fa-users me-2"></i>Clients
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content">
+                <!-- Company Settings Tab -->
+                <div class="tab-pane fade show active" id="company-tab">
+                    <div class="form-section">
+                        <h4 class="mb-4">
+                            <i class="fas fa-cog me-2 text-primary"></i>
+                            Informations de l'entreprise
+                        </h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">Nom de l'entreprise</label>
+                                <input type="text" class="form-control mb-3" id="companyName" placeholder="Mega Pascal Engineering">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Matricule Fiscale</label>
+                                <input type="text" class="form-control mb-3" id="companyTaxId" placeholder="MF 123456789">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <label class="form-label">Adresse</label>
+                                <textarea class="form-control mb-3" id="companyAddress" rows="3" placeholder="Adresse complète de l'entreprise"></textarea>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control mb-3" id="companyEmail" placeholder="contact@megapascal.tn">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Téléphone</label>
+                                <input type="tel" class="form-control mb-3" id="companyPhone" placeholder="+216 71 123 456">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <label class="form-label">Logo URL</label>
+                                <input type="url" class="form-control mb-3" id="companyLogo" placeholder="https://example.com/logo.png (URL ou chemin local)">
+                                <small class="text-muted">Entrez une URL internet ou un chemin local vers le logo</small>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-9">
+                                <label class="form-label">Logo</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="logoPath" placeholder="Chemin vers le fichier du logo" readonly>
+                                    <button class="btn btn-secondary" type="button" onclick="selectLogo()">
+                                        <i class="fas fa-folder-open"></i> Parcourir
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center mt-4">
+                            <button class="btn btn-primary btn-lg" onclick="saveCompanyInfo()">
+                                <i class="fas fa-save me-2"></i>Enregistrer les informations
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Invoice Creation Tab -->
+                <div class="tab-pane fade" id="invoice-tab">
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <div class="form-section">
+                                <h4 class="mb-3">
+                                    <i class="fas fa-user me-2 text-primary"></i>
+                                    Sélection du client
+                                </h4>
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <select class="form-control" id="clientSelect">
+                                            <option value="">Choisir un client...</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button class="btn btn-secondary w-100" onclick="loadClients()">
+                                            <i class="fas fa-sync me-2"></i>Actualiser
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-md-4">
+                                        <button class="btn btn-primary w-100" onclick="confirmClient()">
+                                            <i class="fas fa-check me-2"></i>Confirmer
+                                        </button>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button class="btn btn-outline-primary w-100" onclick="addNewClient()">
+                                            <i class="fas fa-plus me-2"></i>Nouveau client
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-section">
+                                <h4 class="mb-3">
+                                    <i class="fas fa-hashtag me-2 text-primary"></i>
+                                    Numéro de facture
+                                </h4>
+                                <input type="text" class="form-control mb-3" id="invoiceNumber" placeholder="Laisser vide pour auto-générer">
+                                <small class="text-muted">Le numéro sera généré automatiquement si vide</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Invoice Lines Table -->
+                    <div class="invoice-table">
+                        <table class="table table-hover">
+                            <thead class="table-header">
+                                <tr>
+                                    <th style="width: 35%">Prestation</th>
+                                    <th style="width: 10%">Quantité</th>
+                                    <th style="width: 10%">Unité</th>
+                                    <th style="width: 15%">Prix unitaire</th>
+                                    <th style="width: 10%">TVA %</th>
+                                    <th style="width: 20%">Total</th>
+                                    <th style="width: 5%">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="invoiceLines">
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted py-4">
+                                        <i class="fas fa-plus-circle fa-2x mb-2"></i>
+                                        <p class="mb-0">Ajoutez des lignes de facture ci-dessous</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="text-center mt-3">
+                            <button class="add-line-btn" onclick="addInvoiceLine()">
+                                <i class="fas fa-plus me-2"></i>Ajouter une ligne
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Totals Section -->
+                    <div class="totals-section">
+                        <div class="total-item">
+                            <span>Sous-total HT:</span>
+                            <span id="subtotalHT">0.00 TND</span>
+                        </div>
+                        <div class="total-item">
+                            <span>TVA:</span>
+                            <span id="tvaAmount">0.00 TND</span>
+                        </div>
+                        <div class="total-item">
+                            <span>Total TTC:</span>
+                            <span id="totalTTC">0.00 TND</span>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="text-center mt-4">
+                        <button class="btn btn-primary btn-lg me-3" onclick="saveInvoice()">
+                            <i class="fas fa-save me-2"></i>Enregistrer la facture
+                        </button>
+                        <button class="btn btn-success btn-lg me-3" onclick="generatePDF()">
+                            <i class="fas fa-file-pdf me-2"></i>Générer PDF
+                        </button>
+                        <button class="btn btn-secondary btn-lg" onclick="clearInvoice()">
+                            <i class="fas fa-eraser me-2"></i>Nouveau
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Clients Tab -->
+                <div class="tab-pane fade" id="clients-tab">
+                    <div class="form-section">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4 class="mb-0">
+                                <i class="fas fa-users me-2 text-primary"></i>
+                                Gestion des clients
+                            </h4>
+                            <button class="btn btn-primary" onclick="openClientDialog()">
+                                <i class="fas fa-plus me-2"></i>Ajouter un client
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-header">
+                                    <tr>
+                                        <th>Nom</th>
+                                        <th>Adresse</th>
+                                        <th>Email</th>
+                                        <th>Téléphone</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="clientsList">
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted py-4">
+                                            <i class="fas fa-users fa-2x mb-2"></i>
+                                            <p class="mb-0">Aucun client enregistré</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Client Modal -->
+    <div class="modal fade" id="clientModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user-plus me-2"></i>
+                        Ajouter un client
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nom</label>
+                        <input type="text" class="form-control" id="newClientName">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Adresse</label>
+                        <textarea class="form-control" id="newClientAddress" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Matricule Fiscale</label>
+                        <input type="text" class="form-control" id="newClientTaxId" placeholder="MF 123456789">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="newClientEmail">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Téléphone</label>
+                        <input type="tel" class="form-control" id="newClientPhone">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" onclick="saveNewClient()">
+                        <i class="fas fa-save me-2"></i>Enregistrer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoice Line Modal -->
+    <div class="modal fade" id="lineModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-plus me-2"></i>
+                        Ajouter une ligne de facture
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Prestation</label>
+                        <input type="text" class="form-control" id="linePrestation">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Quantité</label>
+                            <input type="number" class="form-control" id="lineQuantity" min="0" step="0.01">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Unité</label>
+                            <select class="form-control" id="lineUnit">
+                                <option value="Unité">Unité</option>
+                                <option value="Heure">Heure</option>
+                                <option value="Jour">Jour</option>
+                                <option value="Mètre">Mètre</option>
+                                <option value="M²">M²</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Prix unitaire (TND)</label>
+                            <input type="number" class="form-control" id="lineUnitPrice" min="0" step="0.01">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">TVA (%)</label>
+                            <select class="form-control" id="lineTVA">
+                                <option value="0">0%</option>
+                                <option value="7">7%</option>
+                                <option value="13">13%</option>
+                                <option value="19">19%</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" onclick="saveInvoiceLine()">
+                        <i class="fas fa-save me-2"></i>Ajouter
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Application state
+        let invoiceLines = [];
+        let clients = [];
+        let selectedClientId = null;
+        let isDarkMode = false;
+
+        // Theme toggle
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            const icon = document.getElementById('themeIcon');
+            const themeText = document.querySelector('.theme-toggle span');
+            
+            if (isDarkMode) {
+                document.body.style.background = 'linear-gradient(135deg, #1a1a2e 0%, #2d3748 100%)';
+                icon.className = 'fas fa-sun';
+                themeText.textContent = 'Mode clair';
+            } else {
+                document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                icon.className = 'fas fa-moon';
+                themeText.textContent = 'Mode sombre';
+            }
+        }
+
+        // Tab functionality
+        document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+            tab.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                
+                // Remove active class from all tabs and panes
+                document.querySelectorAll('.nav-link').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('show', 'active'));
+                
+                // Add active class to clicked tab and corresponding pane
+                this.classList.add('active');
+                document.querySelector(targetId).classList.add('show', 'active');
+            });
+        });
+
+        // Company info functions
+        function saveCompanyInfo() {
+            const companyData = {
+                name: document.getElementById('companyName').value,
+                address: document.getElementById('companyAddress').value,
+                taxId: document.getElementById('companyTaxId').value,
+                email: document.getElementById('companyEmail').value,
+                phone: document.getElementById('companyPhone').value,
+                logoPath: document.getElementById('logoPath').value,
+                logoUrl: document.getElementById('companyLogo').value
+            };
+            
+            // Save to localStorage
+            localStorage.setItem('companyData', JSON.stringify(companyData));
+            alert('Informations de l\'entreprise enregistrées avec succès!');
+        }
+
+        function selectLogo() {
+            // In a real web app, this would open a file picker
+            alert('Fonctionnalité de sélection de fichier - À implémenter');
+        }
+
+        // Client management
+        function loadClients() {
+            // Load from localStorage or API
+            const savedClients = localStorage.getItem('clients');
+            if (savedClients) {
+                clients = JSON.parse(savedClients);
+                updateClientsList();
+                updateClientSelect();
+            }
+        }
+
+        function updateClientsList() {
+            const tbody = document.getElementById('clientsList');
+            if (clients.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">
+                            <i class="fas fa-users fa-2x mb-2"></i>
+                            <p class="mb-0">Aucun client enregistré</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = clients.map(client => `
+                <tr>
+                    <td>${client.name}</td>
+                    <td>${client.address || '-'}</td>
+                    <td>${client.email || '-'}</td>
+                    <td>${client.phone || '-'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary me-2" onclick="selectClient('${client.id}')">
+                            <i class="fas fa-check"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteClient('${client.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateClientSelect() {
+            const select = document.getElementById('clientSelect');
+            select.innerHTML = '<option value="">Choisir un client...</option>' + 
+                clients.map(client => `<option value="${client.id}">${client.name}</option>`).join('');
+            
+            // Add event listener to automatically update selectedClientId
+            select.addEventListener('change', function() {
+                const clientId = this.value;
+                if (clientId) {
+                    selectedClientId = parseInt(clientId);
+                    const client = clients.find(c => c.id === selectedClientId);
+                    if (client) {
+                        console.log('Client sélectionné:', client.name);
+                    }
+                } else {
+                    selectedClientId = null;
+                }
+            });
+        }
+
+        function openClientDialog() {
+            const modal = new bootstrap.Modal(document.getElementById('clientModal'));
+            modal.show();
+        }
+
+        function saveNewClient() {
+            const newClient = {
+                id: Date.now(),
+                name: document.getElementById('newClientName').value,
+                address: document.getElementById('newClientAddress').value,
+                taxId: document.getElementById('newClientTaxId').value,
+                email: document.getElementById('newClientEmail').value,
+                phone: document.getElementById('newClientPhone').value
+            };
+
+            if (!newClient.name) {
+                alert('Veuillez entrer au moins le nom du client');
+                return;
+            }
+
+            clients.push(newClient);
+            localStorage.setItem('clients', JSON.stringify(clients));
+            
+            updateClientsList();
+            updateClientSelect();
+            
+            // Close modal and reset form
+            bootstrap.Modal.getInstance(document.getElementById('clientModal')).hide();
+            document.getElementById('newClientName').value = '';
+            document.getElementById('newClientAddress').value = '';
+            document.getElementById('newClientTaxId').value = '';
+            document.getElementById('newClientEmail').value = '';
+            document.getElementById('newClientPhone').value = '';
+            
+            alert('Client ajouté avec succès!');
+        }
+
+        function selectClient(clientId) {
+            selectedClientId = clientId;
+            const client = clients.find(c => c.id === clientId);
+            if (client) {
+                document.getElementById('clientSelect').value = clientId;
+                alert(`Client sélectionné: ${client.name}`);
+            }
+        }
+
+        function deleteClient(clientId) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce client?')) {
+                clients = clients.filter(c => c.id !== clientId);
+                localStorage.setItem('clients', JSON.stringify(clients));
+                updateClientsList();
+                updateClientSelect();
+                alert('Client supprimé avec succès!');
+            }
+        }
+
+        function confirmClient() {
+            const clientId = document.getElementById('clientSelect').value;
+            if (!clientId) {
+                alert('Veuillez sélectionner un client');
+                return;
+            }
+            
+            selectedClientId = clientId;
+            const client = clients.find(c => c.id === clientId);
+            if (client) {
+                alert(`Client confirmé: ${client.name}`);
+            }
+        }
+
+        function addNewClient() {
+            openClientDialog();
+        }
+
+        // Invoice management
+        function openLineDialog() {
+            const modal = new bootstrap.Modal(document.getElementById('lineModal'));
+            modal.show();
+        }
+
+        function addInvoiceLine() {
+            openLineDialog();
+        }
+
+        function saveInvoiceLine() {
+            const line = {
+                id: Date.now().toString(),
+                prestation: document.getElementById('linePrestation').value,
+                quantity: parseFloat(document.getElementById('lineQuantity').value) || 0,
+                unit: document.getElementById('lineUnit').value,
+                unitPrice: parseFloat(document.getElementById('lineUnitPrice').value) || 0,
+                tva: parseFloat(document.getElementById('lineTVA').value) || 0
+            };
+
+            if (!line.prestation || line.quantity <= 0) {
+                alert('Veuillez remplir la prestation et la quantité');
+                return;
+            }
+
+            line.total = line.quantity * line.unitPrice;
+            line.totalWithTVA = line.total * (1 + line.tva / 100);
+
+            invoiceLines.push(line);
+            updateInvoiceTable();
+            calculateTotals();
+
+            // Close modal and reset form
+            bootstrap.Modal.getInstance(document.getElementById('lineModal')).hide();
+            document.getElementById('linePrestation').value = '';
+            document.getElementById('lineQuantity').value = '';
+            document.getElementById('lineUnit').value = 'Unité';
+            document.getElementById('lineUnitPrice').value = '';
+            document.getElementById('lineTVA').value = '0';
+        }
+
+        function updateInvoiceTable() {
+            const tbody = document.getElementById('invoiceLines');
+            
+            if (invoiceLines.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            <i class="fas fa-plus-circle fa-2x mb-2"></i>
+                            <p class="mb-0">Ajoutez des lignes de facture ci-dessous</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = invoiceLines.map(line => `
+                <tr>
+                    <td>${line.prestation}</td>
+                    <td>${line.quantity}</td>
+                    <td>${line.unit}</td>
+                    <td>${line.unitPrice.toFixed(2)} TND</td>
+                    <td>${line.tva}%</td>
+                    <td>${line.totalWithTVA.toFixed(2)} TND</td>
+                    <td>
+                        <button class="remove-line-btn" onclick="removeInvoiceLine('${line.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function removeInvoiceLine(lineId) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette ligne?')) {
+                invoiceLines = invoiceLines.filter(l => l.id !== lineId);
+                updateInvoiceTable();
+                calculateTotals();
+            }
+        }
+
+        function calculateTotals() {
+            const subtotal = invoiceLines.reduce((sum, line) => sum + (line.quantity * line.unitPrice), 0);
+            const tvaAmount = invoiceLines.reduce((sum, line) => {
+                const lineTotal = line.quantity * line.unitPrice;
+                return sum + (lineTotal * line.tva / 100);
+            }, 0);
+            const total = subtotal + tvaAmount;
+
+            document.getElementById('subtotalHT').textContent = `${subtotal.toFixed(2)} TND`;
+            document.getElementById('tvaAmount').textContent = `${tvaAmount.toFixed(2)} TND`;
+            document.getElementById('totalTTC').textContent = `${total.toFixed(2)} TND`;
+        }
+
+        function saveInvoice() {
+            if (!selectedClientId) {
+                alert('Veuillez sélectionner un client');
+                return;
+            }
+
+            if (invoiceLines.length === 0) {
+                alert('Veuillez ajouter au moins une ligne de facture');
+                return;
+            }
+
+            const invoiceData = {
+                clientId: selectedClientId,
+                invoiceNumber: document.getElementById('invoiceNumber').value || `F${Date.now()}`,
+                lines: invoiceLines,
+                date: new Date().toISOString(),
+                subtotal: document.getElementById('subtotalHT').textContent,
+                tva: document.getElementById('tvaAmount').textContent,
+                total: document.getElementById('totalTTC').textContent
+            };
+
+            // Save to localStorage (in real app, would send to server)
+            const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+            invoices.push(invoiceData);
+            localStorage.setItem('invoices', JSON.stringify(invoices));
+
+            alert('Facture enregistrée avec succès!');
+        }
+
+        function generatePDF() {
+            if (invoiceLines.length === 0) {
+                alert('Veuillez ajouter des lignes de facture');
+                return;
+            }
+
+            // Get company data from localStorage
+            const companyData = JSON.parse(localStorage.getItem('companyData') || '{}');
+            const selectedClient = clients.find(c => c.id === selectedClientId);
+            
+            if (!selectedClient) {
+                alert('Veuillez sélectionner un client');
+                return;
+            }
+
+            // Calculate totals
+            const subtotal = invoiceLines.reduce((sum, line) => sum + (line.quantity * line.unitPrice), 0);
+            const tvaAmount = invoiceLines.reduce((sum, line) => {
+                const lineTotal = line.quantity * line.unitPrice;
+                return sum + (lineTotal * line.tva / 100);
+            }, 0);
+            const total = subtotal + tvaAmount;
+
+            // Create invoice content for PDF
+            const invoiceContent = {
+                invoice_number: document.getElementById('invoiceNumber').value || `F${Date.now()}`,
+                company: [
+                    companyData.name || 'MEGA PASCAL ENGINEERING',
+                    companyData.address || '',
+                    companyData.taxId || '',
+                    companyData.email || '',
+                    companyData.phone || '',
+                    companyData.logoUrl || companyData.logoPath || ''
+                ],
+                client: [
+                    selectedClient.name,
+                    selectedClient.address || '',
+                    selectedClient.taxId || '',
+                    selectedClient.email || '',
+                    selectedClient.phone || ''
+                ],
+                lines: invoiceLines.map(line => ({
+                    prestation: line.prestation || line.task || '',
+                    quantity: line.quantity,
+                    unitPrice: line.unitPrice,
+                    tva: line.tva,
+                    total: line.total
+                })),
+                totals: {
+                    subtotal: subtotal,
+                    tva: tvaAmount,
+                    total: total
+                },
+                date: new Date().toLocaleDateString('fr-FR')
+            };
+
+            console.log('Sending invoice data:', invoiceContent);
+
+            // Send to server for PDF generation
+            fetch('/generate-invoice-pdf', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(invoiceContent)
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.blob();
+                } else {
+                    return response.json().then(errorData => {
+                        throw new Error(errorData.error || 'PDF generation failed');
+                    });
+                }
+            })
+            .then(blob => {
+                // Create download link
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Facture_${invoiceContent.invoice_number}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                alert('PDF généré avec succès!');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Erreur lors de la génération du PDF: ' + error.message);
+            });
+        }
+
+        function clearInvoice() {
+            if (confirm('Voulez-vous effacer toutes les données de la facture?')) {
+                invoiceLines = [];
+                selectedClientId = null;
+                document.getElementById('clientSelect').value = '';
+                document.getElementById('invoiceNumber').value = '';
+                updateInvoiceTable();
+                calculateTotals();
+            }
+        }
+
+        // Load saved data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load company data
+            const savedCompany = localStorage.getItem('companyData');
+            if (savedCompany) {
+                const companyData = JSON.parse(savedCompany);
+                document.getElementById('companyName').value = companyData.name || '';
+                document.getElementById('companyAddress').value = companyData.address || '';
+                document.getElementById('companyTaxId').value = companyData.taxId || '';
+                document.getElementById('companyEmail').value = companyData.email || '';
+                document.getElementById('companyPhone').value = companyData.phone || '';
+                document.getElementById('logoPath').value = companyData.logoPath || '';
+            }
+
+            // Load clients
+            loadClients();
+        });
+    </script>
+</body>
+</html>
