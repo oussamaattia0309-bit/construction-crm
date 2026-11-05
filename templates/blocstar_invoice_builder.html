@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="section-title mb-2">Invoice Builder - {{ label }}</h1>
+            <p class="text-muted">Select tasks to invoice, set quantities, prices and taxes.</p>
+        </div>
+    </div>
+
+    {% if tasks %}
+    <form method="POST" action="{{ url_for('blocstar_invoice_generate', year=year, month=month) }}">
+        <div class="card dashboard-card mb-4">
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Client name</label>
+                        <input type="text" name="client_name" class="form-control" value="Blocstar">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Invoice number (optional)</label>
+                        <input type="number" name="invoice_number" class="form-control" placeholder="auto">
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Select</th>
+                                <th>Task</th>
+                                <th>Qty</th>
+                                <th>Unit price</th>
+                                <th>TVA %</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for t in tasks %}
+                            <tr>
+                                <td>
+                                    <input type="checkbox" name="include_{{ loop.index0 }}" checked>
+                                </td>
+                                <td>{{ t.name }}</td>
+                                <td>
+                                    <input type="number" name="qty_{{ loop.index0 }}" value="1" step="0.01" class="form-control" style="width:90px;">
+                                </td>
+                                <td>
+                                    <input type="number" name="price_{{ loop.index0 }}" value="0" step="0.01" class="form-control" style="width:110px;">
+                                </td>
+                                <td>
+                                    <input type="number" name="tax_{{ loop.index0 }}" value="0" step="0.01" class="form-control" style="width:90px;">
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="text-end mt-3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-file-pdf me-2"></i>Generate Invoice PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+    {% else %}
+    <div class="alert alert-info">No executed tasks found for this month.</div>
+    {% endif %}
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <a href="{{ url_for('blocstar_projects') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Blocstar Projects
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

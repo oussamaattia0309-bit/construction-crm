@@ -410,11 +410,13 @@ def index():
         active_projects = Project.query.filter_by(status='in_progress').count()
         completed_projects = Project.query.filter_by(status='completed').count()
         planned_projects = Project.query.filter_by(status='planned').count()
+        blocstar_projects = Project.query.filter(Project.client_name.ilike('%blocstar%')).count()
         
         return render_template('index.html', 
                              active_projects=active_projects,
                              completed_projects=completed_projects,
-                             planned_projects=planned_projects)
+                             planned_projects=planned_projects,
+                             blocstar_projects=blocstar_projects)
     return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -777,6 +779,90 @@ def delete_provider(id):
 def projects():
     projects_list = Project.query.all()
     return render_template('projects.html', projects=projects_list)
+
+MONTH_LABELS = {10: 'October', 11: 'November', 12: 'December'}
+
+def _blocstar_executed_tasks(year, month):
+    tasks = []
+    for p in Project.query.filter(Project.client_name.ilike('%blocstar%')).all():
+        for t in p.tasks:
+            if (t.status or '').lower() != 'completed':
+                continue
+            d = t.end_date or (t.created_at.date() if t.created_at else None)
+            if d and d.year == year and d.month == month:
+                tasks.append(t)
+    return tasks
+
+@app.route('/blocstar-invoice-builder/<int:year>/<int:month>')
+@login_required
+def blocstar_invoice_builder(year, month):
+    tasks = _blocstar_executed_tasks(year, month)
+    label = f"{MONTH_LABELS.get(month, month)} {year}"
+    return render_template('blocstar_invoice_builder.html', tasks=tasks, year=year, month=month, label=label)
+
+@app.route('/blocstar-invoice-generate/<int:year>/<int:month>', methods=['POST'])
+@login_required
+def blocstar_invoice_generate(year, month):
+    tasks = _blocstar_executed_tasks(year, month)
+    lines = []
+    for idx, t in enumerate(tasks):
+        if request.form.get(f'include_{idx}') == 'on':
+            try:
+                qty = float(request.form.get(f'qty_{idx}', 1) or 1)
+            except ValueError:
+                qty = 1.0
+            try:
+                price = float(request.form.get(f'price_{idx}', 0) or 0)
+            except ValueError:
+                price = 0.0
+            try:
+                tax = float(request.form.get(f'tax_{idx}', 0) or 0)
+            except ValueError:
+                tax = 0.0
+            line_total = qty * price
+            lines.append({'task': t.name, 'quantity': qty, 'unit_price': price, 'tax_rate': tax, 'total': line_total})
+    client_name = request.form.get('client_name', 'Blocstar').strip() or 'Blocstar'
+    try:
+        invoice_number = int(request.form.get('invoice_number', '') or 0)
+    except ValueError:
+        invoice_number = 0
+    if invoice_number == 0:
+        invoice_number = int(datetime.now().timestamp())
+    company = ['Mega Pascal Engineering', '', '', '', '', '']
+    client = [1, client_name, '', '', '', '']
+    subtotal = sum(l['total'] for l in lines)
+    tax_breakdown = {}
+    for l in lines:
+        tax_amount = l['total'] * (l['tax_rate'] / 100)
+        tax_breakdown[l['tax_rate']] = tax_breakdown.get(l['tax_rate'], 0) + tax_amount
+    grand_total = subtotal + sum(tax_breakdown.values())
+    totals = {'subtotal': subtotal, 'grand_total': grand_total}
+    import sys, os
+    sys.path.append(os.path.join(os.path.dirname(__file__), 'Logiciel Facturation'))
+    from pdf_generator import generate_invoice
+    pdf_filepath = generate_invoice(
+        invoice_number=invoice_number,
+        company=company,
+        client=client,
+        lines=lines,
+        totals=totals,
+        tax_breakdown=tax_breakdown,
+        timbre_amount=0.0
+    )
+    return send_file(pdf_filepath, mimetype='application/pdf', as_attachment=True,
+                     download_name=f'Blocstar_Invoice_{year}_{month:02d}.pdf')
+
+
+@app.route('/blocstar-projects')
+@login_required
+def blocstar_projects():
+    projects_list = Project.query.filter(Project.client_name.ilike('%blocstar%')).all()
+    months = []
+    for m in (10, 11, 12):
+        cnt = len(_blocstar_executed_tasks(2026, m))
+        months.append({'label': f'{MONTH_LABELS[m]} 2026', 'month': m, 'year': 2026, 'task_count': cnt})
+    return render_template('projects.html', projects=projects_list, page_title='Blocstar Projects',
+                          invoice_mode=True, months=months)
 
 @app.route('/projects/add', methods=['POST'])
 @login_required

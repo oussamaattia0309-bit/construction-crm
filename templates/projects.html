@@ -4,7 +4,7 @@
 <div class="container">
     <div class="row mb-4">
         <div class="col-12">
-            <h1 class="section-title mb-2">Projects</h1>
+            <h1 class="section-title mb-2">{{ page_title or 'Projects' }}</h1>
             <p class="text-muted">Manage your construction projects</p>
         </div>
     </div>
@@ -118,6 +118,33 @@
             {% endif %}
         </div>
     </div>
+
+    <!-- Invoice Generator (Blocstar) -->
+    {% if invoice_mode %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <h2 class="section-title mb-3"><i class="fas fa-file-invoice me-2"></i>Invoice Generator (by month)</h2>
+            <p class="text-muted">Generate an invoice based on tasks executed for Blocstar projects.</p>
+        </div>
+    </div>
+    <div class="row g-4 mb-4">
+        {% for m in months %}
+        <div class="col-md-4">
+            <div class="card dashboard-card h-100">
+                <div class="card-body text-center p-4">
+                    <h5 class="fw-bold mb-2">{{ m.label }}</h5>
+                    <p class="text-muted mb-3">{{ m.task_count }} task(s) executed</p>
+                    <form method="GET" action="{{ url_for('blocstar_invoice_builder', year=m.year, month=m.month) }}">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-file-pdf me-2"></i>Generate Invoice
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
     <!-- Back to Index Button -->
     <div class="row mt-4">
